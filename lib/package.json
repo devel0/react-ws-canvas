@@ -1,6 +1,7 @@
 {
   "name": "react-ws-canvas",
   "version": "0.1.2-0",
+  "description": "Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "author": {
@@ -8,6 +9,7 @@
     "email": "lorenzo.delana@gmail.com",
     "url": "https://github.com/devel0?tab=repositories"
   },
+  "repository": "https://github.com/devel0/react-ws-canvas",
   "license": "MIT",
   "dependencies": {
     "@types/jest": "24.0.21",
