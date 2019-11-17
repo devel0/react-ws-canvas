@@ -1,0 +1,1 @@
+export enum WSCanvasSelectMode { Cell, Row }
