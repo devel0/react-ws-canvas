@@ -1,8 +1,14 @@
 {
   "name": "react-ws-canvas",
-  "version": "0.1.0",  
+  "version": "0.1.1-0",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
+  "author": {
+    "name": "Lorenzo Delana",
+    "email": "lorenzo.delana@gmail.com",
+    "url": "https://github.com/devel0?tab=repositories"
+  },
+  "license": "MIT",
   "dependencies": {
     "@types/jest": "24.0.21",
     "@types/lodash": "^4.14.146",
@@ -23,10 +29,10 @@
   },
   "eslintConfig": {
     "extends": "react-app"
-  },  
-  "peerDependencies": {        
+  },
+  "peerDependencies": {
     "react": "^16.11.0",
-    "react-dom": "^16.11.0"    
+    "react-dom": "^16.11.0"
   },
   "devDependencies": {
     "@svgr/rollup": "^4.3.3",
