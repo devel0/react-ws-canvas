@@ -4,7 +4,15 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
+[LIVE DEMO](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) of master branch development testing example
+
 ## features
+
+- canvas based high performance datagrid ( able to scroll with ease millions of rows maintaining immediate cell focus and editing features )
+- direct cell editing, just click on a cell then type, hit ENTER or arrows keys to move next ( [native cell types][1] )
+
+
+[1]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasColumn.tsx#L1
 
 ## quickstart
 
