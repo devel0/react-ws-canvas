@@ -8,3 +8,4 @@ yarn version --prepatch
 cp -f "$exdir"/../README.md "$exdir"
 yarn publish
 
+rm -f "$exdir"/README.md
