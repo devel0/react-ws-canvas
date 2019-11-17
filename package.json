@@ -1,4 +1,8 @@
 {
   "private": true,
-  "workspaces": ["example", "lib"]
+  "workspaces": [
+    "example",
+    "lib"
+  ],
+  "version": "0.0.1-0"
 }
