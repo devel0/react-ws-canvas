@@ -8,8 +8,16 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## features
 
-- canvas based high performance datagrid ( able to scroll with ease millions of rows maintaining immediate cell focus and editing features )
-- direct cell editing, just click on a cell then type, hit ENTER or arrows keys to move next ( [native cell types][1] )
+- **canvas based** high performance datagrid ( able to scroll with ease millions of rows maintaining immediate cell focus and editing features )
+
+
+
+- **direct cell editing**, just click on a cell then type, hit ENTER or arrows keys to move next ( [native cell types][1] )
+  - "text": type text to change cell ; CANC to clear cell ; CTRL+C / CTRL+V to copy/paste
+  - "boolean": toggle boolean with keyboard space when cell focused
+  - "date", "time", "datetime": smart date insertion ( typing 121030 results in 12/10/2030 ) browser locale supported
+  - "number": sci numbers ( typing 12e-3 results in 0.012 displayed ) browser locale support for decimal separators
+- cell selection mode and row selection mode
 
 
 [1]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasColumn.tsx#L1
