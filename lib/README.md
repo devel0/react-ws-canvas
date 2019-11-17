@@ -1,5 +1,7 @@
 # react ws canvas
 
+[![NPM](https://img.shields.io/npm/v/react-ws-canvas.svg)](https://www.npmjs.com/package/react-ws-canvas) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
 ## features
