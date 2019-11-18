@@ -19,6 +19,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - **canvas based** high performance datagrid ( able to scroll with ease millions of rows maintaining immediate cell focus and editing features )
 
+50000 rows x 200 cols example
+
 ![](doc/50000rows_200cols.gif)
 
 - **direct cell editing**, just click on a cell then type, hit ENTER or arrows keys to move next ( [native cell types][1] )
