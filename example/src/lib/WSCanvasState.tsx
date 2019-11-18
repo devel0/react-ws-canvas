@@ -7,7 +7,7 @@ import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
 import * as _ from 'lodash';
 import { WSCanvasFilter } from "./WSCanvasFilter";
 
-export class WSCanvasState {
+export class WSCanvasState {    
     constructor() {
         this.scrollOffset = new WSCanvasCellCoord();
         this.scrollOffsetStart = new WSCanvasCellCoord();
@@ -20,7 +20,7 @@ export class WSCanvasState {
         this.focusedFilterColIdx = -1;
         this.filters = [];
         this.filtersTrack = "";
-        this.editMode = WSCanvasEditMode.none;        
+        this.editMode = WSCanvasEditMode.none;
         this.filteredRowsCount = 0;
 
         this.customEditCell = null;
@@ -28,10 +28,11 @@ export class WSCanvasState {
         this.columnWidthOverride = new Map<number, number>();
         this.resizingCol = -2;
         this.resizingColStartNfo = [-2, 0];
+        this.colWidthExpanded = 0;
 
         this.selection = new WSCanvasSelection([]);
-        this.columnsSort = [];       
-        this.cursorOverCell = false; 
+        this.columnsSort = [];
+        this.cursorOverCell = false;
 
         this.verticalScrollBarRect = null;
         this.verticalScrollHandleRect = null;
@@ -58,7 +59,7 @@ export class WSCanvasState {
     filters: WSCanvasFilter[];
     filtersTrack: string;
 
-    editMode: WSCanvasEditMode;    
+    editMode: WSCanvasEditMode;
     filteredRowsCount: number;
 
     customEditCell: WSCanvasCellCoord | null;
@@ -67,9 +68,10 @@ export class WSCanvasState {
     resizingCol: number;
     /** x,width */
     resizingColStartNfo: number[];
+    colWidthExpanded: number;
 
     selection: WSCanvasSelection;
-    columnsSort: WSCanvasColumnSortInfo[];    
+    columnsSort: WSCanvasColumnSortInfo[];
     cursorOverCell: boolean;
 
     verticalScrollBarRect: WSCanvasRect | null;

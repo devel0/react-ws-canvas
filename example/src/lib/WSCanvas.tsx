@@ -115,8 +115,8 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const minH = (showColNumber ? colNumberRowHeightFull() : 0) + rowsCount * (rowHeight + 1) + scrollBarThk + 10;
 
-    let W = width;
-    let H = Math.min(height, minH) - debugSize.height;
+    let margin_padding_W = 0;
+    let margin_padding_H = 0;
 
     if (canvasDivRef.current) {
         const csty = getComputedStyle(canvasDivRef.current);
@@ -131,9 +131,12 @@ export function WSCanvas(props: WSCanvasProps) {
         const paddingTop = csty.paddingTop ? parseFloat(csty.paddingTop) : 0;
         const paddingBottom = csty.paddingBottom ? parseFloat(csty.paddingBottom) : 0;
 
-        W -= (marginLeft + marginRight + paddingLeft + paddingRight);
-        H -= (marginTop + marginBottom + paddingTop + paddingBottom);
+        margin_padding_W -= (marginLeft + marginRight + paddingLeft + paddingRight);
+        margin_padding_H -= (marginTop + marginBottom + paddingTop + paddingBottom);
     }
+
+    let W = width - margin_padding_W;
+    let H = Math.min(height - debugSize.height - margin_padding_H, minH);
 
     const overridenColWidth = (state: WSCanvasState, cidx: number) => {
         const q = state.columnWidthOverride.get(cidx);
@@ -816,6 +819,31 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const paint = (state: WSCanvasState) => {
         ++state.paintcnt;
+
+        const colwavail = W - (verticalScrollbarActive ? scrollBarThk : 0) - rowNumberColWidth - 2;
+        let colwsumbefore = 0;
+        for (let ci = 0; ci < viewColsCount; ++ci) colwsumbefore += colWidth(ci);
+
+        if (state.paintcnt > 1 && colwsumbefore > state.colWidthExpanded) {
+            let wtofillTotal = colwavail - colwsumbefore;
+
+            if (wtofillTotal > 0) {
+                // compute column width weight factor
+                const wfact = new Map<number, number>();
+                for (let ci = 0; ci < viewColsCount; ++ci) {
+                    wfact.set(ci, colWidth(ci) / colwsumbefore);
+                }
+                // distribute space
+                let wtofillUsed = 0;
+                for (let ci = 0; ci < viewColsCount; ++ci) {
+                    let wtoadd = wtofillTotal * wfact.get(ci)!;
+                    if (wtofillUsed + wtoadd > wtofillTotal) wtoadd = wtofillTotal - wtofillUsed;
+                    state.columnWidthOverride.set(ci, colWidth(ci) + wtoadd);
+                    wtofillUsed += wtoadd;
+                }
+                state.colWidthExpanded = colwsumbefore;
+            }
+        }
 
         if (canvasRef.current) {
             const canvas = canvasRef.current;

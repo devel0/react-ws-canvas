@@ -16,6 +16,7 @@ export const WSCanvasPropsDefault = () => {
         rowsCount: 1000,
         colsCount: 50,
         colWidth: () => DEFAULT_COL_WIDTH,
+        colWidthExpand: true,
         rowHeight: DEFAULT_ROW_HEIGHT,
         frozenRowsCount: 0,
         frozenColsCount: 0,

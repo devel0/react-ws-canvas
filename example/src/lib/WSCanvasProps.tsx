@@ -19,6 +19,8 @@ export interface WSCanvasProps {
     colsCount: number;
     /** width of column in the grid */
     colWidth: (cidx: number) => number;
+    /** expand column width to fit control width ( if column width sum not already exceed control width ) */
+    colWidthExpand: boolean;
     /** height of rows in the grid */
     rowHeight: number;
     /** nr of frozen rows */
