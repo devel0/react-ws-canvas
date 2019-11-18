@@ -29,7 +29,8 @@ export const WSCanvasPropsDefault = () => {
         highlightColNumber: true,
         columnClickBehavior: WSCanvasColumnClickBehavior.ToggleSort,
         showFilter: false,
-
+        showPartialColumns: true,
+        
         getCellData: (cell) => null,
         setCellData: (cell, value) => { },
         getCellCustomEdit: undefined,

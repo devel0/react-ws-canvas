@@ -45,6 +45,7 @@ export function WSCanvas(props: WSCanvasProps) {
         highlightColNumber,
         columnClickBehavior,
         showFilter,
+        showPartialColumns,
 
         getCellData,
         setCellData,
@@ -822,8 +823,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     rowsYMax = viewRowsCount * (rowHeight + 1) + (showColNumber ? (colNumberRowHeightFull() + 1) : 0) + 1;
 
                     ctx.fillStyle = gridLinesColor;
-                    ctx.fillRect(0, 0, colsXMax, rowsYMax);
-
+                    ctx.fillRect(0, 0, (showPartialColumns && stateNfo.scrollOffset.col !== colsCount - viewColsCount) ? W : colsXMax, rowsYMax);
                 }
                 //#endregion
 
@@ -849,7 +849,9 @@ export function WSCanvas(props: WSCanvasProps) {
                             }
 
                             drawCols(0, frozenColsCount - 1);
-                            drawCols(state.scrollOffset.col + frozenColsCount, state.scrollOffset.col + viewColsCount - 1);
+                            drawCols(
+                                state.scrollOffset.col + frozenColsCount,
+                                state.scrollOffset.col + viewColsCount - ((showPartialColumns && stateNfo.scrollOffset.col !== colsCount - viewColsCount) ? 0 : 1));
 
                             y += rowHeight + 1;
                         }
@@ -935,7 +937,9 @@ export function WSCanvas(props: WSCanvasProps) {
                         ctx.fillRect(1, 1, x - 2, colNumberRowHeightFull());
                     }
                     if (frozenColsCount > 0) drawColNumber(0, frozenColsCount - 1);
-                    drawColNumber(frozenColsCount + state.scrollOffset.col, state.scrollOffset.col + viewColsCount - 1);
+                    drawColNumber(
+                        frozenColsCount + state.scrollOffset.col,
+                        state.scrollOffset.col + viewColsCount - ((showPartialColumns && stateNfo.scrollOffset.col !== colsCount - viewColsCount) ? 0 : 1));
                 }
                 //#endregion
 
@@ -1144,7 +1148,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 //#endregion
 
                 //#region CLEAR EXCEEDING TEXT ( after ending col cells )
-                {
+                if (!showPartialColumns || stateNfo.scrollOffset.col === colsCount - viewColsCount) {
                     ctx.fillStyle = sheetBackgroundColor;
                     ctx.fillRect(colsXMax, 0, W - colsXMax, H);
                 }

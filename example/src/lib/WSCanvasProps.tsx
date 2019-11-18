@@ -45,6 +45,8 @@ export interface WSCanvasProps {
     columnClickBehavior: WSCanvasColumnClickBehavior;
     /** show column filters row */
     showFilter: boolean;
+    /** show or truncate partial columns */
+    showPartialColumns: boolean;
 
     /** retrieve data from a cell */
     getCellData: (coord: WSCanvasCellCoord) => any;
