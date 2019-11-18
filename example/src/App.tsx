@@ -56,7 +56,7 @@ const App: React.FC = () => {
       }}>columnClickSelect</button>
     </div>
     <div>
-      {Sample2(winSize.width, winSize.height - userSize.height, api, columnClickBehavior)}
+      {Sample1(winSize.width, winSize.height - userSize.height, api, columnClickBehavior)}
     </div>
   </div>
 }
