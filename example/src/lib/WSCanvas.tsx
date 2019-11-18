@@ -54,6 +54,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const [children, setChildren] = useState<JSX.Element[]>([]);
     const [filterChildren, setFilterChildren] = useState<JSX.Element[]>([]);
     const [rowToSortedRowIndexMap, setRowToSortedRowIndexMap] = useState<number[] | null>(null);
+    const [rowToMatchingFilterRow, setRowToMatchingFilterRow] = useState<number[] | null>(null);
 
     const W = width;
     const H = height - debugSize.height;
@@ -67,7 +68,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const computeFilteredRowsCount = (state: WSCanvasState) => {
-        const q = (state.rowToMatchingFilterRow === null) ? rowsCount : state.rowToMatchingFilterRow.length;
+        const q = (rowToMatchingFilterRow === null) ? rowsCount : rowToMatchingFilterRow.length;
         return q;
     };
 
@@ -80,7 +81,7 @@ export function WSCanvas(props: WSCanvasProps) {
     let sortingRowToSortedRowIndexMap: number[] | null = null;
 
     const sortedGetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord) => {
-        const filterMap = state.rowToMatchingFilterRow;
+        const filterMap = rowToMatchingFilterRow;
         const sortingMap = sortingRowToSortedRowIndexMap;
         const sortedMap = rowToSortedRowIndexMap;
 
@@ -102,7 +103,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const sortedSetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord, value: any) => {
-        const filterMap = state.rowToMatchingFilterRow;
+        const filterMap = rowToMatchingFilterRow;
         const sortingMap = sortingRowToSortedRowIndexMap;
         const sortedMap = rowToSortedRowIndexMap;
 
@@ -455,7 +456,7 @@ export function WSCanvas(props: WSCanvasProps) {
             if (ri >= state.filteredRowsCount) break;
 
             if (ri === cell.row) {
-                let resy = y + (showColNumber ? colNumberRowHeightFull() : 0);                
+                let resy = y + (showColNumber ? colNumberRowHeightFull() : 0);
 
                 return new WSCanvasCoord(colXW[0], resy, colXW[1]);
             }
@@ -520,7 +521,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const cellType = getCellType(state.focusedCell, cellData);
 
             switch (cellType) {
-                case "date":                    
+                case "date":
                     sortedSetCellData(state, state.focusedCell, moment(cellData, dateCellMomentFormat));
                     break;
                 case "time":
@@ -582,7 +583,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     qfilter.push(ri);
                 }
             }
-            state.rowToMatchingFilterRow = qfilter;
+            setRowToMatchingFilterRow(qfilter);
             state.filteredRowsCount = qfilter.length;
         }
     }
@@ -734,7 +735,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 let rowsYMax = 0;
 
                 //#region GRID LINE BACKGROUND ( to make grid lines as diff result )
-                {                    
+                {
                     const lastViewdCol = colGetXWidth(state, state.scrollOffset.col + viewColsCount - 1);
                     colsXMax = lastViewdCol[0] + lastViewdCol[1] + 1;// colGetXWidth(state.scrollOffset.col + viewColsCount)[0];
                     rowsYMax = viewRowsCount * (rowHeight + 1) + (showColNumber ? (colNumberRowHeightFull() + 1) : 0) + 1;
@@ -1321,7 +1322,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     sortedSetCellData(state, cell, String(prevData) + e.key);
                             }
                             break;
-                    }                    
+                    }
 
                     paint(state);
                     applyState = true;
@@ -1621,7 +1622,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    const handleTouchStart = (e: TouchEvent) => {        
+    const handleTouchStart = (e: TouchEvent) => {
         if (e.touches.length > 1) return;
 
         const state = stateNfo.dup();
@@ -1645,7 +1646,7 @@ export function WSCanvas(props: WSCanvasProps) {
         setStateNfo(state);
     }
 
-    const handleTouchMove = (e: TouchEvent) => {        
+    const handleTouchMove = (e: TouchEvent) => {
         if (e.touches.length > 1) return;
 
         const state = stateNfo.dup();
@@ -1759,8 +1760,11 @@ export function WSCanvas(props: WSCanvasProps) {
         s += " k:" + k + " w:" + x;
     });
 
+    const stateNfoSize = debug ? JSON.stringify(stateNfo).length : 0;
+
     const DEBUG_CTL = debug ? <div ref={debugRef}>
-        <b>paintcnt</b> => {stateNfo.paintcnt}<br/>
+        <b>paint cnt</b> => {stateNfo.paintcnt}<br />
+        <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
 
         <b>graphics (w x h)</b> => frame({width} x {height}) -
         debug({debugSize.width} x {debugSize.height}) -

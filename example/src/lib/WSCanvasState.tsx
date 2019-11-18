@@ -20,8 +20,7 @@ export class WSCanvasState {
         this.focusedFilterColIdx = -1;
         this.filters = [];
         this.filtersTrack = "";
-        this.editMode = WSCanvasEditMode.none;
-        this.rowToMatchingFilterRow = null
+        this.editMode = WSCanvasEditMode.none;        
         this.filteredRowsCount = 0;
 
         this.customEditCell = null;
@@ -58,8 +57,7 @@ export class WSCanvasState {
     filters: WSCanvasFilter[];
     filtersTrack: string;
 
-    editMode: WSCanvasEditMode;
-    rowToMatchingFilterRow: number[] | null;
+    editMode: WSCanvasEditMode;    
     filteredRowsCount: number;
 
     customEditCell: WSCanvasCellCoord | null;
