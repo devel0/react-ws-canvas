@@ -47,6 +47,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - [column click behavior][12] can be full column select or column toggle sort
 
+- [column header][15] can be customized
+
+- column width can be changed intractively using mouse
+
+![](doc/column-width-resize.png)
+
 - data getter/setter can follow a [worksheet][7] or a [db record type][8]
 
 - [api][10] available for control interactions ( [example][11] )
@@ -71,6 +77,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [12]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L35-L36
 [13]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L44-L45
 [14]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L50-L51
+[15]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/Sample2.tsx#L87
 
 ## quickstart
 
