@@ -440,24 +440,31 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** [-2,0] not on screen ; -1:(row col number); [ci,cwidth] is the result */
-    const xGetCol = (state: WSCanvasState, x: number) => {
+    const xGetCol = (state: WSCanvasState, x: number, allowPartialCol: boolean = false) => {
         if (showRowNumber && x >= 1 && x <= 1 + rowNumberColWidth) return [-1, rowNumberColWidth];
+
         let _x = 1 + (showRowNumber ? rowNumberColWidth : 0);
+
         for (let ci = 0; ci < frozenColsCount; ++ci) {
             const cWidth = overridenColWidth(state, ci) + 1;
             if (x >= _x && x < _x + cWidth) return [ci, cWidth];
             _x += cWidth;
         }
-        for (let ci = frozenColsCount + stateNfo.scrollOffset.col; ci < frozenColsCount + stateNfo.scrollOffset.col + viewColsCount; ++ci) {
+
+        let lastColView = frozenColsCount + stateNfo.scrollOffset.col + viewColsCount;
+        if (allowPartialCol && lastColView < colsCount) lastColView++;
+
+        for (let ci = frozenColsCount + stateNfo.scrollOffset.col; ci < lastColView; ++ci) {
             const cWidth = overridenColWidth(state, ci) + 1;
             if (x >= _x && x < _x + cWidth) return [ci, cWidth];
             _x += cWidth;
         }
+
         return [-2, 0];
     }
 
     /** [-2,0] not on screen */
-    const colGetXWidth = (state: WSCanvasState, qci: number) => {
+    const colGetXWidth = (state: WSCanvasState, qci: number, allowPartialCol: boolean = false) => {
         if (qci === -1) return [1, rowNumberColWidth];
 
         let _x = 1 + (showRowNumber ? rowNumberColWidth : 0);
@@ -466,7 +473,11 @@ export function WSCanvas(props: WSCanvasProps) {
             if (ci === qci) return [_x, cWidth];
             _x += cWidth;
         }
-        for (let ci = frozenColsCount + stateNfo.scrollOffset.col; ci < frozenColsCount + stateNfo.scrollOffset.col + viewColsCount; ++ci) {
+
+        let lastColView = frozenColsCount + stateNfo.scrollOffset.col + viewColsCount;
+        if (allowPartialCol && lastColView < colsCount) lastColView++;
+
+        for (let ci = frozenColsCount + stateNfo.scrollOffset.col; ci < lastColView; ++ci) {
             const cWidth = overridenColWidth(state, ci) + 1;
             if (ci === qci) return [_x, cWidth];
             _x += cWidth;
@@ -474,11 +485,11 @@ export function WSCanvas(props: WSCanvasProps) {
         return [-2, 0];
     }
 
-    const canvasToCellCoord = (state: WSCanvasState, ccoord: WSCanvasCoord) => {
+    const canvasToCellCoord = (state: WSCanvasState, ccoord: WSCanvasCoord, allowPartialCol: boolean = false) => {
         const px = ccoord.x;
         const py = ccoord.y;
 
-        const ci = xGetCol(state, ccoord.x);
+        const ci = xGetCol(state, ccoord.x, allowPartialCol);
 
         // on column headers
         if (showColNumber && py >= 0 && py <= 2 + colNumberRowHeightFull()) {
@@ -491,7 +502,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
 
         // on row headers
-        if (showRowNumber && ci[0] === -1 /*px >= 1 && px <= 1 + rowNumberColWidth*/) {
+        if (showRowNumber && ci[0] === -1) {
             let y = 3 + (showColNumber ? colNumberRowHeightFull() : 0);
             for (let ri = state.scrollOffset.row; ri < state.scrollOffset.row + viewRowsCount; ++ri) {
                 if (ri >= state.filteredRowsCount) break;
@@ -521,8 +532,8 @@ export function WSCanvas(props: WSCanvasProps) {
     }
     api.canvasCoordToCellCoord = (ccoord) => canvasToCellCoord(stateNfo, ccoord);
 
-    const cellToCanvasCoord = (state: WSCanvasState, cell: WSCanvasCellCoord) => {
-        const colXW = colGetXWidth(state, cell.col);
+    const cellToCanvasCoord = (state: WSCanvasState, cell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {
+        const colXW = colGetXWidth(state, cell.col, allowPartialCol);
         if (cell.filterRow) return new WSCanvasCoord(colXW[0], colNumberRowHeight + filterTextMargin, colXW[1]);
 
         let y = 1;
@@ -954,7 +965,11 @@ export function WSCanvas(props: WSCanvasProps) {
                         qFilter = { colIdx: state.focusedFilterColIdx, filter: "" } as WSCanvasFilter;
                         state.filters.push(qFilter);
                     }
-                    const ccoord = cellToCanvasCoord(state, new WSCanvasCellCoord(0, state.focusedFilterColIdx, true));
+                    
+                    const ccoord = cellToCanvasCoord(state,
+                        new WSCanvasCellCoord(0, state.focusedFilterColIdx, true),
+                        showPartialColumns);
+
                     if (ccoord) {
                         let canceling = false;
                         setFilterChildren([
@@ -1448,7 +1463,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const state = stateNfo.dup();
 
                 if (!evalClickStart(state, ccoord)) {
-                    cellCoord = canvasToCellCoord(state, ccoord);
+                    cellCoord = canvasToCellCoord(state, ccoord, showPartialColumns);
 
                     if (cellCoord) {
                         if (cellCoord.row === -1 && cellCoord.col === -1) { // ENTIRE GRID SEL                        
