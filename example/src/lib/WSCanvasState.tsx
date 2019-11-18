@@ -30,7 +30,8 @@ export class WSCanvasState {
         this.resizingColStartNfo = [-2, 0];
 
         this.selection = new WSCanvasSelection([]);
-        this.columnsSort = [];        
+        this.columnsSort = [];       
+        this.cursorOverCell = false; 
 
         this.verticalScrollBarRect = null;
         this.verticalScrollHandleRect = null;
@@ -69,6 +70,7 @@ export class WSCanvasState {
 
     selection: WSCanvasSelection;
     columnsSort: WSCanvasColumnSortInfo[];    
+    cursorOverCell: boolean;
 
     verticalScrollBarRect: WSCanvasRect | null;
     verticalScrollHandleRect: WSCanvasRect | null;

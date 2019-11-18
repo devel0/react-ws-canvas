@@ -3,6 +3,7 @@ import { WSCanvasSelectMode } from "./WSCanvasSelectionMode";
 import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 import { WSCanvasColumnType, WSCanvasColumnClickBehavior } from "./WSCanvasColumn";
 import { WSCanvasApi } from "./WSCanvasApi";
+import { CSSProperties } from "react";
 
 /** see WSCanvasPropsDefault for default values */
 export interface WSCanvasProps {
@@ -28,10 +29,18 @@ export interface WSCanvasProps {
     selectionModeMulti: boolean;
     /** selection mode row or cell */
     selectionMode: WSCanvasSelectMode;
+    /** select focused cell or row depending on selectionMode */
+    selectFocusedCellOrRow: boolean;
+    /** show focused cell outline */
+    showFocusedCellOutline: boolean;
     /** show row numbers column */
     showRowNumber: boolean;
+    /** highlight row header matching current sel */
+    highlightRowNumber: boolean;
     /** show column headers row */
     showColNumber: boolean;
+    /** highlight column header matching current sel */
+    highlightColNumber: boolean;
     /** behavior for column header click sort or select */
     columnClickBehavior: WSCanvasColumnClickBehavior;
     /** show column filters row */
@@ -48,12 +57,14 @@ export interface WSCanvasProps {
     /** column sort method */
     getColumnLessThanOp?: (col: number) => (a: any, b: any) => boolean;
     /** specify type of a cell */
-    getCellType?: (coord: WSCanvasCellCoord, value: any) => WSCanvasColumnType;    
+    getCellType?: (coord: WSCanvasCellCoord, value: any) => WSCanvasColumnType;
+    /** specify cell editor inhibit */
+    isCellReadonly?: (coord: WSCanvasCellCoord) => boolean;
 
     /** cell background */
     sheetBackgroundColor: string;
     /** grid lines color */
-    gridLinesColor: string;    
+    gridLinesColor: string;
     /** color of frozen row/cols separator line*/
     frozenCellGridLinesColor: string;
     /** color or focused cell outline */
@@ -81,8 +92,12 @@ export interface WSCanvasProps {
     /** color of cell text */
     cellTextColor: string;
     /** font of row/col nunbers */
-    headerFont: string;        
-    
+    headerFont: string;
+    /** default cell cursor */
+    cellCursor: string;
+    /** default non cell cursor */
+    outsideCellCursor: string;
+
     /** filter apply debounce (ms) */
     filterDebounceMs: number;
     /** filter edit cell margin */
@@ -91,11 +106,11 @@ export interface WSCanvasProps {
     filterIgnoreCase: boolean;
     /** filter cell background color */
     filterBackground: string;
-    
+
     /** width of row numbers col */
-    rowNumberColWidth: number;    
+    rowNumberColWidth: number;
     /** height of column numbers row */
-    colNumberRowHeight: number;    
+    colNumberRowHeight: number;
     /** background of row/col number cells */
     cellNumberBackgroundColor: string;
 
@@ -106,11 +121,16 @@ export interface WSCanvasProps {
     /** thickness of scrollbar */
     scrollBarThk: number;
     /** min length of scrollbar handle */
-    minScrollHandleLen: number;          
-    /** scrollbar handle color */                                  
+    minScrollHandleLen: number;
+    /** scrollbar handle color */
     scrollBarColor: string;
     /** scrollbar handle actived color */
-    clickedScrollBarColor: string;        
+    clickedScrollBarColor: string;
+
+    /** div container custom styles */
+    containerStyle?: CSSProperties;
+    /** canvas custom styles ( margin and padding will overriden to 0; use containerStyle for these ) */
+    canvasStyle?: CSSProperties;
 
     /** enable debug div ( for dev purpose ) */
     debug: boolean;

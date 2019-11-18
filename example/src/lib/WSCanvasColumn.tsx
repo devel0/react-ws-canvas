@@ -16,4 +16,5 @@ export interface WSCanvasColumn {
     header: string;
     field: string;
     lessThan: (a: any, b: any) => boolean;
+    width: number;
 }

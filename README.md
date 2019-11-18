@@ -164,6 +164,21 @@ yarn start
 
 - start chrome session using F5
 
+## local deploy
+
+- from library
+
+```sh
+cd lib
+yarn build && yalc publish
+```
+
+- from your project
+
+```sh
+npm uninstall react-ws-canvas --save && yalc add react-ws-canvas && npm install
+```
+
 ## how this project was built
 
 ```sh
