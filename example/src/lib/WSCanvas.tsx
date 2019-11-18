@@ -640,7 +640,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
 
         // adjust scrollOffset.col
-        if (cell.col >= state.scrollOffset.col + viewColsCount) {
+        if (cell.col >= state.scrollOffset.col + viewColsCount - 1) {
             state.scrollOffset = state.scrollOffset.setCol(cell.col - viewColsCount + 1);
         }
         else if (cell.col - frozenColsCount <= state.scrollOffset.col) {
@@ -965,7 +965,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         qFilter = { colIdx: state.focusedFilterColIdx, filter: "" } as WSCanvasFilter;
                         state.filters.push(qFilter);
                     }
-                    
+
                     const ccoord = cellToCanvasCoord(state,
                         new WSCanvasCellCoord(0, state.focusedFilterColIdx, true),
                         showPartialColumns);
