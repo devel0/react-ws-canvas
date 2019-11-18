@@ -10,17 +10,56 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - **canvas based** high performance datagrid ( able to scroll with ease millions of rows maintaining immediate cell focus and editing features )
 
-
+![](doc/50000rows_200cols.gif)
 
 - **direct cell editing**, just click on a cell then type, hit ENTER or arrows keys to move next ( [native cell types][1] )
   - "text": type text to change cell ; CANC to clear cell ; CTRL+C / CTRL+V to copy/paste
   - "boolean": toggle boolean with keyboard space when cell focused
   - "date", "time", "datetime": smart date insertion ( typing 121030 results in 12/10/2030 ) browser locale supported
   - "number": sci numbers ( typing 12e-3 results in 0.012 displayed ) browser locale support for decimal separators
-- cell selection mode and row selection mode
 
+- [cell or row][2] selection mode]
+
+![](doc/selection-mode-cells.png)
+
+![](doc/selection-mode-rows.png)
+
+- selection [mode multi][9]
+
+![](doc/selection-mode-multi.png)
+
+- frozen [rows][3], [cols][4]
+
+![](doc/frozen-rows-cols.png)
+
+- rows and cols numbering can be [shown or hidden][5]
+
+- if column numbering visible automatic sort can be customized through [less-than-op][6]
+
+- [column click behavior][12] can be full column select or column toggle sort
+
+- data getter/setter can follow a [worksheet][7] or a [db record type][8]
+
+- [api][10] available for control interactions ( [example][11] )
+
+- each individual cell [custom edit][13] ( F2 ) control can be customized
+
+- each individual [cell type][14] can be customized
 
 [1]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasColumn.tsx#L1
+[2]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L30
+[3]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L24
+[4]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L26
+[5]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L31-L34
+[6]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L48-L49
+[7]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/Sample1.tsx#L29-L34
+[8]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/Sample2.tsx#L81-L86
+[9]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L27-L28
+[10]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasApi.tsx#L7
+[11]: https://github.com/devel0/react-ws-canvas/blob/38997638bb5f1f043164fdf73802490cfafa06c3/example/src/App.tsx#L15
+[12]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L35-L36
+[13]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L44-L45
+[14]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L50-L51
 
 ## quickstart
 
