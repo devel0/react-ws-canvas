@@ -53,6 +53,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const [children, setChildren] = useState<JSX.Element[]>([]);
     const [filterChildren, setFilterChildren] = useState<JSX.Element[]>([]);
+    const [rowToSortedRowIndexMap, setRowToSortedRowIndexMap] = useState<number[] | null>(null);
 
     const W = width;
     const H = height - debugSize.height;
@@ -81,7 +82,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const sortedGetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord) => {
         const filterMap = state.rowToMatchingFilterRow;
         const sortingMap = sortingRowToSortedRowIndexMap;
-        const sortedMap = state.rowToSortedRowIndexMap;
+        const sortedMap = rowToSortedRowIndexMap;
 
         if (sortingMap !== null) {
             return getCellData(new WSCanvasCellCoord(sortingMap[coord.row], coord.col));
@@ -103,7 +104,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const sortedSetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord, value: any) => {
         const filterMap = state.rowToMatchingFilterRow;
         const sortingMap = sortingRowToSortedRowIndexMap;
-        const sortedMap = state.rowToSortedRowIndexMap;
+        const sortedMap = rowToSortedRowIndexMap;
 
         if (sortingMap !== null) {
             setCellData(new WSCanvasCellCoord(sortingMap[coord.row], coord.col), value);
@@ -588,7 +589,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const sortRows = (state: WSCanvasState) => {
         if (state.columnsSort.length === 0) {
-            state.rowToSortedRowIndexMap = null;
+            setRowToSortedRowIndexMap(null);
         }
         else {
             sortingRowToSortedRowIndexMap = null;
@@ -624,7 +625,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 sortingRowToSortedRowIndexMap = colData.map((x) => x.ri);
             }
-            state.rowToSortedRowIndexMap = sortingRowToSortedRowIndexMap;
+            setRowToSortedRowIndexMap(sortingRowToSortedRowIndexMap);
             sortingRowToSortedRowIndexMap = null;
         }
     }
@@ -1403,7 +1404,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     case WSCanvasColumnClickBehavior.ToggleSort:
                                         {
                                             if (!shift_key) {
-                                                state.rowToSortedRowIndexMap = null;
+                                                setRowToSortedRowIndexMap(null);
                                                 state.columnsSort = state.columnsSort.filter((x) => x.columnIndex === cellCoord!.col);
                                             }
 
