@@ -585,6 +585,8 @@ export function WSCanvas(props: WSCanvasProps) {
             }
             setRowToMatchingFilterRow(qfilter);
             state.filteredRowsCount = qfilter.length;
+
+            return qfilter;
         }
     }
 
@@ -716,8 +718,12 @@ export function WSCanvas(props: WSCanvasProps) {
     const debouncedFilter = useDebounce(stateNfo.filtersTrack, 500);
     useEffect(() => {
         const state = stateNfo.dup();
-        applyFilter(state);
+        const qfilter = applyFilter(state);
         sortRows(state);
+        if (qfilter && qfilter.length > 0) {
+            focusCell(state, new WSCanvasCellCoord(0, state.focusedFilterColIdx), true, false, true);            
+            rectifyScrollOffset(state);
+        }
         setStateNfo(state);
     }, [debouncedFilter]);
 
@@ -918,7 +924,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                                 const state = stateNfo.dup();
                                                 state.focusedCell = new WSCanvasCellCoord(0, state.focusedFilterColIdx);
                                                 state.focusedFilterColIdx = -1;
-                                                focusCell(state, state.focusedCell, true, true, true);
+                                                focusCell(state, state.focusedCell, true, false, true);
                                                 if (canvasRef.current) {
                                                     canvasRef.current.focus();
                                                 }
