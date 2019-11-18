@@ -720,6 +720,8 @@ export function WSCanvas(props: WSCanvasProps) {
     }, [debouncedFilter]);
 
     const paint = (state: WSCanvasState) => {
+        ++state.paintcnt;
+
         if (canvasRef.current) {
             const canvas = canvasRef.current;
 
@@ -1757,6 +1759,8 @@ export function WSCanvas(props: WSCanvasProps) {
     });
 
     const DEBUG_CTL = debug ? <div ref={debugRef}>
+        <b>paintcnt</b> => {stateNfo.paintcnt}<br/>
+
         <b>graphics (w x h)</b> => frame({width} x {height}) -
         debug({debugSize.width} x {debugSize.height}) -
         canvasDiv({width} x {height - debugSize.height})<br />

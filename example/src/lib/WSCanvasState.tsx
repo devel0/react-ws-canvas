@@ -28,7 +28,7 @@ export class WSCanvasState {
         this.customEditValue = null;
         this.columnWidthOverride = new Map<number, number>();
         this.resizingCol = -2;
-        this.resizingColStartNfo = [-2,0];
+        this.resizingColStartNfo = [-2, 0];
 
         this.selection = new WSCanvasSelection([]);
         this.columnsSort = [];
@@ -43,6 +43,7 @@ export class WSCanvasState {
         this.horizontalScrollClickStartCoord = null;
         this.horizontalScrollClickStartFactor = 0;
 
+        this.paintcnt = 0;
         this.debugNfo = "";
     }
 
@@ -82,6 +83,7 @@ export class WSCanvasState {
     horizontalScrollClickStartCoord: WSCanvasCoord | null;
     horizontalScrollClickStartFactor: number;
 
+    paintcnt: number;
     debugNfo: string;
 
     dup() {
