@@ -59,6 +59,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - column custom [initial sort][18]
 
+![](doc/initial-sort.png)
+
 - data getter/setter can follow a [worksheet][7] or a [db record type][8]
 
 - [api][10] available for control interactions ( [example][11] )
