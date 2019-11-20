@@ -55,6 +55,10 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/column-width-resize.png)
 
+- column width [autoexpand][16]
+
+- column custom [initial sort][18]
+
 - data getter/setter can follow a [worksheet][7] or a [db record type][8]
 
 - [api][10] available for control interactions ( [example][11] )
@@ -80,6 +84,9 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [13]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L44-L45
 [14]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L50-L51
 [15]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/Sample2.tsx#L87
+[16]: https://github.com/devel0/react-ws-canvas/blob/5a7b126b35a08350f1fb3409138c2dfee49360f4/example/src/lib/WSCanvasProps.tsx#L23-L24
+[17]: https://github.com/devel0/react-ws-canvas/blob/5a7b126b35a08350f1fb3409138c2dfee49360f4/example/src/lib/WSCanvasProps.tsx#L68-L69
+[18]: https://github.com/devel0/react-ws-canvas/blob/86ffa34c4b17f6f56b106119c7874c910df9c371/example/src/Sample2.tsx#L93-L99
 
 ## quickstart
 
