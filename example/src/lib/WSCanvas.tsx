@@ -140,7 +140,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const paddingBottom = csty.paddingBottom ? parseFloat(csty.paddingBottom) : 0;
 
         margin_padding_W -= (marginLeft + marginRight + paddingLeft + paddingRight);
-        margin_padding_H -= (marginTop + marginBottom + paddingTop + paddingBottom);
+        margin_padding_H -= (marginTop + marginBottom + paddingTop + paddingBottom);        
     }
 
     let W = width - margin_padding_W;
@@ -887,6 +887,8 @@ export function WSCanvas(props: WSCanvasProps) {
         let colwsumbefore = 0;
         for (let ci = 0; ci < viewColsCount; ++ci) colwsumbefore += colWidth(ci);
 
+        if (state.paintcnt===1 && canvasRef.current) canvasRef.current.focus();
+
         if (state.paintcnt > 1 && colwsumbefore > state.colWidthExpanded) {
             let wtofillTotal = colwavail - colwsumbefore;
 
@@ -1277,7 +1279,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     };
 
-    const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {
+    const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {        
         if (api.onPreviewKeyDown) api.onPreviewKeyDown(e);
 
         if (!e.defaultPrevented) {
