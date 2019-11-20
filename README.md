@@ -67,6 +67,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - each individual cell [custom edit][13] ( F2 ) control can be customized
 
+- [cell style][19] customization
+
+![](doc/cell-style-customization.png)
+
+- container and canvas [styles][20]
+
 - each individual [cell type][14] can be customized
 
 - support mobile touch scrolling rows, cols and scrollbars
@@ -89,6 +95,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [16]: https://github.com/devel0/react-ws-canvas/blob/5a7b126b35a08350f1fb3409138c2dfee49360f4/example/src/lib/WSCanvasProps.tsx#L23-L24
 [17]: https://github.com/devel0/react-ws-canvas/blob/5a7b126b35a08350f1fb3409138c2dfee49360f4/example/src/lib/WSCanvasProps.tsx#L68-L69
 [18]: https://github.com/devel0/react-ws-canvas/blob/86ffa34c4b17f6f56b106119c7874c910df9c371/example/src/Sample2.tsx#L93-L99
+[19]: https://github.com/devel0/react-ws-canvas/blob/eea7a9f653fe827300291b3b5b3e6870d9ff4692/example/src/Sample2.tsx#L100-L109
+[20]: https://github.com/devel0/react-ws-canvas/blob/eea7a9f653fe827300291b3b5b3e6870d9ff4692/example/src/lib/WSCanvasProps.tsx#L143-L146
 
 ## quickstart
 
