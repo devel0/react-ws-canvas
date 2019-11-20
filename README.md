@@ -139,6 +139,7 @@ const App: React.FC = () => {
 
   return <WSCanvas
     width={winSize.width} height={winSize.height}
+    rowsCount={rows.length} colsCount={COLS}
     showColNumber={true} showRowNumber={true} showFilter={true}
     getCellData={(cell) => rows[cell.row][cell.col]}
     setCellData={(cell, value) => {
