@@ -78,6 +78,7 @@ export function WSCanvas(props: WSCanvasProps) {
         headerFont,
         cellCursor,
         outsideCellCursor,
+        rowHoverColor,
 
         filterDebounceMs,
         filterTextMargin,
@@ -360,8 +361,9 @@ export function WSCanvas(props: WSCanvasProps) {
         const y_ = y + 0.5;
 
         let cellBackground = sheetBackgroundColor;
-        if (getCellBackgroundColor !== undefined)
-        {
+        if (state.hoveredRow === cell.row && rowHoverColor) {
+            cellBackground = rowHoverColor;
+        } else if (getCellBackgroundColor !== undefined) {
             const q = getCellBackgroundColor(cell, props);
             if (q) cellBackground = q;
         }
@@ -611,6 +613,23 @@ export function WSCanvas(props: WSCanvasProps) {
             _x += cWidth;
         }
         return [-2, 0];
+    }
+
+    const canvasToRow = (state: WSCanvasState, ccoord: WSCanvasCoord) => {
+        const py = ccoord.y;
+
+        // on data cells
+        {
+            let y = 3 + (showColNumber ? colNumberRowHeightFull() : 0);
+            for (let ri = state.scrollOffset.row; ri < state.scrollOffset.row + viewRowsCount; ++ri) {
+                if (ri >= state.filteredRowsCount) break;
+                if (py >= y && py < y + rowHeight) return ri;
+
+                y += rowHeight + 1;
+            }
+
+            return -2;
+        }
     }
 
     const canvasToCellCoord = (state: WSCanvasState, ccoord: WSCanvasCoord, allowPartialCol: boolean = false) => {
@@ -1728,6 +1747,15 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
             }
 
+            const hoverRow = canvasToRow(stateNfo, ccoord);
+            if (hoverRow !== -2 && hoverRow !== stateNfo.hoveredRow) {
+                if (state === undefined) {
+                    state = stateNfo.dup();
+                    stateUpdated = true;
+                }
+                state.hoveredRow = hoverRow;
+            }
+
             if (e.buttons === 0 && (stateNfo.verticalScrollClickStartCoord !== null || stateNfo.horizontalScrollClickStartCoord !== null)) {
                 if (state === undefined) {
                     state = stateNfo.dup();
@@ -1746,7 +1774,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     const startX = state.resizingColStartNfo[0];
                     const startWidth = state.resizingColStartNfo[1];
                     const newWidth = startWidth + (x - startX);
-                    console.log("changing col:" + state.resizingCol + " from:" + startWidth + " to:" + newWidth);
+                    // console.log("changing col:" + state.resizingCol + " from:" + startWidth + " to:" + newWidth);
                     state.columnWidthOverride.set(state.resizingCol, newWidth);
                 }
                 else if (state.verticalScrollClickStartCoord !== null)

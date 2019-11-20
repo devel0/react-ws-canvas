@@ -56,17 +56,17 @@ export interface WSCanvasProps {
     /** set data of a cell */
     setCellData: (coord: WSCanvasCellCoord, value: any) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor */
-    getCellCustomEdit?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => JSX.Element | undefined;
+    getCellCustomEdit?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => JSX.Element | undefined,
     /** header of given col */
     getColumnHeader?: (col: number) => string;
     /** column sort method */
-    getColumnLessThanOp?: (col: number) => (a: any, b: any) => boolean;
+    getColumnLessThanOp?: (col: number) => (a: any, b: any) => boolean | undefined;
     /** specify type of a cell */
-    getCellType?: (coord: WSCanvasCellCoord, value: any) => WSCanvasColumnType;
+    getCellType?: (coord: WSCanvasCellCoord, value: any) => WSCanvasColumnType | undefined;
     /** specify cell editor inhibit */
-    isCellReadonly?: (coord: WSCanvasCellCoord) => boolean;
+    isCellReadonly?: (coord: WSCanvasCellCoord) => boolean | undefined;
     /** specify predefined column sort ( WSCanvasColumn array helper ) */
-    columnInitialSort?: WSCanvasColumnSortInfo[];
+    columnInitialSort: WSCanvasColumnSortInfo[] | undefined;
 
     /** individual cell background customization */
     getCellBackgroundColor?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
@@ -110,6 +110,8 @@ export interface WSCanvasProps {
     cellCursor: string;
     /** default non cell cursor */
     outsideCellCursor: string;
+    /** row hover */
+    rowHoverColor: string | undefined;
 
     /** filter apply debounce (ms) */
     filterDebounceMs: number;
@@ -141,9 +143,9 @@ export interface WSCanvasProps {
     clickedScrollBarColor: string;
 
     /** div container custom styles */
-    containerStyle?: CSSProperties;
+    containerStyle: CSSProperties | undefined;
     /** canvas custom styles ( margin and padding will overriden to 0; use containerStyle for these ) */
-    canvasStyle?: CSSProperties;
+    canvasStyle: CSSProperties | undefined;
 
     /** enable debug div ( for dev purpose ) */
     debug: boolean;

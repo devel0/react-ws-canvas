@@ -63,6 +63,7 @@ export const WSCanvasPropsDefault = () => {
         headerFont: "16px Liberation Sans",
         cellCursor: "default",
         outsideCellCursor: "default",
+        rowHoverColor: "rgba(250,250,250,0.5)",
 
         filterDebounceMs: 500,
         filterTextMargin: 3,

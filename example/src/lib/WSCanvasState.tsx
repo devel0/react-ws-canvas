@@ -20,6 +20,8 @@ export class WSCanvasState {
         this.focusedFilterColIdx = -1;
         this.filters = [];
         this.filtersTrack = "";
+        this.hoveredRow = -2;
+
         this.editMode = WSCanvasEditMode.none;
         this.filteredRowsCount = 0;
 
@@ -59,6 +61,7 @@ export class WSCanvasState {
     focusedFilterColIdx: number;
     filters: WSCanvasFilter[];
     filtersTrack: string;
+    hoveredRow: number;
 
     editMode: WSCanvasEditMode;
     filteredRowsCount: number;
