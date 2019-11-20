@@ -97,6 +97,16 @@ export function Sample2(width: number, height: number, api: WSCanvasApi, columnC
         sortOrder: c.sortOrder
       } as WSCanvasColumnSortInfo
     })}
+    getCellBackgroundColor={(cell, props) => {
+      if (cell.row === 2) return "navy";
+      if (cell.col === 1) return "lightyellow";      
+    }}
+    getCellFont={(cell, props) => {
+      if (cell.col === 1) return "bold " + props.font;
+    }}
+    getCellTextColor={(cell, props) => {
+      if (cell.row === 2) return "white";
+    }}
     getColumnHeader={(col) => columns[col].header}
     getColumnLessThanOp={(col) => columns[col].lessThan}
     getCellType={(cell, data) => columns[cell.col].type}

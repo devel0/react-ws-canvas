@@ -68,6 +68,8 @@ export interface WSCanvasProps {
     /** specify predefined column sort ( WSCanvasColumn array helper ) */
     columnInitialSort?: WSCanvasColumnSortInfo[];
 
+    /** individual cell background customization */
+    getCellBackgroundColor?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
     /** cell background */
     sheetBackgroundColor: string;
     /** grid lines color */
@@ -94,8 +96,12 @@ export interface WSCanvasProps {
     dateTimeCellMomentFormat: string;
     /** margin of text inside cells */
     textMargin: number;
+    /** individual cell font customization */
+    getCellFont?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
     /** font of cells text */
     font: string;
+    /** individual cell text color customization */
+    getCellTextColor?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
     /** color of cell text */
     cellTextColor: string;
     /** font of row/col nunbers */

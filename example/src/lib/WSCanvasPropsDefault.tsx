@@ -41,6 +41,7 @@ export const WSCanvasPropsDefault = () => {
         isCellReadonly: undefined,
         columnInitialSort: undefined,
 
+        getCellBackgroundColor: undefined,
         sheetBackgroundColor: "white",
         gridLinesColor: "#c0c0c0",
         frozenCellGridLinesColor: "black",
@@ -55,7 +56,9 @@ export const WSCanvasPropsDefault = () => {
         timeCellMomentFormat: "LT",
         dateTimeCellMomentFormat: "L LT",
         textMargin: 2,
+        getCellFont: undefined,
         font: "12px Liberation Sans",
+        getCellTextColor: undefined,
         cellTextColor: "black",
         headerFont: "16px Liberation Sans",
         cellCursor: "default",

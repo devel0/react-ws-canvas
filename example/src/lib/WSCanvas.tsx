@@ -56,6 +56,7 @@ export function WSCanvas(props: WSCanvasProps) {
         isCellReadonly,
         columnInitialSort,
 
+        getCellBackgroundColor,
         sheetBackgroundColor,
         gridLinesColor,
         frozenCellGridLinesColor,
@@ -70,7 +71,9 @@ export function WSCanvas(props: WSCanvasProps) {
         timeCellMomentFormat,
         dateTimeCellMomentFormat,
         textMargin,
+        getCellFont,
         font,
+        getCellTextColor,
         cellTextColor,
         headerFont,
         cellCursor,
@@ -356,7 +359,13 @@ export function WSCanvas(props: WSCanvasProps) {
         const x_ = x - 0.5;
         const y_ = y + 0.5;
 
-        ctx.fillStyle = isSelected ? selectionBackgroundColor : sheetBackgroundColor;
+        let cellBackground = sheetBackgroundColor;
+        if (getCellBackgroundColor !== undefined)
+        {
+            const q = getCellBackgroundColor(cell, props);
+            if (q) cellBackground = q;
+        }
+        ctx.fillStyle = isSelected ? selectionBackgroundColor : cellBackground;
         ctx.fillRect(x, y, cWidth, rowHeight);
 
         if (isSelected) {
@@ -396,8 +405,19 @@ export function WSCanvas(props: WSCanvasProps) {
             }
         }
 
-        ctx.font = font;
-        ctx.fillStyle = cellTextColor;
+        let cellFont = font;
+        if (getCellFont !== undefined) {
+            const q = getCellFont(cell, props);
+            if (q) cellFont = q;
+        }
+        ctx.font = cellFont;
+
+        let cellColor = cellTextColor;
+        if (getCellTextColor !== undefined) {
+            const q = getCellTextColor(cell, props);
+            if (q) cellColor = q;
+        }
+        ctx.fillStyle = cellColor;
         ctx.textAlign = "left";
         ctx.textBaseline = "middle";
 
