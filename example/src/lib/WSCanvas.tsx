@@ -277,7 +277,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     if (!stateNfo.initialized) {
         if (columnInitialSort && rowsCount > 0) {
-            const state = stateNfo.dup();            
+            const state = stateNfo.dup();
             state.columnsSort = columnInitialSort;
             state.initialized = true;
             applyFilter(state);
@@ -1662,47 +1662,49 @@ export function WSCanvas(props: WSCanvasProps) {
             let state: WSCanvasState | undefined = undefined;
 
             if (canvasRef.current) {
-                if (showColNumber && y < colNumberRowHeightFull()) {
-                    let qCol = xGetCol(stateNfo, x);
+                if (e.buttons === 0) {
+                    if (showColNumber && y < colNumberRowHeightFull()) {
+                        let qCol = xGetCol(stateNfo, x);
 
-                    let resizingCol = -2;
-                    let cwidth = qCol[1];
-                    let onHandle = false;
-                    if (qCol[0] > -2) {
-                        let tryResizingCol = qCol[0];
-                        let colX = colGetXWidth(stateNfo, tryResizingCol);
-                        cwidth = colX[1];
-                        let skip = false; // workaround avoid cursor flicker
-
-                        if (Math.abs(x - colX[0]) < 2 * RESIZE_HANDLE_TOL) {
-                            skip = true;
-                        } else if (x - colX[0] > RESIZE_HANDLE_TOL) {
-                            ++tryResizingCol;
-                            colX = colGetXWidth(stateNfo, tryResizingCol);
+                        let resizingCol = -2;
+                        let cwidth = qCol[1];
+                        let onHandle = false;
+                        if (qCol[0] > -2) {
+                            let tryResizingCol = qCol[0];
+                            let colX = colGetXWidth(stateNfo, tryResizingCol);
                             cwidth = colX[1];
+                            let skip = false; // workaround avoid cursor flicker
+
+                            if (Math.abs(x - colX[0]) < 2 * RESIZE_HANDLE_TOL) {
+                                skip = true;
+                            } else if (x - colX[0] > RESIZE_HANDLE_TOL) {
+                                ++tryResizingCol;
+                                colX = colGetXWidth(stateNfo, tryResizingCol);
+                                cwidth = colX[1];
+                            }
+
+                            if (!skip && (x === colX[0] || (colX[0] >= x - RESIZE_HANDLE_TOL && colX[0] <= x + RESIZE_HANDLE_TOL))) {
+                                onHandle = true;
+                                resizingCol = tryResizingCol - 1;
+                                cwidth = colGetXWidth(stateNfo, resizingCol)[1];
+                            }
                         }
 
-                        if (!skip && (x === colX[0] || (colX[0] >= x - RESIZE_HANDLE_TOL && colX[0] <= x + RESIZE_HANDLE_TOL))) {
-                            onHandle = true;
-                            resizingCol = tryResizingCol - 1;
-                            cwidth = colGetXWidth(stateNfo, resizingCol)[1];
+                        if (stateNfo.resizingCol !== resizingCol) {
+                            if (state === undefined) {
+                                state = stateNfo.dup();
+                                stateUpdated = true;
+                            }
+                            state.resizingCol = resizingCol;
+                            state.resizingColStartNfo = [x, cwidth];
                         }
-                    }
-
-                    if (stateNfo.resizingCol !== resizingCol) {
+                    } else if (stateNfo.resizingCol !== -2) {
                         if (state === undefined) {
                             state = stateNfo.dup();
                             stateUpdated = true;
                         }
-                        state.resizingCol = resizingCol;
-                        state.resizingColStartNfo = [x, cwidth];
+                        state.resizingCol = -2;
                     }
-                } else if (stateNfo.resizingCol !== -2) {
-                    if (state === undefined) {
-                        state = stateNfo.dup();
-                        stateUpdated = true;
-                    }
-                    state.resizingCol = -2;
                 }
             }
 
@@ -1724,6 +1726,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     const startX = state.resizingColStartNfo[0];
                     const startWidth = state.resizingColStartNfo[1];
                     const newWidth = startWidth + (x - startX);
+                    console.log("changing col:" + state.resizingCol + " from:" + startWidth + " to:" + newWidth);
                     state.columnWidthOverride.set(state.resizingCol, newWidth);
                 }
                 else if (state.verticalScrollClickStartCoord !== null)
