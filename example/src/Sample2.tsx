@@ -14,7 +14,7 @@ interface MyData {
 export function Sample2(width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
   const [rows, setRows] = useState<MyData[]>([]);
 
-  const ROWS = 100000;
+  const ROWS = 5000;
 
   const columns = [
     {
