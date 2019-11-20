@@ -2011,7 +2011,7 @@ export function WSCanvas(props: WSCanvasProps) {
             scrollOffset:({stateNfo.scrollOffset.row},{stateNfo.scrollOffset.col}) - overcell:{String(stateNfo.cursorOverCell)}<br />
 
             <b>selection</b> => {stateNfo.selection.toString()}<br />
-            <b>columnSort</b> => {_.orderBy(stateNfo.columnsSort, (x) => x.sortOrder)
+            <b>columnSort</b> => {_.orderBy(stateNfo.columnsSort.filter((x) => x.sortDirection), (x) => x.sortOrder)
                 .map((x, idx) => "ord:" + x.sortOrder + " col:" + x.columnIndex + " dir:" + x.sortDirection + " ; ")}<br />
 
             <b>misc</b> => lang({navigator.language}) - momentLocale({moment().locale()})<br />
