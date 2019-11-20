@@ -1,6 +1,7 @@
 import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn } from "./lib";
 
 import React, { useState, useEffect } from "react";
+import { WSCanvasSortDirection, WSCanvasColumnSortInfo } from "react-ws-canvas";
 
 interface MyData {
   col1: string;
@@ -14,7 +15,7 @@ interface MyData {
 export function Sample2(width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
   const [rows, setRows] = useState<MyData[]>([]);
 
-  const ROWS = 100;
+  const ROWS = 100000;
 
   const columns = [
     {
@@ -26,13 +27,17 @@ export function Sample2(width: number, height: number, api: WSCanvasApi, columnC
         const bNr = parseInt((b as string).replace("r", ""));
 
         return aNr < bNr;
-      }
+      },
+      sortDirection: WSCanvasSortDirection.Descending,
+      sortOrder: 1,
     },
     {
       type: "number",
       header: "col2",
       field: "col2",
-      lessThan: (a,b) => (a as number) < (b as number)
+      lessThan: (a, b) => (a as number) < (b as number),
+      sortDirection: WSCanvasSortDirection.Ascending,
+      sortOrder: 0,
     },
     {
       type: "boolean",
@@ -42,7 +47,8 @@ export function Sample2(width: number, height: number, api: WSCanvasApi, columnC
     {
       type: "date",
       header: "col4",
-      field: "col4"
+      field: "col4",
+      lessThan: (a, b) => (a as Date) < (b as Date)
     },
     {
       type: "time",
@@ -72,7 +78,7 @@ export function Sample2(width: number, height: number, api: WSCanvasApi, columnC
     }
 
     setRows(_rows);
-  }, []);    
+  }, []);
 
   return <WSCanvas
     api={api}
@@ -84,6 +90,13 @@ export function Sample2(width: number, height: number, api: WSCanvasApi, columnC
       (q[cell.row] as any)[columns[cell.col].field] = value;
       setRows(q);
     }}
+    columnInitialSort={columns.map((c, idx) => {
+      return {
+        columnIndex: idx,
+        sortDirection: c.sortDirection,
+        sortOrder: c.sortOrder
+      } as WSCanvasColumnSortInfo
+    })}
     getColumnHeader={(col) => columns[col].header}
     getColumnLessThanOp={(col) => columns[col].lessThan}
     getCellType={(cell, data) => columns[cell.col].type}
@@ -91,7 +104,7 @@ export function Sample2(width: number, height: number, api: WSCanvasApi, columnC
     rowHeight={30}
     showFilter={true}
     showColNumber={true} showRowNumber={true}
-    debug={true}
+    debug={false}
     frozenRowsCount={0} frozenColsCount={0}
     rowsCount={rows.length} colsCount={columns.length} />
 }
