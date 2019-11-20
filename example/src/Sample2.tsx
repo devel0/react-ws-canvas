@@ -1,7 +1,6 @@
-import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn } from "./lib";
+import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo } from "./lib";
 
 import React, { useState, useEffect } from "react";
-import { WSCanvasSortDirection, WSCanvasColumnSortInfo } from "react-ws-canvas";
 
 interface MyData {
   col1: string;
