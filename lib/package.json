@@ -1,6 +1,6 @@
 {
   "name": "react-ws-canvas",
-  "version": "0.1.10-0",
+  "version": "0.1.11-0",
   "description": "Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
