@@ -54,6 +54,7 @@ export function WSCanvas(props: WSCanvasProps) {
         getColumnLessThanOp,
         getCellType,
         isCellReadonly,
+        columnInitialSort,
 
         sheetBackgroundColor,
         gridLinesColor,
@@ -97,6 +98,8 @@ export function WSCanvas(props: WSCanvasProps) {
         debug
     } = props;
 
+    //#region STATE AND INIT
+
     const containerRef = useRef<HTMLDivElement>(null);
     const debugRef = useRef<HTMLDivElement>(null);
     const canvasDivRef = useRef<HTMLDivElement>(null);
@@ -110,6 +113,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const [filterChildren, setFilterChildren] = useState<JSX.Element[]>([]);
     const [rowToSortedRowIndexMap, setRowToSortedRowIndexMap] = useState<number[] | null>(null);
     const [rowToMatchingFilterRow, setRowToMatchingFilterRow] = useState<number[] | null>(null);
+    const debouncedFilter = useDebounce(stateNfo.filtersTrack, filterDebounceMs);
 
     const colNumberRowHeightFull = () => colNumberRowHeight + (showFilter ? rowHeight : 0);
 
@@ -138,6 +142,11 @@ export function WSCanvas(props: WSCanvasProps) {
     let W = width - margin_padding_W;
     let H = Math.min(height - debugSize.height - margin_padding_H, minH);
 
+    const computeViewRows = (withHorizontalScrollbar: boolean) => {
+        const h = H - (showColNumber ? (colNumberRowHeightFull() + 1) : 0) - 2;
+        return Math.floor((h - (withHorizontalScrollbar ? scrollBarThk : 0)) / (rowHeight + 1));
+    };
+
     const overridenColWidth = (state: WSCanvasState, cidx: number) => {
         const q = state.columnWidthOverride.get(cidx);
         if (q)
@@ -145,6 +154,139 @@ export function WSCanvas(props: WSCanvasProps) {
         else
             return colWidth(cidx);
     }
+
+    const computeViewCols = (state: WSCanvasState, withVerticalScrollbar: boolean) => {
+        let q = 0;
+        {
+            const ww = W - (showRowNumber ? (rowNumberColWidth + 1) : 0) - (withVerticalScrollbar ? scrollBarThk : 0);
+            let w = 0;
+            for (let cidx = 0; cidx < frozenColsCount; ++cidx) {
+                w += overridenColWidth(state, cidx) + 1;
+                if (w > ww) break;
+                ++q;
+            }
+            for (let cidx = frozenColsCount + state.scrollOffset.col; cidx < colsCount; ++cidx) {
+                w += overridenColWidth(state, cidx) + 1;
+                if (w > ww) break;
+                ++q;
+            }
+        }
+        return q;
+    };
+
+    const verticalScrollbarActive =
+        verticalScrollbarMode === WSCanvasScrollbarMode.on ||
+        (verticalScrollbarMode === WSCanvasScrollbarMode.auto && computeViewRows(false) < stateNfo.filteredRowsCount)
+
+    const horizontalScrollbarActive =
+        horizontalScrollbarMode === WSCanvasScrollbarMode.on ||
+        (horizontalScrollbarMode === WSCanvasScrollbarMode.auto && computeViewCols(stateNfo, false) < colsCount);
+
+    const viewRowsCount = computeViewRows(horizontalScrollbarActive);
+    const viewColsCount = computeViewCols(stateNfo, verticalScrollbarActive);
+
+    const applyFilter = (state: WSCanvasState) => {
+        const qfilter: number[] = [];
+
+        if (rowsCount > 0 && stateNfo.filters) {
+            for (let ri = 0; ri < rowsCount; ++ri) {
+                let matching = true;
+                for (let fi = 0; fi < stateNfo.filters.length; ++fi) {
+                    const { colIdx, filter } = stateNfo.filters[fi];
+                    const data = getCellData(new WSCanvasCellCoord(ri, colIdx));
+
+                    const F = filterIgnoreCase ? String(filter).toLowerCase() : String(filter);
+                    const S = filterIgnoreCase ? String(data).toLowerCase() : String(data);
+
+                    if (S.indexOf(F) === -1) {
+                        matching = false;
+                        break;
+                    }
+                }
+                if (matching) {
+                    qfilter.push(ri);
+                }
+            }
+            setRowToMatchingFilterRow(qfilter);
+            state.filteredRowsCount = qfilter.length;
+        }
+
+        return qfilter;
+    }
+
+    let sortingRowToSortedRowIndexMap: number[] | null = null;
+
+    const applySort = (state: WSCanvasState) => {
+        if (state.columnsSort.length === 0) {
+            setRowToSortedRowIndexMap(null);
+        }
+        else {
+            sortingRowToSortedRowIndexMap = null;
+
+            const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");
+
+            for (let si = 0; si < orderedColumnSort.length; ++si) {
+                const columnSort = orderedColumnSort[si];
+                const columnType = getCellType ? getCellType(new WSCanvasCellCoord(0, columnSort.columnIndex), null) : "text";
+                let predefinedLessThanOp: (a: any, b: any) => boolean = (a, b) => true;
+                switch (columnType) {
+                    case "date":
+                    case "time":
+                    case "datetime":
+                    case "boolean":
+                        predefinedLessThanOp = (a, b) => (a < b);
+                        break;
+                    default:
+                        predefinedLessThanOp = (a, b) => String(a).localeCompare(String(b)) < 0;
+                        break;
+                }
+                let lessThanOp = getColumnLessThanOp ? getColumnLessThanOp(columnSort.columnIndex) : predefinedLessThanOp;
+                if (lessThanOp === undefined) lessThanOp = predefinedLessThanOp;
+
+                let colData: WSCanvasSortingRowInfo[] = [];
+                for (let ri = 0; ri < state.filteredRowsCount; ++ri) {
+                    if (si > 0)
+                        colData.push({
+                            ri: sortingRowToSortedRowIndexMap![ri],
+                            cellData: getCellData(new WSCanvasCellCoord(sortingRowToSortedRowIndexMap![ri], columnSort.columnIndex))
+                        });
+                    else colData.push({
+                        ri: ri,
+                        cellData: getCellData(new WSCanvasCellCoord(ri, columnSort.columnIndex))
+                    });
+                }
+
+                colData.sort((a, b) => {
+                    const valA = a.cellData;
+                    const valB = b.cellData;
+                    let ascRes = -1;
+                    ascRes = lessThanOp(valA, valB) ? -1 : 1;
+
+                    if (columnSort.sortDirection === WSCanvasSortDirection.Descending)
+                        return -ascRes;
+                    else
+                        return ascRes;
+                });
+
+                sortingRowToSortedRowIndexMap = colData.map((x) => x.ri);
+            }
+            setRowToSortedRowIndexMap(sortingRowToSortedRowIndexMap);
+            sortingRowToSortedRowIndexMap = null;
+        }
+    }
+
+    if (!stateNfo.initialized) {
+        if (columnInitialSort && rowsCount > 0) {
+            const state = stateNfo.dup();            
+            state.columnsSort = columnInitialSort;
+            state.initialized = true;
+            applyFilter(state);
+            applySort(state);
+            setStateNfo(state);
+        }
+    }
+
+    //#endregion
 
     const computeFilteredRowsCount = (state: WSCanvasState) => {
         const q = (rowToMatchingFilterRow === null) ? rowsCount : rowToMatchingFilterRow.length;
@@ -156,8 +298,6 @@ export function WSCanvas(props: WSCanvasProps) {
         state.filteredRowsCount = computeFilteredRowsCount(state);
         setStateNfo(state);
     }, [rowsCount]);
-
-    let sortingRowToSortedRowIndexMap: number[] | null = null;
 
     const sortedGetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord) => {
         const filterMap = rowToMatchingFilterRow;
@@ -200,41 +340,6 @@ export function WSCanvas(props: WSCanvasProps) {
                 setCellData(new WSCanvasCellCoord(filterMap[coord.row], coord.col), value);
         }
     }
-
-    const computeViewRows = (withHorizontalScrollbar: boolean) => {
-        const h = H - (showColNumber ? (colNumberRowHeightFull() + 1) : 0) - 2;
-        return Math.floor((h - (withHorizontalScrollbar ? scrollBarThk : 0)) / (rowHeight + 1));
-    };
-
-    const computeViewCols = (state: WSCanvasState, withVerticalScrollbar: boolean) => {
-        let q = 0;
-        {
-            const ww = W - (showRowNumber ? (rowNumberColWidth + 1) : 0) - (withVerticalScrollbar ? scrollBarThk : 0);
-            let w = 0;
-            for (let cidx = 0; cidx < frozenColsCount; ++cidx) {
-                w += overridenColWidth(state, cidx) + 1;
-                if (w > ww) break;
-                ++q;
-            }
-            for (let cidx = frozenColsCount + state.scrollOffset.col; cidx < colsCount; ++cidx) {
-                w += overridenColWidth(state, cidx) + 1;
-                if (w > ww) break;
-                ++q;
-            }
-        }
-        return q;
-    };
-
-    const verticalScrollbarActive =
-        verticalScrollbarMode === WSCanvasScrollbarMode.on ||
-        (verticalScrollbarMode === WSCanvasScrollbarMode.auto && computeViewRows(false) < stateNfo.filteredRowsCount)
-
-    const horizontalScrollbarActive =
-        horizontalScrollbarMode === WSCanvasScrollbarMode.on ||
-        (horizontalScrollbarMode === WSCanvasScrollbarMode.auto && computeViewCols(stateNfo, false) < colsCount);
-
-    const viewRowsCount = computeViewRows(horizontalScrollbarActive);
-    const viewColsCount = computeViewCols(stateNfo, verticalScrollbarActive);
 
     const formatCellDataAsDate = (cellData: any) => moment(cellData as Date).format(dateCellMomentFormat);
     const formatCellDataAsTime = (cellData: any) => moment(cellData as Date).format(timeCellMomentFormat);
@@ -317,19 +422,19 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
                         str = cellData;
                     else
-                        str = formatCellDataAsDate(cellData);
+                        str = cellData ? formatCellDataAsDate(cellData) : "";
                     break;
                 case "time":
                     if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
                         str = cellData;
                     else
-                        str = formatCellDataAsTime(cellData);
+                        str = cellData ? formatCellDataAsTime(cellData) : "";
                     break;
                 case "datetime":
                     if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
                         str = cellData;
                     else
-                        str = formatCellDataAsDateTime(cellData);
+                        str = cellData ? formatCellDataAsDateTime(cellData) : "";
                     break;
                 case "number":
                     if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
@@ -340,7 +445,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     ctx.textAlign = "right";
                     break;
                 case "text":
-                    str = String(cellData);
+                    str = cellData;
                     break;
             }
         }
@@ -533,7 +638,6 @@ export function WSCanvas(props: WSCanvasProps) {
             return null;
         }
     }
-    api.canvasCoordToCellCoord = (ccoord) => canvasToCellCoord(stateNfo, ccoord);
 
     const cellToCanvasCoord = (state: WSCanvasState, cell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {
         const colXW = colGetXWidth(state, cell.col, allowPartialCol);
@@ -553,7 +657,6 @@ export function WSCanvas(props: WSCanvasProps) {
         }
         return null;
     }
-    api.cellToCanvasCoord = (cell) => cellToCanvasCoord(stateNfo, cell);
 
     const clearSelection = (state: WSCanvasState) => {
         state.selection.clearSelection();
@@ -565,12 +668,6 @@ export function WSCanvas(props: WSCanvasProps) {
             (!selectionModeMulti || clearPreviousSel) ?
                 new WSCanvasSelection([new WSCanvasSelectionRange(cell, cell)]) :
                 state.selection.add(cell);
-    }
-
-    api.setSelection = (selection: WSCanvasSelection) => {
-        const state = stateNfo.dup();
-        state.selection = selection;
-        setStateNfo(state);
     }
 
     const openCellCustomEdit = (state: WSCanvasState) => {
@@ -648,78 +745,6 @@ export function WSCanvas(props: WSCanvasProps) {
         }
         else if (cell.col - frozenColsCount <= state.scrollOffset.col) {
             state.scrollOffset = state.scrollOffset.setCol(Math.max(0, cell.col - frozenColsCount));
-        }
-    }
-
-    const applyFilter = (state: WSCanvasState) => {
-        const qfilter: number[] = [];
-
-        if (rowsCount > 0 && stateNfo.filters) {
-            for (let ri = 0; ri < rowsCount; ++ri) {
-                let matching = true;
-                for (let fi = 0; fi < stateNfo.filters.length; ++fi) {
-                    const { colIdx, filter } = stateNfo.filters[fi];
-                    const data = getCellData(new WSCanvasCellCoord(ri, colIdx));
-
-                    const F = filterIgnoreCase ? String(filter).toLowerCase() : String(filter);
-                    const S = filterIgnoreCase ? String(data).toLowerCase() : String(data);
-
-                    if (S.indexOf(F) === -1) {
-                        matching = false;
-                        break;
-                    }
-                }
-                if (matching) {
-                    qfilter.push(ri);
-                }
-            }
-            setRowToMatchingFilterRow(qfilter);
-            state.filteredRowsCount = qfilter.length;
-        }
-
-        return qfilter;
-    }
-
-    const sortRows = (state: WSCanvasState) => {
-        if (state.columnsSort.length === 0) {
-            setRowToSortedRowIndexMap(null);
-        }
-        else {
-            sortingRowToSortedRowIndexMap = null;
-
-            const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");
-
-            for (let si = 0; si < orderedColumnSort.length; ++si) {
-                const columnSort = orderedColumnSort[si];
-                const lessThanOp = getColumnLessThanOp ? getColumnLessThanOp(columnSort.columnIndex) : undefined;
-
-                let colData: WSCanvasSortingRowInfo[] = [];
-                for (let ri = 0; ri < state.filteredRowsCount; ++ri) {
-                    if (si > 0)
-                        colData.push({
-                            ri: sortingRowToSortedRowIndexMap![ri],
-                            cellData: getCellData(new WSCanvasCellCoord(sortingRowToSortedRowIndexMap![ri], columnSort.columnIndex))
-                        });
-                    else colData.push({
-                        ri: ri,
-                        cellData: getCellData(new WSCanvasCellCoord(ri, columnSort.columnIndex))
-                    });
-                }
-
-                colData.sort((a, b) => {
-                    const valA = a.cellData;
-                    const valB = b.cellData;
-                    const ascRes = lessThanOp ? (lessThanOp(valA, valB) ? -1 : 1) : String(valA).localeCompare(String(valB));
-                    if (columnSort.sortDirection === WSCanvasSortDirection.Descending)
-                        return -ascRes;
-                    else
-                        return ascRes;
-                });
-
-                sortingRowToSortedRowIndexMap = colData.map((x) => x.ri);
-            }
-            setRowToSortedRowIndexMap(sortingRowToSortedRowIndexMap);
-            sortingRowToSortedRowIndexMap = null;
         }
     }
 
@@ -805,11 +830,10 @@ export function WSCanvas(props: WSCanvasProps) {
         paint(stateNfo);
     }, [width, height, stateNfo, debugSize, getCellData, setCellData]);
 
-    const debouncedFilter = useDebounce(stateNfo.filtersTrack, filterDebounceMs);
     useEffect(() => {
         const state = stateNfo.dup();
         const qfilter = applyFilter(state);
-        sortRows(state);
+        applySort(state);
         if (qfilter && qfilter.length > 0) {
             focusCell(state, new WSCanvasCellCoord(0, state.focusedFilterColIdx), true, false, true);
             rectifyScrollOffset(state);
@@ -1494,6 +1518,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     cellCoord = canvasToCellCoord(state, ccoord, showPartialColumns);
 
                     if (cellCoord) {
+                        e.preventDefault();
                         if (cellCoord.row === -1 && cellCoord.col === -1) { // ENTIRE GRID SEL                        
                             state.focusedFilterColIdx = -1;
                             state.selection = new WSCanvasSelection([
@@ -1562,7 +1587,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                             }
 
                                             clearSelection(state);
-                                            sortRows(state);
+                                            applySort(state);
                                         }
                                         break;
 
@@ -1914,63 +1939,42 @@ export function WSCanvas(props: WSCanvasProps) {
         return () => { };
     }, [canvasRef, stateNfo]);
 
-    let s = "";
-    stateNfo.columnWidthOverride.forEach((x, k) => {
-        s += " k:" + k + " w:" + x;
-    });
+    //#region API
+    {
+        api.canvasCoordToCellCoord = (ccoord) => canvasToCellCoord(stateNfo, ccoord);
+        api.cellToCanvasCoord = (cell) => cellToCanvasCoord(stateNfo, cell);
+        api.setSelection = (selection: WSCanvasSelection) => {
+            const state = stateNfo.dup();
+            state.selection = selection;
+            setStateNfo(state);
+        }
 
-    const stateNfoSize = debug ? JSON.stringify(stateNfo).length : 0;
+        api.clearSelection = () => {
+            const state = stateNfo.dup();
+            clearSelection(state);
+            setStateNfo(state);
+        };
 
-    const DEBUG_CTL = debug ? <div ref={debugRef}>
-        <b>paint cnt</b> => {stateNfo.paintcnt}<br />
-        <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
+        api.focusCell = (cell, scrollTo, endingCell, clearSelection) => {
+            const state = stateNfo.dup();
+            focusCell(state, cell, scrollTo, endingCell, clearSelection);
+            setStateNfo(state);
+        }
+        api.scrollTo = (coord) => {
+            const state = stateNfo.dup();
+            scrollTo(state, coord);
+            setStateNfo(state);
+        }
 
-        <b>graphics (w x h)</b> => frame({width} x {height}) -
-        debug({debugSize.width} x {debugSize.height}) -
-        canvasDiv({width} x {height - debugSize.height})<br />
+        api.getSelection = () => stateNfo.selection;
 
-        <b>grid (rows x cols))</b> => data({stateNfo.filteredRowsCount} x {colsCount}) -
-        view:({viewRowsCount} x {viewColsCount})<br />
-
-        <b>edit</b> => mode({stateNfo.editMode}) -
-        cell({stateNfo.customEditCell ? (stateNfo.customEditCell.row + "," + stateNfo.customEditCell.col) : ""}) -
-        focusedCell({stateNfo.focusedCell.row},{stateNfo.focusedCell.col}) -
-        scrollOffset:({stateNfo.scrollOffset.row},{stateNfo.scrollOffset.col}) - overcell:{String(stateNfo.cursorOverCell)}<br />
-
-        <b>selection</b> => {stateNfo.selection.toString()}<br />
-        <b>columnSort</b> => {_.orderBy(stateNfo.columnsSort, (x) => x.sortOrder)
-            .map((x, idx) => "ord:" + x.sortOrder + " col:" + x.columnIndex + " dir:" + x.sortDirection + " ; ")}<br />
-
-        <b>misc</b> => lang({navigator.language}) - momentLocale({moment().locale()})<br />
-
-        resizingCol:{stateNfo.resizingCol} - focusedFilterColIdx:{stateNfo.focusedFilterColIdx}
-        <br />
-    </div> : null;
-
-    api.clearSelection = () => {
-        const state = stateNfo.dup();
-        clearSelection(state);
-        setStateNfo(state);
-    };
-
-    api.focusCell = (cell, scrollTo, endingCell, clearSelection) => {
-        const state = stateNfo.dup();
-        focusCell(state, cell, scrollTo, endingCell, clearSelection);
-        setStateNfo(state);
+        api.setSorting = (newSorting) => {
+            const state = stateNfo.dup();
+            state.columnsSort = newSorting;
+            setStateNfo(state);
+        }
     }
-    api.scrollTo = (coord) => {
-        const state = stateNfo.dup();
-        scrollTo(state, coord);
-        setStateNfo(state);
-    }
-
-    api.getSelection = () => stateNfo.selection;
-
-    api.setSorting = (newSorting) => {
-        const state = stateNfo.dup();
-        state.columnsSort = newSorting;
-        setStateNfo(state);
-    }
+    //#endregion
 
     const baseDivContainerStyle = {
         overflow: "hidden",
@@ -1981,6 +1985,39 @@ export function WSCanvas(props: WSCanvasProps) {
         cursor: (stateNfo.resizingCol !== -2) ? "w-resize" :
             stateNfo.cursorOverCell ? cellCursor : outsideCellCursor
     } as CSSProperties;
+
+    //#region DEBUG CTL
+    let DEBUG_CTL: JSX.Element | null = null;
+    {
+        const stateNfoSize = debug ? JSON.stringify(stateNfo).length : 0;
+
+        DEBUG_CTL = debug ? <div ref={debugRef}>
+            <b>paint cnt</b> => {stateNfo.paintcnt}<br />
+            <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
+
+            <b>graphics (w x h)</b> => frame({width} x {height}) -
+            debug({debugSize.width} x {debugSize.height}) -
+            canvasDiv({width} x {height - debugSize.height})<br />
+
+            <b>grid (rows x cols))</b> => data({stateNfo.filteredRowsCount} x {colsCount}) -
+            view:({viewRowsCount} x {viewColsCount})<br />
+
+            <b>edit</b> => mode({stateNfo.editMode}) -
+            cell({stateNfo.customEditCell ? (stateNfo.customEditCell.row + "," + stateNfo.customEditCell.col) : ""}) -
+            focusedCell({stateNfo.focusedCell.row},{stateNfo.focusedCell.col}) -
+            scrollOffset:({stateNfo.scrollOffset.row},{stateNfo.scrollOffset.col}) - overcell:{String(stateNfo.cursorOverCell)}<br />
+
+            <b>selection</b> => {stateNfo.selection.toString()}<br />
+            <b>columnSort</b> => {_.orderBy(stateNfo.columnsSort, (x) => x.sortOrder)
+                .map((x, idx) => "ord:" + x.sortOrder + " col:" + x.columnIndex + " dir:" + x.sortDirection + " ; ")}<br />
+
+            <b>misc</b> => lang({navigator.language}) - momentLocale({moment().locale()})<br />
+
+            resizingCol:{stateNfo.resizingCol} - focusedFilterColIdx:{stateNfo.focusedFilterColIdx}
+            <br />
+        </div> : null;
+    }
+    //#endregion
 
     return <div ref={containerRef}
         style={{

@@ -45,6 +45,7 @@ export class WSCanvasState {
 
         this.paintcnt = 0;
         this.debugNfo = "";
+        this.initialized = false;
     }
 
     scrollOffset: WSCanvasCellCoord;
@@ -85,6 +86,7 @@ export class WSCanvasState {
 
     paintcnt: number;
     debugNfo: string;
+    initialized: boolean;
 
     dup() {
         const q = _.cloneDeep(this) as WSCanvasState;

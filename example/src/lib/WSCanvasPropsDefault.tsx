@@ -39,6 +39,7 @@ export const WSCanvasPropsDefault = () => {
         getColumnLessThanOp: undefined,
         getCellType: undefined,
         isCellReadonly: undefined,
+        columnInitialSort: undefined,
 
         sheetBackgroundColor: "white",
         gridLinesColor: "#c0c0c0",

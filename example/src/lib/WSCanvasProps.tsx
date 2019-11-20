@@ -4,6 +4,7 @@ import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 import { WSCanvasColumnType, WSCanvasColumnClickBehavior } from "./WSCanvasColumn";
 import { WSCanvasApi } from "./WSCanvasApi";
 import { CSSProperties } from "react";
+import { WSCanvasColumnSortInfo } from "react-ws-canvas";
 
 /** see WSCanvasPropsDefault for default values */
 export interface WSCanvasProps {
@@ -64,6 +65,8 @@ export interface WSCanvasProps {
     getCellType?: (coord: WSCanvasCellCoord, value: any) => WSCanvasColumnType;
     /** specify cell editor inhibit */
     isCellReadonly?: (coord: WSCanvasCellCoord) => boolean;
+    /** specify predefined column sort ( WSCanvasColumn array helper ) */
+    columnInitialSort?: WSCanvasColumnSortInfo[];
 
     /** cell background */
     sheetBackgroundColor: string;
