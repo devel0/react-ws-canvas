@@ -40,6 +40,7 @@ export const WSCanvasPropsDefault = () => {
         getCellType: undefined,
         isCellReadonly: undefined,
         columnInitialSort: undefined,
+        getCellTextAlign: undefined,
 
         getCellBackgroundColor: undefined,
         sheetBackgroundColor: "white",

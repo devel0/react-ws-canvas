@@ -55,6 +55,7 @@ export function WSCanvas(props: WSCanvasProps) {
         getCellType,
         isCellReadonly,
         columnInitialSort,
+        getCellTextAlign,
 
         getCellBackgroundColor,
         sheetBackgroundColor,
@@ -140,7 +141,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const paddingBottom = csty.paddingBottom ? parseFloat(csty.paddingBottom) : 0;
 
         margin_padding_W -= (marginLeft + marginRight + paddingLeft + paddingRight);
-        margin_padding_H -= (marginTop + marginBottom + paddingTop + paddingBottom);        
+        margin_padding_H -= (marginTop + marginBottom + paddingTop + paddingBottom);
     }
 
     let W = width - margin_padding_W;
@@ -436,8 +437,7 @@ export function WSCanvas(props: WSCanvasProps) {
             switch (cellType) {
                 case "boolean":
                     const val = cellData as boolean;
-                    if (val === true) str = "\u25FC"; // https://www.rapidtables.com/code/text/unicode-characters.html                    
-                    posX = x + textMargin + cWidth / 2;
+                    if (val === true) str = "\u25FC"; // https://www.rapidtables.com/code/text/unicode-characters.html                                        
                     ctx.textAlign = "center";
                     break;
                 case "date":
@@ -462,14 +462,32 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
                         str = cellData;
                     else
-                        str = Number(cellData).toLocaleString(navigator.language);
-                    posX = x + cWidth - textMargin;
+                        str = Number(cellData).toLocaleString(navigator.language);                    
                     ctx.textAlign = "right";
                     break;
                 case "text":
                     str = cellData;
                     break;
             }
+        }
+
+        if (getCellTextAlign) {
+            const q = getCellTextAlign(cell, cellData);
+            if (q) {
+                ctx.textAlign = q;
+            }
+        }
+
+        switch (ctx.textAlign) {
+            case "left":
+            case "start":
+                posX = x + textMargin; break;
+            case "center": posX = x + textMargin + cWidth / 2; break;
+            case "right":
+            case "end":
+                posX = x + cWidth - textMargin; break;
+            default:
+                posX = x + textMargin; break;
         }
 
         ctx.fillText(str, posX, posY);
@@ -760,6 +778,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const focusCell = (state: WSCanvasState, cell: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearPreviousSel?: boolean) => {
+        if (canvasRef.current) canvasRef.current.focus();
         setSelectionByEndingCell(state, cell, endingCell, clearPreviousSel);
 
         state.focusedCell = cell;
@@ -887,7 +906,7 @@ export function WSCanvas(props: WSCanvasProps) {
         let colwsumbefore = 0;
         for (let ci = 0; ci < viewColsCount; ++ci) colwsumbefore += colWidth(ci);
 
-        if (state.paintcnt===1 && canvasRef.current) canvasRef.current.focus();
+        // if (state.paintcnt === 1 && canvasRef.current) canvasRef.current.focus();
 
         if (state.paintcnt > 1 && colwsumbefore > state.colWidthExpanded) {
             let wtofillTotal = colwavail - colwsumbefore;
@@ -1279,7 +1298,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     };
 
-    const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {        
+    const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {
         if (api.onPreviewKeyDown) api.onPreviewKeyDown(e);
 
         if (!e.defaultPrevented) {
@@ -1528,6 +1547,8 @@ export function WSCanvas(props: WSCanvasProps) {
                 } else {
                     state.editMode = WSCanvasEditMode.none;
                 }
+
+                if (keyHandled) e.preventDefault();
 
                 if (applyState) {
                     rectifyScrollOffset(state);

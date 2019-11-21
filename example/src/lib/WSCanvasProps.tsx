@@ -67,6 +67,8 @@ export interface WSCanvasProps {
     isCellReadonly?: (coord: WSCanvasCellCoord) => boolean | undefined;
     /** specify predefined column sort ( WSCanvasColumn array helper ) */
     columnInitialSort: WSCanvasColumnSortInfo[] | undefined;
+    /** specify text align of a cell */
+    getCellTextAlign?: (coord: WSCanvasCellCoord, value: any) => CanvasTextAlign | undefined;
 
     /** individual cell background customization */
     getCellBackgroundColor?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
