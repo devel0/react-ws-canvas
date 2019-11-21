@@ -50,5 +50,7 @@
     "rollup-plugin-typescript2": "^0.25.2",
     "rollup-plugin-url": "^3.0.0"
   },
-  "files": [    "dist"  ]
+  "files": [
+    "dist"
+  ]
 }
