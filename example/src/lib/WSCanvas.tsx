@@ -32,6 +32,7 @@ export function WSCanvas(props: WSCanvasProps) {
         rowsCount,
         colsCount,
         colWidth,
+        colWidthExpand,
         rowHeight,
         frozenRowsCount,
         frozenColsCount,
@@ -152,6 +153,7 @@ export function WSCanvas(props: WSCanvasProps) {
         return Math.floor((h - (withHorizontalScrollbar ? scrollBarThk : 0)) / (rowHeight + 1));
     };
 
+    /** (NO side effects on state) */
     const overridenColWidth = (state: WSCanvasState, cidx: number) => {
         const q = state.columnWidthOverride.get(cidx);
         if (q)
@@ -304,6 +306,7 @@ export function WSCanvas(props: WSCanvasProps) {
         setStateNfo(state);
     }, [rowsCount]);
 
+    /** (NO side effects on state) */
     const sortedGetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord) => {
         const filterMap = rowToMatchingFilterRow;
         const sortingMap = sortingRowToSortedRowIndexMap;
@@ -350,6 +353,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const formatCellDataAsTime = (cellData: any) => moment(cellData as Date).format(timeCellMomentFormat);
     const formatCellDataAsDateTime = (cellData: any) => moment(cellData as Date).format(dateTimeCellMomentFormat);
 
+    /** (NO side effects on state) */
     const redrawCellInternal = (state: WSCanvasState, cell: WSCanvasCellCoord, ctx: CanvasRenderingContext2D, cWidth: number, x: number, y: number) => {
         const isSelected = (
             ((selectFocusedCellOrRow && state.selection.ranges.length === 1) || state.selection.ranges.length > 1) ||
@@ -481,20 +485,20 @@ export function WSCanvas(props: WSCanvasProps) {
         switch (ctx.textAlign) {
             case "left":
             case "start":
-                posX = x + textMargin; 
+                posX = x + textMargin;
                 break;
 
             case "center":
-                posX = x + textMargin + cWidth / 2; 
+                posX = x + textMargin + cWidth / 2;
                 break;
 
             case "right":
             case "end":
-                posX = x + cWidth - textMargin; 
+                posX = x + cWidth - textMargin;
                 break;
-                
+
             default:
-                posX = x + textMargin; 
+                posX = x + textMargin;
                 break;
         }
 
@@ -529,7 +533,9 @@ export function WSCanvas(props: WSCanvasProps) {
     const horizontalScrollHanleLen = () => Math.max(minScrollHandleLen, (W - scrollBarThk) / colsCount * viewColsCount);
     const verticalScrollHandleLen = (state: WSCanvasState) => Math.max(minScrollHandleLen, (H - scrollBarThk) / state.filteredRowsCount * viewRowsCount);
 
+    /** @returns true if side effects on state */
     const paintHorizontalScrollbar = (state: WSCanvasState, ctx: CanvasRenderingContext2D, factor: number) => {
+        let stateChanged = false;
         ctx.lineWidth = 1;
 
         const scrollHandleLen = horizontalScrollHanleLen();
@@ -539,7 +545,12 @@ export function WSCanvas(props: WSCanvasProps) {
             const W_ = W - 4 - scrollBarThk;
             const Y_ = H - 2 - scrollBarThk;
             ctx.fillStyle = gridLinesColor;
-            state.horizontalScrollBarRect = new WSCanvasRect(new WSCanvasCoord(1, Y_), new WSCanvasCoord(W_ + 1, scrollBarThk), WSCanvasRectMode.pointAndSize);
+            const newHorizontalScrollBarRect = new WSCanvasRect(new WSCanvasCoord(1, Y_), new WSCanvasCoord(W_ + 1, scrollBarThk), WSCanvasRectMode.pointAndSize);
+            if (state.horizontalScrollBarRect === null || !newHorizontalScrollBarRect.equals(state.horizontalScrollBarRect)) {
+                state.horizontalScrollBarRect = newHorizontalScrollBarRect;
+                stateChanged = true;
+            }
+
             const r = state.horizontalScrollBarRect;
             ctx.fillRect(r.leftTop.x, r.leftTop.y, r.width, r.height);
 
@@ -550,15 +561,23 @@ export function WSCanvas(props: WSCanvasProps) {
         {
             const scrollBarLeftTop = new WSCanvasCoord(scrollPos, H - scrollBarThk - 2);
             const scrollBarSize = new WSCanvasCoord(scrollHandleLen - 1, scrollBarThk - 1);
-            state.horizontalScrollHandleRect = new WSCanvasRect(scrollBarLeftTop, scrollBarSize, WSCanvasRectMode.pointAndSize);
+            const newHorizontalScrollHandleRect = new WSCanvasRect(scrollBarLeftTop, scrollBarSize, WSCanvasRectMode.pointAndSize);
+            if (state.horizontalScrollHandleRect === null || !newHorizontalScrollHandleRect.equals(state.horizontalScrollHandleRect)) {
+                state.horizontalScrollHandleRect = newHorizontalScrollHandleRect;
+                stateChanged = true;
+            }
 
             ctx.fillStyle = (state.horizontalScrollClickStartCoord !== null) ? clickedScrollBarColor : scrollBarColor;
             const r = state.horizontalScrollHandleRect;
             ctx.fillRect(r.leftTop.x, r.leftTop.y, r.width, r.height);
         }
+
+        return stateChanged;
     }
 
+    /** @returns true if side effects on state */
     const paintVerticalScrollbar = (state: WSCanvasState, ctx: CanvasRenderingContext2D, factor: number) => {
+        let stateChanged = false;
         ctx.lineWidth = 1;
 
         const scrollHandleLen = verticalScrollHandleLen(state);
@@ -568,7 +587,11 @@ export function WSCanvas(props: WSCanvasProps) {
             const H_ = H - 3 - scrollBarThk;
             const X_ = W - 2 - scrollBarThk;
             ctx.fillStyle = gridLinesColor;
-            state.verticalScrollBarRect = new WSCanvasRect(new WSCanvasCoord(X_, 0), new WSCanvasCoord(scrollBarThk, H_ + 1), WSCanvasRectMode.pointAndSize);
+            const newVerticalScrollBarRect = new WSCanvasRect(new WSCanvasCoord(X_, 0), new WSCanvasCoord(scrollBarThk, H_ + 1), WSCanvasRectMode.pointAndSize);
+            if (state.verticalScrollBarRect === null || !newVerticalScrollBarRect.equals(state.verticalScrollBarRect)) {
+                state.verticalScrollBarRect = newVerticalScrollBarRect;
+                stateChanged = true;
+            }
             const r = state.verticalScrollBarRect;
             ctx.fillRect(r.leftTop.x, r.leftTop.y, r.width, r.height);
         }
@@ -576,12 +599,18 @@ export function WSCanvas(props: WSCanvasProps) {
         {
             const scrollBarHandleLeftTop = new WSCanvasCoord(W - scrollBarThk - 2, scrollPos);
             const scrollBarSize = new WSCanvasCoord(scrollBarThk - 1, scrollHandleLen - 1);
-            state.verticalScrollHandleRect = new WSCanvasRect(scrollBarHandleLeftTop, scrollBarSize, WSCanvasRectMode.pointAndSize);
+            const newVerticalScrollHandleRect = new WSCanvasRect(scrollBarHandleLeftTop, scrollBarSize, WSCanvasRectMode.pointAndSize);
+            if (state.verticalScrollHandleRect === null || !newVerticalScrollHandleRect.equals(state.verticalScrollHandleRect)) {
+                state.verticalScrollHandleRect = newVerticalScrollHandleRect;
+                stateChanged = true;
+            }
 
             ctx.fillStyle = (state.verticalScrollClickStartCoord !== null) ? clickedScrollBarColor : scrollBarColor;
             const r = state.verticalScrollHandleRect;
             ctx.fillRect(r.leftTop.x, r.leftTop.y, r.width, r.height);
         }
+
+        return stateChanged;
     }
 
     const cleanupScrollClick = (state: WSCanvasState) => {
@@ -619,7 +648,8 @@ export function WSCanvas(props: WSCanvasProps) {
         return [-2, 0];
     }
 
-    /** [-2,0] not on screen */
+    /** [-2,0] not on screen
+     * (NO side effects on state) */
     const colGetXWidth = (state: WSCanvasState, qci: number, allowPartialCol: boolean = false) => {
         if (qci === -1) return [1, rowNumberColWidth];
 
@@ -704,6 +734,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
+    /** (NO side effects on state) */
     const cellToCanvasCoord = (state: WSCanvasState, cell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {
         const colXW = colGetXWidth(state, cell.col, allowPartialCol);
         if (cell.filterRow) return new WSCanvasCoord(colXW[0], colNumberRowHeight + filterTextMargin, colXW[1]);
@@ -892,7 +923,15 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    useEffect(() => {
+    /** (NO side effects on state) */
+    const computeIsOverCell = (state: WSCanvasState, x: number, y: number) => {        
+        return x >= state.tableCellsBBox.leftTop.x && x <= state.tableCellsBBox.rightBottom.x &&
+            y >= state.tableCellsBBox.leftTop.y && y <= state.tableCellsBBox.rightBottom.y;
+        // return y > (2 + colNumberRowHeightFull()) && y < (H - (horizontalScrollbarActive ? scrollBarThk : 0)) &&
+        //     x > (1 + (showRowNumber ? (rowNumberColWidth + 1) : 0)) && x < (W - (verticalScrollbarActive ? scrollBarThk : 0));
+    }
+
+    useEffect(() => {        
         paint(stateNfo);
     }, [width, height, stateNfo, debugSize, getCellData, setCellData]);
 
@@ -908,6 +947,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }, [debouncedFilter]);
 
     const paint = (state: WSCanvasState) => {
+        let stateChanged = false;
         ++state.paintcnt;
 
         const colwavail = W - (verticalScrollbarActive ? scrollBarThk : 0) - rowNumberColWidth - 2;
@@ -916,7 +956,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         // if (state.paintcnt === 1 && canvasRef.current) canvasRef.current.focus();
 
-        if (state.paintcnt > 1 && colwsumbefore > state.colWidthExpanded) {
+        if (state.paintcnt > 1 && colWidthExpand && colwsumbefore > state.colWidthExpanded) {
             let wtofillTotal = colwavail - colwsumbefore;
 
             if (wtofillTotal > 0) {
@@ -934,6 +974,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     wtofillUsed += wtoadd;
                 }
                 state.colWidthExpanded = colwsumbefore;
+                stateChanged = true;
             }
         }
 
@@ -952,6 +993,11 @@ export function WSCanvas(props: WSCanvasProps) {
                     const lastViewdCol = colGetXWidth(state, state.scrollOffset.col + viewColsCount - 1);
                     colsXMax = lastViewdCol[0] + lastViewdCol[1] + (showRowNumber ? 1 : 0);
                     rowsYMax = viewRowsCount * (rowHeight + 1) + (showColNumber ? (colNumberRowHeightFull() + 1) : 0) + 1;
+                    const newTableCellsBBox = new WSCanvasRect(new WSCanvasCoord(0, 0), new WSCanvasCoord(colsXMax, rowsYMax));
+                    if (!state.tableCellsBBox.equals(newTableCellsBBox)) {
+                        state.tableCellsBBox = newTableCellsBBox;
+                        stateChanged = true;
+                    }
 
                     ctx.fillStyle = gridLinesColor;
                     ctx.fillRect(0, 0, (showPartialColumns && stateNfo.scrollOffset.col !== colsCount - viewColsCount) ? W : colsXMax, rowsYMax);
@@ -1084,6 +1130,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (qFilter === undefined) {
                         qFilter = { colIdx: state.focusedFilterColIdx, filter: "" } as WSCanvasFilter;
                         state.filters.push(qFilter);
+                        stateChanged = true;
                     }
 
                     const ccoord = cellToCanvasCoord(state,
@@ -1292,18 +1339,20 @@ export function WSCanvas(props: WSCanvasProps) {
                 //#region DRAW HORIZONTAL SCROLLBAR
                 if (horizontalScrollbarActive) {
                     const scrollFactor = state.scrollOffset.col / (colsCount - viewColsCount);
-                    paintHorizontalScrollbar(state, ctx, scrollFactor);
+                    if (paintHorizontalScrollbar(state, ctx, scrollFactor)) stateChanged = true;
                 }
                 //#endregion
 
                 //#region DRAW VERTICAL SCROLLBAR
                 if (verticalScrollbarActive) {
                     const scrollFactor = state.scrollOffset.row / (state.filteredRowsCount - viewRowsCount);
-                    paintVerticalScrollbar(state, ctx, scrollFactor);
+                    if (paintVerticalScrollbar(state, ctx, scrollFactor)) stateChanged = true;
                 }
                 //#endregion
             }
         }
+
+        return stateChanged;
     };
 
     const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {
@@ -1720,7 +1769,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {        
         if (api.onPreviewMouseMove) api.onPreviewMouseMove(e);
 
         if (!e.defaultPrevented) {
@@ -1730,6 +1779,19 @@ export function WSCanvas(props: WSCanvasProps) {
             const RESIZE_HANDLE_TOL = 10;
             let stateUpdated = false;
             let state: WSCanvasState | undefined = undefined;
+
+            const isOverCell = computeIsOverCell(stateNfo, x, y);            
+            if (isOverCell !== stateNfo.cursorOverCell) {
+                stateUpdated = true;
+                state = stateNfo.dup();
+                state.cursorOverCell = isOverCell;
+            }
+
+            if (!isOverCell)
+            {
+                if (stateUpdated) setStateNfo(state!);
+                return;                
+            }
 
             if (canvasRef.current) {
                 if (e.buttons === 0) {
@@ -1815,9 +1877,8 @@ export function WSCanvas(props: WSCanvasProps) {
             }
 
             {
-                const isOverCell =
-                    y > (2 + colNumberRowHeightFull()) && y < (H - (horizontalScrollbarActive ? scrollBarThk : 0)) &&
-                    x > (1 + (showRowNumber ? (rowNumberColWidth + 1) : 0)) && x < (W - (verticalScrollbarActive ? scrollBarThk : 0));
+                const isOverCell = computeIsOverCell(stateNfo, x, y);
+
                 if (stateNfo.cursorOverCell !== isOverCell) {
                     if (state === undefined) {
                         state = stateNfo.dup();
@@ -1862,10 +1923,10 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
-        if (api.onPreviewMouseWheel) api.onPreviewMouseWheel(e);
+    const handleWheel = (e: WheelEvent) => {
+        if (api.onPreviewMouseWheel) api.onPreviewMouseWheel( e);
 
-        if (!e.defaultPrevented) {
+        if (!e.defaultPrevented && stateNfo.cursorOverCell) {
             const shift_key = e.getModifierState("Shift");
             const state = stateNfo.dup();
 
@@ -1883,6 +1944,8 @@ export function WSCanvas(props: WSCanvasProps) {
             }
 
             setStateNfo(state);
+            
+            e.preventDefault();
 
             if (api.onMouseWheel) api.onMouseWheel(e);
         }
@@ -1899,12 +1962,13 @@ export function WSCanvas(props: WSCanvasProps) {
         if (touch && canvasRef.current) {
             state.touchCur = [touch.clientX, touch.clientY];
             state.touchStart = [touch.clientX, touch.clientY];
-            state.touchStartTime = new Date().getTime();
+            state.touchStartTime = new Date().getTime();            
 
             const canv = canvasRef.current;
             const x = touch.clientX - canv.offsetLeft;
             const y = touch.clientY - canv.offsetTop;
             const ccoord = new WSCanvasCoord(x, y);
+            state.cursorOverCell = computeIsOverCell(state, x,y);            
 
             evalClickStart(state, ccoord);
         }
@@ -1915,16 +1979,19 @@ export function WSCanvas(props: WSCanvasProps) {
     const handleTouchMove = (e: TouchEvent) => {
         if (e.touches.length > 1) return;
 
-        const state = stateNfo.dup();
-
         const touch = e.touches.item(0);
         if (touch && canvasRef.current) {
-            state.touchCur = [touch.clientX, touch.clientY];
-
             const canv = canvasRef.current;
             const x = touch.clientX - canv.offsetLeft;
             const y = touch.clientY - canv.offsetTop;
             const ccoord = new WSCanvasCoord(x, y);
+
+            const isOverCell = computeIsOverCell(stateNfo, x, y);
+            let isOverCellChanged = stateNfo.cursorOverCell !== isOverCell;            
+
+            const state = stateNfo.dup();
+            state.cursorOverCell = isOverCell;
+            state.touchCur = [touch.clientX, touch.clientY];            
 
             const SCROLL_TOUCH_TOLERANCE = 20;
 
@@ -1940,7 +2007,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     state.horizontalScrollClickStartCoord !== null &&
                     state.horizontalScrollBarRect.leftTop.y <= y + SCROLL_TOUCH_TOLERANCE &&
                     state.horizontalScrollBarRect.rightBottom.y >= y - SCROLL_TOUCH_TOLERANCE
-                );
+                );            
 
             if (state.verticalScrollHandleRect) {
                 state.debugNfo = state.verticalScrollHandleRect.toString() + " cx:" + (touch.clientX - canv.offsetLeft) + " cy:" + (touch.clientY - canv.offsetTop);
@@ -1953,6 +2020,8 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
 
                 evalVerticalScrollMove(state, state.verticalScrollClickStartCoord.y, y);
+
+                e.preventDefault();
             } else if (onHorizontalScrollBar) {
                 if (state.horizontalScrollClickStartCoord === null) {
                     state.horizontalScrollClickStartFactor = state.scrollOffset.col / (colsCount - viewColsCount);
@@ -1960,7 +2029,9 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
 
                 evalHorizontalScrollMove(state, state.horizontalScrollClickStartCoord.x, x);
-            } else {
+
+                e.preventDefault();
+            } else if (isOverCell) {
                 const X_SENSITIVITY = width / 10;
                 const Y_SENSITIVITY = height / 25;
 
@@ -1974,12 +2045,13 @@ export function WSCanvas(props: WSCanvasProps) {
                     state.scrollOffset = new WSCanvasCellCoord(
                         Math.max(0, Math.min(state.filteredRowsCount - viewRowsCount, state.scrollOffset.row + deltaRow)),
                         Math.max(0, Math.min(colsCount - viewColsCount, state.scrollOffset.col + deltaCol)));
-                }
-            }
-        }
-        e.preventDefault();
+                }        
+                
+                e.preventDefault();
+            }                            
 
-        setStateNfo(state);
+            setStateNfo(state);
+        }
     }
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -2007,11 +2079,13 @@ export function WSCanvas(props: WSCanvasProps) {
 
     useLayoutEffect(() => {
         if (canvasRef.current) {
+            canvasRef.current.addEventListener("wheel", handleWheel);
             canvasRef.current.addEventListener("touchstart", handleTouchStart);
             canvasRef.current.addEventListener("touchmove", handleTouchMove, { passive: false });
-            canvasRef.current.addEventListener("touchend", handleTouchEnd);
+            canvasRef.current.addEventListener("touchend", handleTouchEnd);            
             return () => {
                 if (canvasRef.current) {
+                    canvasRef.current.removeEventListener("wheel", handleWheel);
                     canvasRef.current.removeEventListener("touchstart", handleTouchStart);
                     canvasRef.current.removeEventListener("touchmove", handleTouchMove);
                     canvasRef.current.removeEventListener("touchend", handleTouchEnd);
@@ -2115,8 +2189,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             <canvas ref={canvasRef}
                 tabIndex={0}
-                style={canvasStyle === undefined ? baseCanvasStyle : Object.assign(baseCanvasStyle, canvasStyle, { margin: 0, padding: 0 })}
-                onWheel={handleWheel}
+                style={canvasStyle === undefined ? baseCanvasStyle : Object.assign(baseCanvasStyle, canvasStyle, { margin: 0, padding: 0 })}                
                 onKeyDown={handleKeyDown}
                 onPointerDown={handlePointerDown}
                 onMouseDown={handleMouseDown}

@@ -31,8 +31,8 @@ export class WSCanvasApi {
     onPreviewMouseDoubleClick?: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
     onMouseDoubleClick?: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
 
-    onPreviewMouseWheel?: (e: React.WheelEvent<HTMLCanvasElement>) => void;
-    onMouseWheel?: (e: React.WheelEvent<HTMLCanvasElement>) => void;
+    onPreviewMouseWheel?: (e: WheelEvent) => void;
+    onMouseWheel?: (e: WheelEvent) => void;
 
     onContextMenu?: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
 
