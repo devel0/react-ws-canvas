@@ -1,4 +1,4 @@
-import { WSCanvasSortDirection } from "react-ws-canvas";
+import { WSCanvasSortDirection } from "./WSCanvasSortDirection";
 
 export type WSCanvasColumnType = "text" | "number" | "boolean" | "custom" | "date" | "time" | "datetime";
 
