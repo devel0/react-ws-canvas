@@ -6,6 +6,8 @@ cd "$exdir"
 yarn version --prepatch
 
 cp -f "$exdir"/../README.md "$exdir"
+rm -fr "$exdir"/dist
+yarn build
 yarn publish
 
 rm -f "$exdir"/README.md
