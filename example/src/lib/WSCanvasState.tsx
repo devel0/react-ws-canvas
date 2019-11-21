@@ -11,6 +11,7 @@ export class WSCanvasState {
     constructor() {
         this.scrollOffset = new WSCanvasCellCoord();
         this.scrollOffsetStart = new WSCanvasCellCoord();
+        this.tableCellsBBox = new WSCanvasRect();
 
         this.touchStartTime = 0;
         this.touchStart = [0, 0];
@@ -52,6 +53,7 @@ export class WSCanvasState {
 
     scrollOffset: WSCanvasCellCoord;
     scrollOffsetStart: WSCanvasCellCoord;
+    tableCellsBBox: WSCanvasRect;
 
     touchStartTime: number;
     touchStart: number[];

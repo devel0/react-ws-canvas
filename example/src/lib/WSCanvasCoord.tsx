@@ -16,6 +16,11 @@ export class WSCanvasCoord {
     get width() { return this._width; }
     get height() { return this._height; }
 
+    equals(other: WSCanvasCoord) {
+        return this._x === other._x && this._y === other._y &&
+            this._width === other._width && this._height === other._height;
+    }
+
     sum(delta: WSCanvasCoord) {
         return new WSCanvasCoord(this._x + delta._x, this._y + delta._y);
     }

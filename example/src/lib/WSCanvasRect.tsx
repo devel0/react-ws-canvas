@@ -20,6 +20,10 @@ export class WSCanvasRect {
         }
     }
 
+    equals(other:WSCanvasRect) {
+        return this._leftTop.equals(other._leftTop) && this._rightBottom.equals(other._rightBottom);
+    }
+
     get leftTop() { return this._leftTop; }
     get rightBottom() { return this._rightBottom; }
 
