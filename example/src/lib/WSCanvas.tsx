@@ -462,7 +462,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
                         str = cellData;
                     else
-                        str = Number(cellData).toLocaleString(navigator.language);                    
+                        str = Number(cellData).toLocaleString(navigator.language);
                     ctx.textAlign = "right";
                     break;
                 case "text":
@@ -481,13 +481,21 @@ export function WSCanvas(props: WSCanvasProps) {
         switch (ctx.textAlign) {
             case "left":
             case "start":
-                posX = x + textMargin; break;
-            case "center": posX = x + textMargin + cWidth / 2; break;
+                posX = x + textMargin; 
+                break;
+
+            case "center":
+                posX = x + textMargin + cWidth / 2; 
+                break;
+
             case "right":
             case "end":
-                posX = x + cWidth - textMargin; break;
+                posX = x + cWidth - textMargin; 
+                break;
+                
             default:
-                posX = x + textMargin; break;
+                posX = x + textMargin; 
+                break;
         }
 
         ctx.fillText(str, posX, posY);
