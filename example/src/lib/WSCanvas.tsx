@@ -307,47 +307,42 @@ export function WSCanvas(props: WSCanvasProps) {
         setStateNfo(state);
     }, [rowsCount]);
 
-    /** (NO side effects on state) */
-    const sortedGetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord) => {
+    const sortedGetRow = (coord: WSCanvasCellCoord) => {
         const filterMap = rowToMatchingFilterRow;
         const sortingMap = sortingRowToSortedRowIndexMap;
         const sortedMap = rowToSortedRowIndexMap;
 
         if (sortingMap !== null) {
-            return getCellData(new WSCanvasCellCoord(sortingMap[coord.row], coord.col));
+            return sortingMap[coord.row];
         }
         else if (sortedMap !== null) {
             if (filterMap === null)
-                return getCellData(new WSCanvasCellCoord(sortedMap[coord.row], coord.col));
+                return sortedMap[coord.row];
             else
-                return getCellData(new WSCanvasCellCoord(filterMap[sortedMap[coord.row]], coord.col));
+                return filterMap[sortedMap[coord.row]];
         }
         else {
             if (filterMap === null)
-                return getCellData(coord);
+                return coord.row;
             else
-                return getCellData(new WSCanvasCellCoord(filterMap[coord.row], coord.col))
+                return filterMap[coord.row];
         }
     }
 
-    const sortedSetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord, value: any) => {
-        const filterMap = rowToMatchingFilterRow;
-        const sortingMap = sortingRowToSortedRowIndexMap;
-        const sortedMap = rowToSortedRowIndexMap;
-
-        if (sortingMap !== null) {
-            setCellData(new WSCanvasCellCoord(sortingMap[coord.row], coord.col), value);
-        } else if (sortedMap !== null) {
-            if (filterMap === null)
-                setCellData(new WSCanvasCellCoord(sortedMap[coord.row], coord.col), value);
-            else
-                setCellData(new WSCanvasCellCoord(filterMap[sortedMap[coord.row]], coord.col), value);
-        } else {
-            if (filterMap === null)
-                setCellData(coord, value);
-            else
-                setCellData(new WSCanvasCellCoord(filterMap[coord.row], coord.col), value);
+    const cellCoordFromSorted = (coord: WSCanvasCellCoord | null) => {
+        if (coord) {
+            return new WSCanvasCellCoord(sortedGetRow(coord), coord.col);
         }
+        return null;
+    }
+
+    /** (NO side effects on state) */
+    const sortedGetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord) => {
+        return getCellData(new WSCanvasCellCoord(sortedGetRow(coord), coord.col));
+    }
+
+    const sortedSetCellData = (state: WSCanvasState, coord: WSCanvasCellCoord, value: any) => {
+        setCellData(new WSCanvasCellCoord(sortedGetRow(coord), coord.col), value);
     }
 
     const formatCellDataAsDate = (cellData: any) => moment(cellData as Date).format(dateCellMomentFormat);
@@ -1628,10 +1623,10 @@ export function WSCanvas(props: WSCanvasProps) {
     const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         let cellCoord: WSCanvasCellCoord | null = null;
         const x = e.pageX - e.currentTarget.offsetLeft;
-        const y = e.pageY - e.currentTarget.offsetTop;        
+        const y = e.pageY - e.currentTarget.offsetTop;
         const ccoord = new WSCanvasCoord(x, y);
 
-        if (api.onPreviewMouseDown) api.onPreviewMouseDown(e, cellCoord);
+        if (api.onPreviewMouseDown) api.onPreviewMouseDown(e, cellCoordFromSorted(cellCoord));
 
         if (!e.defaultPrevented) {
 
@@ -1760,7 +1755,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 setStateNfo(state);
             }
 
-            if (api.onMouseDown) api.onMouseDown(e, cellCoord);
+            if (api.onMouseDown) api.onMouseDown(e, cellCoordFromSorted(cellCoord));
         }
     }
 
@@ -1793,7 +1788,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 stateUpdated = true;
                 state = stateNfo.dup();
                 state.cursorOverCell = isOverCell;
-            }            
+            }
 
             if (canvasRef.current) {
                 if (e.buttons === 0) {
@@ -1902,7 +1897,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const ccoord = new WSCanvasCoord(x, y);
         const cell = canvasToCellCoord(stateNfo, ccoord);
 
-        if (api.onPreviewMouseDoubleClick) api.onPreviewMouseDoubleClick(e, cell);
+        if (api.onPreviewMouseDoubleClick) api.onPreviewMouseDoubleClick(e, cellCoordFromSorted(cell));
 
         if (!e.defaultPrevented) {
             if (cell) {
@@ -1920,7 +1915,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     setStateNfo(state);
                 }
 
-                if (api.onMouseDown) api.onMouseDown(e, cell);
+                if (api.onMouseDown) api.onMouseDown(e, cellCoordFromSorted(cell));
             }
         }
     }
@@ -2076,7 +2071,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const y = e.pageY - e.currentTarget.offsetTop;
         const cell = canvasToCellCoord(stateNfo, new WSCanvasCoord(x, y));
 
-        if (api.onContextMenu) api.onContextMenu(e, cell);
+        if (api.onContextMenu) api.onContextMenu(e, cellCoordFromSorted(cell));
     }
 
     useLayoutEffect(() => {
@@ -2111,6 +2106,7 @@ export function WSCanvas(props: WSCanvasProps) {
             setStateNfo(state);
         }
 
+        // TODO: sorted
         api.cellToCanvasCoord = (cell) => cellToCanvasCoord(stateNfo, cell);
         api.canvasCoordToCellCoord = (ccoord) => canvasToCellCoord(stateNfo, ccoord);
         api.focusCell = (cell, scrollTo, endingCell, clearSelection) => {
@@ -2118,6 +2114,8 @@ export function WSCanvas(props: WSCanvasProps) {
             focusCell(state, cell, scrollTo, endingCell, clearSelection);
             setStateNfo(state);
         }
+        //
+    
         api.scrollTo = (coord) => {
             const state = stateNfo.dup();
             scrollTo(state, coord);
