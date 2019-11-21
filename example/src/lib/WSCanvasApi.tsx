@@ -1,8 +1,8 @@
 import { WSCanvasSelection } from "./WSCanvasSelection";
 import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 import { WSCanvasCoord } from "./WSCanvasCoord";
-import { WSCanvasSortingRowInfo } from "./WSCanvasColumn";
 import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
+import { WSCanvasState } from "./WSCanvasState";
 
 export class WSCanvasApi {
     clearSelection: () => void;
@@ -14,6 +14,8 @@ export class WSCanvasApi {
     focusCell: (coord: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearSelection?: boolean) => void;
     scrollTo: (coord: WSCanvasCellCoord) => void;
     setSorting: (sorting: WSCanvasColumnSortInfo[]) => void;
+    
+    currentState: () => WSCanvasState;
 
     onPreviewKeyDown?: (e: React.KeyboardEvent<HTMLCanvasElement>) => void;
     onKeyDown?: (e: React.KeyboardEvent<HTMLCanvasElement>) => void;
@@ -40,11 +42,13 @@ export class WSCanvasApi {
         this.clearSelection = () => { };
         this.getSelection = () => new WSCanvasSelection([]);
         this.setSelection = () => { };
-        this.setSorting = () => { };
 
         this.cellToCanvasCoord = () => null;
         this.canvasCoordToCellCoord = () => null;
         this.focusCell = () => { };
         this.scrollTo = () => { };
+        this.setSorting = () => { };
+        
+        this.currentState = () => new WSCanvasState();
     }
 }

@@ -114,6 +114,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const debugSize = useElementSize(debugRef);
 
     const [stateNfo, setStateNfo] = useState<WSCanvasState>(new WSCanvasState());
+    const [dbgNfo, setDbgNfo] = useState<string>("");
 
     const [children, setChildren] = useState<JSX.Element[]>([]);
     const [filterChildren, setFilterChildren] = useState<JSX.Element[]>([]);
@@ -141,8 +142,8 @@ export function WSCanvas(props: WSCanvasProps) {
         const paddingTop = csty.paddingTop ? parseFloat(csty.paddingTop) : 0;
         const paddingBottom = csty.paddingBottom ? parseFloat(csty.paddingBottom) : 0;
 
-        margin_padding_W -= (marginLeft + marginRight + paddingLeft + paddingRight);
-        margin_padding_H -= (marginTop + marginBottom + paddingTop + paddingBottom);
+        margin_padding_W += (marginLeft + marginRight + paddingLeft + paddingRight);
+        margin_padding_H += (marginTop + marginBottom + paddingTop + paddingBottom);
     }
 
     let W = width - margin_padding_W;
@@ -924,14 +925,14 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** (NO side effects on state) */
-    const computeIsOverCell = (state: WSCanvasState, x: number, y: number) => {        
+    const computeIsOverCell = (state: WSCanvasState, x: number, y: number) => {
         return x >= state.tableCellsBBox.leftTop.x && x <= state.tableCellsBBox.rightBottom.x &&
             y >= state.tableCellsBBox.leftTop.y && y <= state.tableCellsBBox.rightBottom.y;
         // return y > (2 + colNumberRowHeightFull()) && y < (H - (horizontalScrollbarActive ? scrollBarThk : 0)) &&
         //     x > (1 + (showRowNumber ? (rowNumberColWidth + 1) : 0)) && x < (W - (verticalScrollbarActive ? scrollBarThk : 0));
     }
 
-    useEffect(() => {        
+    useEffect(() => {
         paint(stateNfo);
     }, [width, height, stateNfo, debugSize, getCellData, setCellData]);
 
@@ -1349,6 +1350,13 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (paintVerticalScrollbar(state, ctx, scrollFactor)) stateChanged = true;
                 }
                 //#endregion
+
+                if (debug) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = "red";
+                    ctx.rect(0, 0, W - 1, H - 1);
+                    ctx.stroke();
+                }
             }
         }
 
@@ -1620,7 +1628,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         let cellCoord: WSCanvasCellCoord | null = null;
         const x = e.pageX - e.currentTarget.offsetLeft;
-        const y = e.pageY - e.currentTarget.offsetTop;
+        const y = e.pageY - e.currentTarget.offsetTop;        
         const ccoord = new WSCanvasCoord(x, y);
 
         if (api.onPreviewMouseDown) api.onPreviewMouseDown(e, cellCoord);
@@ -1769,7 +1777,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {        
+    const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         if (api.onPreviewMouseMove) api.onPreviewMouseMove(e);
 
         if (!e.defaultPrevented) {
@@ -1780,18 +1788,12 @@ export function WSCanvas(props: WSCanvasProps) {
             let stateUpdated = false;
             let state: WSCanvasState | undefined = undefined;
 
-            const isOverCell = computeIsOverCell(stateNfo, x, y);            
+            const isOverCell = computeIsOverCell(stateNfo, x, y);
             if (isOverCell !== stateNfo.cursorOverCell) {
                 stateUpdated = true;
                 state = stateNfo.dup();
                 state.cursorOverCell = isOverCell;
-            }
-
-            if (!isOverCell)
-            {
-                if (stateUpdated) setStateNfo(state!);
-                return;                
-            }
+            }            
 
             if (canvasRef.current) {
                 if (e.buttons === 0) {
@@ -1924,7 +1926,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const handleWheel = (e: WheelEvent) => {
-        if (api.onPreviewMouseWheel) api.onPreviewMouseWheel( e);
+        if (api.onPreviewMouseWheel) api.onPreviewMouseWheel(e);
 
         if (!e.defaultPrevented && stateNfo.cursorOverCell) {
             const shift_key = e.getModifierState("Shift");
@@ -1944,7 +1946,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
 
             setStateNfo(state);
-            
+
             e.preventDefault();
 
             if (api.onMouseWheel) api.onMouseWheel(e);
@@ -1962,13 +1964,13 @@ export function WSCanvas(props: WSCanvasProps) {
         if (touch && canvasRef.current) {
             state.touchCur = [touch.clientX, touch.clientY];
             state.touchStart = [touch.clientX, touch.clientY];
-            state.touchStartTime = new Date().getTime();            
+            state.touchStartTime = new Date().getTime();
 
             const canv = canvasRef.current;
             const x = touch.clientX - canv.offsetLeft;
             const y = touch.clientY - canv.offsetTop;
             const ccoord = new WSCanvasCoord(x, y);
-            state.cursorOverCell = computeIsOverCell(state, x,y);            
+            state.cursorOverCell = computeIsOverCell(state, x, y);
 
             evalClickStart(state, ccoord);
         }
@@ -1987,11 +1989,11 @@ export function WSCanvas(props: WSCanvasProps) {
             const ccoord = new WSCanvasCoord(x, y);
 
             const isOverCell = computeIsOverCell(stateNfo, x, y);
-            let isOverCellChanged = stateNfo.cursorOverCell !== isOverCell;            
+            let isOverCellChanged = stateNfo.cursorOverCell !== isOverCell;
 
             const state = stateNfo.dup();
             state.cursorOverCell = isOverCell;
-            state.touchCur = [touch.clientX, touch.clientY];            
+            state.touchCur = [touch.clientX, touch.clientY];
 
             const SCROLL_TOUCH_TOLERANCE = 20;
 
@@ -2007,7 +2009,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     state.horizontalScrollClickStartCoord !== null &&
                     state.horizontalScrollBarRect.leftTop.y <= y + SCROLL_TOUCH_TOLERANCE &&
                     state.horizontalScrollBarRect.rightBottom.y >= y - SCROLL_TOUCH_TOLERANCE
-                );            
+                );
 
             if (state.verticalScrollHandleRect) {
                 state.debugNfo = state.verticalScrollHandleRect.toString() + " cx:" + (touch.clientX - canv.offsetLeft) + " cy:" + (touch.clientY - canv.offsetTop);
@@ -2045,10 +2047,10 @@ export function WSCanvas(props: WSCanvasProps) {
                     state.scrollOffset = new WSCanvasCellCoord(
                         Math.max(0, Math.min(state.filteredRowsCount - viewRowsCount, state.scrollOffset.row + deltaRow)),
                         Math.max(0, Math.min(colsCount - viewColsCount, state.scrollOffset.col + deltaCol)));
-                }        
-                
+                }
+
                 e.preventDefault();
-            }                            
+            }
 
             setStateNfo(state);
         }
@@ -2082,7 +2084,7 @@ export function WSCanvas(props: WSCanvasProps) {
             canvasRef.current.addEventListener("wheel", handleWheel);
             canvasRef.current.addEventListener("touchstart", handleTouchStart);
             canvasRef.current.addEventListener("touchmove", handleTouchMove, { passive: false });
-            canvasRef.current.addEventListener("touchend", handleTouchEnd);            
+            canvasRef.current.addEventListener("touchend", handleTouchEnd);
             return () => {
                 if (canvasRef.current) {
                     canvasRef.current.removeEventListener("wheel", handleWheel);
@@ -2097,20 +2099,20 @@ export function WSCanvas(props: WSCanvasProps) {
 
     //#region API
     {
-        api.canvasCoordToCellCoord = (ccoord) => canvasToCellCoord(stateNfo, ccoord);
-        api.cellToCanvasCoord = (cell) => cellToCanvasCoord(stateNfo, cell);
+        api.clearSelection = () => {
+            const state = stateNfo.dup();
+            clearSelection(state);
+            setStateNfo(state);
+        };
+        api.getSelection = () => stateNfo.selection;
         api.setSelection = (selection: WSCanvasSelection) => {
             const state = stateNfo.dup();
             state.selection = selection;
             setStateNfo(state);
         }
 
-        api.clearSelection = () => {
-            const state = stateNfo.dup();
-            clearSelection(state);
-            setStateNfo(state);
-        };
-
+        api.cellToCanvasCoord = (cell) => cellToCanvasCoord(stateNfo, cell);
+        api.canvasCoordToCellCoord = (ccoord) => canvasToCellCoord(stateNfo, ccoord);
         api.focusCell = (cell, scrollTo, endingCell, clearSelection) => {
             const state = stateNfo.dup();
             focusCell(state, cell, scrollTo, endingCell, clearSelection);
@@ -2121,14 +2123,14 @@ export function WSCanvas(props: WSCanvasProps) {
             scrollTo(state, coord);
             setStateNfo(state);
         }
-
-        api.getSelection = () => stateNfo.selection;
-
         api.setSorting = (newSorting) => {
             const state = stateNfo.dup();
             state.columnsSort = newSorting;
             setStateNfo(state);
         }
+        api.currentState = () => stateNfo;
+
+        //api.currentState = () => { return stateNfo; }
     }
     //#endregion
 
@@ -2150,27 +2152,8 @@ export function WSCanvas(props: WSCanvasProps) {
         DEBUG_CTL = debug ? <div ref={debugRef}>
             <b>paint cnt</b> => {stateNfo.paintcnt}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
-
-            <b>graphics (w x h)</b> => frame({width} x {height}) -
-            debug({debugSize.width} x {debugSize.height}) -
-            canvasDiv({width} x {height - debugSize.height})<br />
-
-            <b>grid (rows x cols))</b> => data({stateNfo.filteredRowsCount} x {colsCount}) -
-            view:({viewRowsCount} x {viewColsCount})<br />
-
-            <b>edit</b> => mode({stateNfo.editMode}) -
-            cell({stateNfo.customEditCell ? (stateNfo.customEditCell.row + "," + stateNfo.customEditCell.col) : ""}) -
-            focusedCell({stateNfo.focusedCell.row},{stateNfo.focusedCell.col}) -
-            scrollOffset:({stateNfo.scrollOffset.row},{stateNfo.scrollOffset.col}) - overcell:{String(stateNfo.cursorOverCell)}<br />
-
-            <b>selection</b> => {stateNfo.selection.toString()}<br />
-            <b>columnSort</b> => {_.orderBy(stateNfo.columnsSort.filter((x) => x.sortDirection), (x) => x.sortOrder)
-                .map((x, idx) => "ord:" + x.sortOrder + " col:" + x.columnIndex + " dir:" + x.sortDirection + " ; ")}<br />
-
-            <b>misc</b> => lang({navigator.language}) - momentLocale({moment().locale()})<br />
-
-            resizingCol:{stateNfo.resizingCol} - focusedFilterColIdx:{stateNfo.focusedFilterColIdx}
-            <br />
+            {dbgNfo}<br />
+            <b>scrollbar</b> => v:{String(verticalScrollbarActive)}<br />
         </div> : null;
     }
     //#endregion
@@ -2179,17 +2162,20 @@ export function WSCanvas(props: WSCanvasProps) {
         style={{
             width: width,
             height: height,
+            border: debug ? "1px solid blue" : "",
             overflow: "hidden"
         }}>
 
-        {DEBUG_CTL}
+        <div style={{ background: "lightcyan" }}>
+            {DEBUG_CTL}
+        </div>
 
         <div ref={canvasDivRef}
             style={containerStyle === undefined ? baseDivContainerStyle : Object.assign(baseDivContainerStyle, containerStyle)}>
 
             <canvas ref={canvasRef}
                 tabIndex={0}
-                style={canvasStyle === undefined ? baseCanvasStyle : Object.assign(baseCanvasStyle, canvasStyle, { margin: 0, padding: 0 })}                
+                style={canvasStyle === undefined ? baseCanvasStyle : Object.assign(baseCanvasStyle, canvasStyle, { margin: 0, padding: 0 })}
                 onKeyDown={handleKeyDown}
                 onPointerDown={handlePointerDown}
                 onMouseDown={handleMouseDown}
