@@ -9,11 +9,12 @@ const App: React.FC = () => {
   const winSize = useWindowSize();
   const userDivRef = useRef<HTMLDivElement>(null);
   const userSize = useElementSize(userDivRef);
+  const [debug, setDebug] = useState(false);
   const api = new WSCanvasApi();
   const [columnClickBehavior, setColumnClickBehavior] = useState(WSCanvasColumnClickBehavior.ToggleSort);
 
   api.onMouseDown = (e, c) => {
-  //  console.log("CELL CLICKED " + c);
+    //  console.log("CELL CLICKED " + c);
   };
 
   api.onContextMenu = (e, c) => {
@@ -24,7 +25,8 @@ const App: React.FC = () => {
   }
 
   return <div>
-    <div ref={userDivRef} style={{ paddingTop: 10, paddingBottom: 10 }}>
+
+    <div ref={userDivRef} style={{ margin: 10 }}>
       <b>API </b>
 
       <button onClick={() => {
@@ -54,9 +56,27 @@ const App: React.FC = () => {
       <button onClick={() => {
         setColumnClickBehavior(WSCanvasColumnClickBehavior.Select);
       }}>columnClickSelect</button>
+
+      <button onClick={() => {
+        setDebug(!debug);        
+      }}>toggleDebug</button>
     </div>
+
     <div>
-      {Sample2(winSize.width, winSize.height - userSize.height, api, columnClickBehavior)}
+      {Sample2(debug, winSize.width, 400, api, columnClickBehavior)}
+    </div>
+
+    <div style={{ background: "lightgreen", margin: "1em" }}>
+      <h3>TEST DIV AFTER CONTROL</h3>
+      <p>sample text 1</p>
+      <p>sample text 2</p>
+      <p>sample text 3</p>
+      <p>sample text 1</p>
+      <p>sample text 2</p>
+      <p>sample text 3</p>
+      <p>sample text 1</p>
+      <p>sample text 2</p>
+      <p>sample text 3</p>
     </div>
   </div>
 }
