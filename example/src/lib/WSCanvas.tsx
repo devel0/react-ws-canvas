@@ -1926,23 +1926,32 @@ export function WSCanvas(props: WSCanvasProps) {
         if (!e.defaultPrevented && stateNfo.cursorOverCell) {
             const shift_key = e.getModifierState("Shift");
             const state = stateNfo.dup();
+            let prevent = true;
 
             if (e.deltaY > 0) {
-                if (shift_key)
+                if (shift_key) {
+                    if (state.scrollOffset.col === colsCount - viewColsCount) prevent = false;
                     state.scrollOffset = state.scrollOffset.setCol(Math.min(state.scrollOffset.col + 1, colsCount - viewColsCount));
-                else
+                }
+                else {
+                    if (state.scrollOffset.row === state.filteredRowsCount - viewRowsCount) prevent = false;
                     state.scrollOffset = state.scrollOffset.setRow(Math.min(state.scrollOffset.row + 1, state.filteredRowsCount - viewRowsCount));
+                }
             }
             else if (e.deltaY < 0) {
-                if (shift_key)
+                if (shift_key) {
+                    if (state.scrollOffset.col === 0) prevent = false;
                     state.scrollOffset = state.scrollOffset.setCol(Math.max(0, state.scrollOffset.col - 1));
-                else
+                }
+                else {
+                    if (state.scrollOffset.row === 0) prevent = false;
                     state.scrollOffset = state.scrollOffset.setRow(Math.max(0, state.scrollOffset.row - 1));
+                }
             }
 
             setStateNfo(state);
 
-            e.preventDefault();
+            if (prevent) e.preventDefault();
 
             if (api.onMouseWheel) api.onMouseWheel(e);
         }
@@ -2115,7 +2124,7 @@ export function WSCanvas(props: WSCanvasProps) {
             setStateNfo(state);
         }
         //
-    
+
         api.scrollTo = (coord) => {
             const state = stateNfo.dup();
             scrollTo(state, coord);
