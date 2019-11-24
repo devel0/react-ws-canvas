@@ -1794,7 +1794,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 if (e.buttons === 0) {
                     if (showColNumber && y < colNumberRowHeightFull()) {
                         let qCol = xGetCol(stateNfo, x);
-
+                        
                         let resizingCol = -2;
                         let cwidth = qCol[1];
                         let onHandle = false;
@@ -1812,12 +1812,21 @@ export function WSCanvas(props: WSCanvasProps) {
                                 cwidth = colX[1];
                             }
 
+                            if (qCol[0] === colsCount - 1) {
+                                const lastX = stateNfo.tableCellsBBox.rightBottom.x;
+                                if (Math.abs(x - lastX) <= RESIZE_HANDLE_TOL) {
+                                    onHandle = true;
+                                    resizingCol = colsCount - 1;
+                                    cwidth = colGetXWidth(stateNfo, resizingCol)[1];
+                                }
+                            }
+
                             if (!skip && (x === colX[0] || (colX[0] >= x - RESIZE_HANDLE_TOL && colX[0] <= x + RESIZE_HANDLE_TOL))) {
                                 onHandle = true;
                                 resizingCol = tryResizingCol - 1;
                                 cwidth = colGetXWidth(stateNfo, resizingCol)[1];
                             }
-                        }
+                        }                       
 
                         if (stateNfo.resizingCol !== resizingCol) {
                             if (state === undefined) {
@@ -2158,7 +2167,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         DEBUG_CTL = debug ? <div ref={debugRef}>
             <b>paint cnt</b> => {stateNfo.paintcnt}<br />
-            <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
+            <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />            
             {dbgNfo}<br />
             <b>scrollbar</b> => v:{String(verticalScrollbarActive)}<br />
         </div> : null;
