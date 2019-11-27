@@ -1548,7 +1548,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         keyHandled = true;
                         if (ctrl_key)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setRow(0));
-                        else if (state.focusedCell.row > 0)
+                        else if (focusedViewCell.row > 0)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.prevRow());
                         break;
 
@@ -1556,7 +1556,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         keyHandled = true;
                         if (ctrl_key)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setCol(colsCount - 1));
-                        else if (state.focusedCell.col < colsCount - 1)
+                        else if (focusedViewCell.col < colsCount - 1)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol());
                         break;
 
@@ -1564,7 +1564,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         keyHandled = true;
                         if (ctrl_key)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setCol(0));
-                        else if (state.focusedCell.col > 0)
+                        else if (focusedViewCell.col > 0)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.prevCol());
                         break;
 
