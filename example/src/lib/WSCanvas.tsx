@@ -1043,8 +1043,8 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** (NO side effects on state) */
-    const computeIsOverCell = (state: WSCanvasState, x: number, y: number) => {
-        return x >= state.tableCellsBBox.leftTop.x && x <= state.tableCellsBBox.rightBottom.x &&
+    const computeIsOverCell = (state: WSCanvasState, x: number, y: number, allowPartialCol: boolean = false) => {
+        return x >= state.tableCellsBBox.leftTop.x && x <= (allowPartialCol ? W : state.tableCellsBBox.rightBottom.x) &&
             y >= state.tableCellsBBox.leftTop.y && y <= state.tableCellsBBox.rightBottom.y;
     }
 
@@ -1378,8 +1378,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     let y = 1 + (showColNumber ? colNumberRowHeightFull() : 0) + 1;
                     for (let fri = 0; fri < frozenRowsCount; ++fri) {
                         const rfri = viewRowToRealRow(vm, fri);
-                        const rh = getRowHeight(rfri);
-                        //console.log("frozen row:" + fri + " realrow:" + rfri + " H=" + rh);
+                        const rh = getRowHeight(rfri);                        
                         y += rh;
                     }
                     ctx.moveTo(0, y);
@@ -2041,7 +2040,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     const startX = state.resizingColStartNfo[0];
                     const startWidth = state.resizingColStartNfo[1];
                     const newWidth = startWidth + (x - startX);
-                    // console.log("changing col:" + state.resizingCol + " from:" + startWidth + " to:" + newWidth);
+                    
                     state.columnWidthOverride.set(state.resizingCol, newWidth);
                     state.columnWidthOverrideTrack = JSON.stringify([...state.columnWidthOverride]);
                 }
@@ -2144,20 +2143,23 @@ export function WSCanvas(props: WSCanvasProps) {
 
         const touch = e.touches.item(0);
         if (touch && canvasRef.current) {
-            state.touchCur = [touch.clientX, touch.clientY];
-            state.touchStart = [touch.clientX, touch.clientY];
+            const canv = canvasRef.current;
+
+            const x = touch.clientX - canv.offsetLeft;
+            const y = touch.clientY - canv.offsetTop;                        
+
+            state.touchCur = [x, y];
+            state.touchStart = [x, y];
             state.touchStartTime = new Date().getTime();
 
-            const canv = canvasRef.current;
-            const x = touch.clientX - canv.offsetLeft;
-            const y = touch.clientY - canv.offsetTop;
             const ccoord = new WSCanvasCoord(x, y);
-            state.cursorOverCell = computeIsOverCell(state, x, y);
+            const isOverCell = computeIsOverCell(state, x, y, true);
+            state.cursorOverCell = isOverCell;                        
 
             evalClickStart(state, ccoord);
         }
 
-        setStateNfo(state);
+        setStateNfo(state);        
     }
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -2166,16 +2168,25 @@ export function WSCanvas(props: WSCanvasProps) {
         const touch = e.touches.item(0);
         if (touch && canvasRef.current) {
             const canv = canvasRef.current;
+
             const x = touch.clientX - canv.offsetLeft;
             const y = touch.clientY - canv.offsetTop;
-            const ccoord = new WSCanvasCoord(x, y);
 
-            const isOverCell = computeIsOverCell(stateNfo, x, y);
-            let isOverCellChanged = stateNfo.cursorOverCell !== isOverCell;
+            const xs = stateNfo.touchStart[0];
+            const ys = stateNfo.touchStart[1];                                    
+
+            const dx = x - xs;
+            const dy = y - ys;
 
             const state = stateNfo.dup();
-            state.cursorOverCell = isOverCell;
-            state.touchCur = [touch.clientX, touch.clientY];
+            state.touchCur = [x, y];                        
+
+            const ccoord = new WSCanvasCoord(x, y);
+            let prevent = false;
+
+            const isOverCell = computeIsOverCell(stateNfo, xs, ys, true);                        
+
+            state.cursorOverCell = isOverCell;                        
 
             const SCROLL_TOUCH_TOLERANCE = 20;
 
@@ -2191,13 +2202,10 @@ export function WSCanvas(props: WSCanvasProps) {
                     state.horizontalScrollClickStartCoord !== null &&
                     state.horizontalScrollBarRect.leftTop.y <= y + SCROLL_TOUCH_TOLERANCE &&
                     state.horizontalScrollBarRect.rightBottom.y >= y - SCROLL_TOUCH_TOLERANCE
-                );
+                );                        
 
-            if (state.verticalScrollHandleRect) {
-                state.debugNfo = state.verticalScrollHandleRect.toString() + " cx:" + (touch.clientX - canv.offsetLeft) + " cy:" + (touch.clientY - canv.offsetTop);
-            }
+            if (state.horizontalScrollClickStartCoord === null && (onVerticalScrollBar || state.verticalScrollClickStartCoord)) {                
 
-            if (state.horizontalScrollClickStartCoord === null && (onVerticalScrollBar || state.verticalScrollClickStartCoord)) {
                 if (state.verticalScrollClickStartCoord === null) {
                     state.verticalScrollClickStartFactor = state.viewScrollOffset.row / (filteredSortedRowsCount() - viewRowsCount);
                     state.verticalScrollClickStartCoord = ccoord;
@@ -2205,8 +2213,9 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 evalVerticalScrollMove(state, state.verticalScrollClickStartCoord.y, y);
 
-                e.preventDefault();
-            } else if (onHorizontalScrollBar || state.horizontalScrollClickStartCoord) {
+                prevent = true;
+            } else if (onHorizontalScrollBar || state.horizontalScrollClickStartCoord) {                
+
                 if (state.horizontalScrollClickStartCoord === null) {
                     state.horizontalScrollClickStartFactor = state.viewScrollOffset.col / (colsCount - viewColsCount);
                     state.horizontalScrollClickStartCoord = ccoord;
@@ -2214,29 +2223,27 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 evalHorizontalScrollMove(state, state.horizontalScrollClickStartCoord.x, x);
 
-                e.preventDefault();
-            } else if (isOverCell) {
+                prevent = true;
+            } else if (isOverCell) {                
                 const X_SENSITIVITY = width / 10;
                 const Y_SENSITIVITY = height / 25;
-
-                const delta = [state.touchCur[0] - state.touchStart[0], state.touchCur[1] - state.touchStart[1]];
+                
+                const delta = [dx, dy];
                 if (Math.abs(delta[0]) > X_SENSITIVITY || Math.abs(delta[1]) > Y_SENSITIVITY) {
                     const deltaRow = -Math.trunc(delta[1] / Y_SENSITIVITY);
-                    const deltaCol = -Math.trunc(delta[0] / X_SENSITIVITY);
-
-                    state.touchStart = [state.touchCur[0], state.touchCur[1]];
+                    const deltaCol = -Math.trunc(delta[0] / X_SENSITIVITY);                    
 
                     state.viewScrollOffset = new WSCanvasCellCoord(
                         Math.max(0, Math.min(filteredSortedRowsCount() - viewRowsCount, state.viewScrollOffset.row + deltaRow)),
                         Math.max(0, Math.min(colsCount - viewColsCount, state.viewScrollOffset.col + deltaCol)));
                 }
 
-                e.preventDefault();
+                prevent = true;
             }
 
             setStateNfo(state);
 
-            if (state.horizontalScrollClickStartCoord !== null || state.verticalScrollClickStartCoord !== null)
+            if (prevent || state.horizontalScrollClickStartCoord !== null || state.verticalScrollClickStartCoord !== null)
                 e.preventDefault();
         }
     }
@@ -2340,14 +2347,8 @@ export function WSCanvas(props: WSCanvasProps) {
         DEBUG_CTL = debug ? <div ref={debugRef}>
             <b>paint cnt</b> => {stateNfo.paintcnt}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
-            <b>graphics</b> => (W:{W} x H:{H}) (viewRowsCnt:{viewRowsCount})<br />
-            <b>scroll</b> => {stateNfo.viewScrollOffset.toString()}<br />
-            <b>focused cell</b> => {stateNfo.focusedCell.toString()}<br />
-            <b>rows</b> => cnt:{rowsCount}<br />
-            <b>viewmap size</b> => {viewMap ? viewMap.realToView.length : "null"}<br />
-            <b>override row height</b> => {overridenRowHeight ? overridenRowHeight.length : "null"}<br />
-            <b>first override rh</b> => {overridenRowHeight ? overridenRowHeight[0] : "null"}<br />
-            <b>x</b>=> {stateNfo.verticalScrollClickStartCoord ? stateNfo.verticalScrollClickStartCoord.toString() : ""}
+            <b>canv off</b> => left:{canvasRef.current ? canvasRef.current.offsetLeft : "null"}, top:{canvasRef.current ? canvasRef.current.offsetTop : "null"}<br/>
+            <b>dbg</b>=> {dbgNfo}
         </div> : null;
     }
     //#endregion
