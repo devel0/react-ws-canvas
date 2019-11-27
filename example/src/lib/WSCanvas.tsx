@@ -249,7 +249,7 @@ export function WSCanvas(props: WSCanvasProps) {
             res[ri] = i;
         }
         return res;
-    }    
+    }
 
     const filterAndSort = (state: WSCanvasState, vm: ViewMap) => {
         //
@@ -1049,17 +1049,19 @@ export function WSCanvas(props: WSCanvasProps) {
     useEffect(() => {
         const vm = {} as ViewMap;
         const state = stateNfo.dup();
-        filterAndSort(state, vm);
+        if (stateNfo.initialized) {
+            filterAndSort(state, vm);
 
-        if (viewMap) {
-            const viewRowToFocus = vm.viewToReal[0];
-            const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
-            focusCell(state, vm, q, true, false, true);
-            rectifyScrollOffset(state, vm);
+            if (viewMap) {
+                const viewRowToFocus = vm.viewToReal[0];
+                const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
+                focusCell(state, vm, q, true, false, true);
+                rectifyScrollOffset(state, vm);
+            }
+
+            setViewMap(vm);
+            setStateNfo(state);
         }
-
-        setViewMap(vm);
-        setStateNfo(state);
     }, [debouncedFilter]);
     //#endregion
 
