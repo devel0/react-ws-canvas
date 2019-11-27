@@ -17,7 +17,7 @@ export const WSCanvasPropsDefault = () => {
         colsCount: 50,
         colWidth: () => DEFAULT_COL_WIDTH,
         colWidthExpand: true,
-        rowHeight: DEFAULT_ROW_HEIGHT,
+        rowHeight: () => DEFAULT_ROW_HEIGHT,
         frozenRowsCount: 0,
         frozenColsCount: 0,
         selectionModeMulti: true,
@@ -31,6 +31,7 @@ export const WSCanvasPropsDefault = () => {
         columnClickBehavior: WSCanvasColumnClickBehavior.ToggleSort,
         showFilter: false,
         showPartialColumns: true,
+        preventWheelOnBounds: true,
         
         getCellData: (cell) => null,
         setCellData: (cell, value) => { },
@@ -57,6 +58,7 @@ export const WSCanvasPropsDefault = () => {
         timeCellMomentFormat: "LT",
         dateTimeCellMomentFormat: "L LT",
         textMargin: 2,
+        getCellTextWrap: undefined,
         getCellFont: undefined,
         font: "12px Liberation Sans",
         getCellTextColor: undefined,
@@ -71,6 +73,7 @@ export const WSCanvasPropsDefault = () => {
         filterIgnoreCase: true,
         filterBackground: "yellow",
 
+        recomputeRowHeightDebounceFilterMs: 0,
         rowNumberColWidth: 80,
         colNumberRowHeight: DEFAULT_ROW_HEIGHT,
         cellNumberBackgroundColor: "#f5f6f7",

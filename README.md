@@ -43,6 +43,10 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/frozen-rows-cols.png)
 
+- [wrap][21] text cells
+
+![](doc/text-wrap.png)
+
 - rows and cols numbering can be [shown or hidden][5]
 
 - if column numbering visible automatic sort can be customized through [less-than-op][6]
@@ -97,6 +101,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [18]: https://github.com/devel0/react-ws-canvas/blob/86ffa34c4b17f6f56b106119c7874c910df9c371/example/src/Sample2.tsx#L93-L99
 [19]: https://github.com/devel0/react-ws-canvas/blob/eea7a9f653fe827300291b3b5b3e6870d9ff4692/example/src/Sample2.tsx#L100-L109
 [20]: https://github.com/devel0/react-ws-canvas/blob/eea7a9f653fe827300291b3b5b3e6870d9ff4692/example/src/lib/WSCanvasProps.tsx#L143-L146
+[21]: 
 
 ## quickstart
 

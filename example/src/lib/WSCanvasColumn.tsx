@@ -20,5 +20,6 @@ export interface WSCanvasColumn {
     lessThan: (a: any, b: any) => boolean;
     width: number;
     sortDirection: WSCanvasSortDirection;
-    sortOrder: number;    
+    sortOrder: number;   
+    wrapText?: boolean; 
 }

@@ -7,9 +7,9 @@ import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
 import * as _ from 'lodash';
 import { WSCanvasFilter } from "./WSCanvasFilter";
 
-export class WSCanvasState {    
+export class WSCanvasState {
     constructor() {
-        this.scrollOffset = new WSCanvasCellCoord();
+        this.viewScrollOffset = new WSCanvasCellCoord();
         this.scrollOffsetStart = new WSCanvasCellCoord();
         this.tableCellsBBox = new WSCanvasRect();
 
@@ -21,14 +21,14 @@ export class WSCanvasState {
         this.focusedFilterColIdx = -1;
         this.filters = [];
         this.filtersTrack = "";
-        this.hoveredRow = -2;
+        this.hoveredViewRow = -2;
 
-        this.editMode = WSCanvasEditMode.none;
-        this.filteredRowsCount = 0;
+        this.editMode = WSCanvasEditMode.none;        
 
         this.customEditCell = null;
         this.customEditValue = null;
         this.columnWidthOverride = new Map<number, number>();
+        this.columnWidthOverrideTrack = "";
         this.resizingCol = -2;
         this.resizingColStartNfo = [-2, 0];
         this.colWidthExpanded = 0;
@@ -51,7 +51,7 @@ export class WSCanvasState {
         this.initialized = false;
     }
 
-    scrollOffset: WSCanvasCellCoord;
+    viewScrollOffset: WSCanvasCellCoord;
     scrollOffsetStart: WSCanvasCellCoord;
     tableCellsBBox: WSCanvasRect;
 
@@ -62,15 +62,17 @@ export class WSCanvasState {
     focusedCell: WSCanvasCellCoord;
     focusedFilterColIdx: number;
     filters: WSCanvasFilter[];
+    /** json serialization of filters to work with debounce */
     filtersTrack: string;
-    hoveredRow: number;
+    hoveredViewRow: number;
 
-    editMode: WSCanvasEditMode;
-    filteredRowsCount: number;
+    editMode: WSCanvasEditMode;    
 
     customEditCell: WSCanvasCellCoord | null;
     customEditValue: any;
-    columnWidthOverride: Map<number, number>;
+    columnWidthOverride: Map<number, number>;    
+    /** json serialization of columnWidthOverride to work with debounce */
+    columnWidthOverrideTrack: string;
     resizingCol: number;
     /** x,width */
     resizingColStartNfo: number[];

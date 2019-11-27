@@ -23,7 +23,7 @@ export interface WSCanvasProps {
     /** expand column width to fit control width ( if column width sum not already exceed control width ) */
     colWidthExpand: boolean;
     /** height of rows in the grid */
-    rowHeight: number;
+    rowHeight: (ridx: number) => number;
     /** nr of frozen rows */
     frozenRowsCount: number;
     /** nr of frozen cols */
@@ -50,6 +50,8 @@ export interface WSCanvasProps {
     showFilter: boolean;
     /** show or truncate partial columns */
     showPartialColumns: boolean;
+    /** prevent wheel default window scroll when scroll at top or bottom */
+    preventWheelOnBounds: boolean;
 
     /** retrieve data from a cell */
     getCellData: (coord: WSCanvasCellCoord) => any;
@@ -98,6 +100,8 @@ export interface WSCanvasProps {
     dateTimeCellMomentFormat: string;
     /** margin of text inside cells */
     textMargin: number;
+    /** individual cell text wrap */
+    getCellTextWrap?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => boolean | undefined;
     /** individual cell font customization */
     getCellFont?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
     /** font of cells text */
@@ -124,6 +128,8 @@ export interface WSCanvasProps {
     /** filter cell background color */
     filterBackground: string;
 
+    /** ms from last column change to recompute row height */
+    recomputeRowHeightDebounceFilterMs: number;
     /** width of row numbers col */
     rowNumberColWidth: number;
     /** height of column numbers row */
