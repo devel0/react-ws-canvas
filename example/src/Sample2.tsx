@@ -119,7 +119,7 @@ export function Sample2(debug: boolean, width: number, height: number, api: WSCa
     getColumnLessThanOp={(col) => columns[col].lessThan}
     getCellType={(cell, data) => columns[cell.col].type}
     colWidth={(col) => 120}
-    rowHeight={30}
+    rowHeight={() => 30}
     showFilter={true}
     showColNumber={true} showRowNumber={true}
     debug={debug} colWidthExpand={false}
