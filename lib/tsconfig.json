@@ -27,6 +27,7 @@
     "noUnusedParameters": false,
     "isolatedModules": false,
     "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true
   },
   "include": [
     "../example/src/lib"
