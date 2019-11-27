@@ -1,0 +1,13 @@
+#!/bin/bash
+
+exdir="$(dirname `readlink -f "$0"`)"
+
+cd "$exdir"
+yarn version --minor
+
+cp -f "$exdir"/../README.md "$exdir"
+rm -fr "$exdir"/dist
+yarn build
+yarn publish
+
+rm -f "$exdir"/README.md
