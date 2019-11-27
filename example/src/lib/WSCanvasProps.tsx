@@ -4,7 +4,7 @@ import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 import { WSCanvasColumnType, WSCanvasColumnClickBehavior } from "./WSCanvasColumn";
 import { WSCanvasApi } from "./WSCanvasApi";
 import { CSSProperties } from "react";
-import { WSCanvasColumnSortInfo } from "react-ws-canvas";
+import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
 
 /** see WSCanvasPropsDefault for default values */
 export interface WSCanvasProps {
