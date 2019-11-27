@@ -9,6 +9,12 @@ import { WSCanvasFilter } from "./WSCanvasFilter";
 
 export class WSCanvasState {
     constructor() {
+        this.widthBackup = 0;
+        this.heightBackup = 0;
+
+        this.viewRowsCount = 0;
+        this.viewColsCount = 0;
+
         this.viewScrollOffset = new WSCanvasCellCoord();
         this.scrollOffsetStart = new WSCanvasCellCoord();
         this.tableCellsBBox = new WSCanvasRect();
@@ -23,7 +29,7 @@ export class WSCanvasState {
         this.filtersTrack = "";
         this.hoveredViewRow = -2;
 
-        this.editMode = WSCanvasEditMode.none;        
+        this.editMode = WSCanvasEditMode.none;
 
         this.customEditCell = null;
         this.customEditValue = null;
@@ -51,6 +57,12 @@ export class WSCanvasState {
         this.initialized = false;
     }
 
+    widthBackup: number;
+    heightBackup: number;
+
+    viewRowsCount: number;
+    viewColsCount: number;
+
     viewScrollOffset: WSCanvasCellCoord;
     scrollOffsetStart: WSCanvasCellCoord;
     tableCellsBBox: WSCanvasRect;
@@ -66,11 +78,11 @@ export class WSCanvasState {
     filtersTrack: string;
     hoveredViewRow: number;
 
-    editMode: WSCanvasEditMode;    
+    editMode: WSCanvasEditMode;
 
     customEditCell: WSCanvasCellCoord | null;
     customEditValue: any;
-    columnWidthOverride: Map<number, number>;    
+    columnWidthOverride: Map<number, number>;
     /** json serialization of columnWidthOverride to work with debounce */
     columnWidthOverrideTrack: string;
     resizingCol: number;

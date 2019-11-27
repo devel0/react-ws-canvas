@@ -222,3 +222,7 @@ Because I need a library to publish and either a working example to test/debug t
   - `/lib/rollup.config.json` ( specifically `input: '../example/src/lib/index.tsx',  ` )
   - `/lib/tsconfig.json` ( specifically `"rootDirs": ["../example/src/lib"],` and `"include": ["../example/src/lib"],` )
   - `/lib/prepatch-and-publish` ( helper script to prepatch version and publish with README.md )
+
+## development notes
+
+- remove any `from "react-ws-canvas";`

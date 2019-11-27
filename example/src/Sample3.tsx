@@ -1,4 +1,4 @@
-import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode } from "./lib";
+import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasSelectMode } from "./lib";
 
 import React, { useState, useEffect } from "react";
 
@@ -86,7 +86,7 @@ export function Sample3(debug: boolean, width: number, height: number, api: WSCa
       }
 
       setRows(_rows);
-    }, 500);
+    }, 100);
     
   }, []);
 
@@ -101,6 +101,10 @@ export function Sample3(debug: boolean, width: number, height: number, api: WSCa
     api={api}
     width={width} height={height}
     containerStyle={{ margin: "2em" }}
+    rowHoverColor={"rgba(248,248,248,1)"}
+        isCellReadonly={() => true}
+        cellCursor="pointer"
+        getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
     columnClickBehavior={columnClickBehavior}
     getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
     setCellData={(cell, value) => {
@@ -115,29 +119,30 @@ export function Sample3(debug: boolean, width: number, height: number, api: WSCa
         sortOrder: c.sortOrder
       } as WSCanvasColumnSortInfo
     })}
-    getCellBackgroundColor={(cell, props) => {
-      // if (cell.row === 2) return "navy";
-      if (cell.col === 1) return "lightyellow";
-    }}
-    getCellFont={(cell, props) => {
-      if (cell.col === 1) return "bold " + props.font;
-    }}
+    // getCellBackgroundColor={(cell, props) => {
+    //   // if (cell.row === 2) return "navy";
+    //   if (cell.col === 1) return "lightyellow";
+    // }}
+    // getCellFont={(cell, props) => {
+    //   if (cell.col === 1) return "bold " + props.font;
+    // }}
     // getCellTextColor={(cell, props) => {
     //   if (cell.row === 2) return "white";
     // }}
     getCellTextWrap={(cell, props) => {
       if (columns[cell.col].wrapText) return columns[cell.col].wrapText;
     }}
-    getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
+    // getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
     getColumnHeader={(col) => columns[col].header}
+    rowHeight={() => 35} textMargin={5}
     getColumnLessThanOp={(col) => columns[col].lessThan}
     getCellType={(cell, data) => columns[cell.col].type}
     // rowHoverColor={"rgba(240,240,240,1)"}
-    colWidth={(col) => 120}
-    rowHeight={(row) => 30}
-    showFilter={true}
-    showColNumber={true} showRowNumber={true}
-    debug={debug} colWidthExpand={false}
-    frozenRowsCount={1} frozenColsCount={0}
+    colWidth={(col) => 120}                
+    selectionMode={WSCanvasSelectMode.Row}
+    showFilter={false}  
+    showColNumber={true} showRowNumber={false}
+    debug={debug} colWidthExpand={true}
+    frozenRowsCount={0} frozenColsCount={0}
     rowsCount={rows.length} colsCount={columns.length} />
 }
