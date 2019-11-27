@@ -374,14 +374,14 @@ export function WSCanvas(props: WSCanvasProps) {
 
     //#endregion    
 
-    useEffect(() => {
-        const state = stateNfo.dup();
-        if (rowsCount > 0) {
-            paint(state, viewMap);
-        }
-        setStateNfo(state);
-        //setViewMap(vm);
-    }, [rowsCount]);
+    // useEffect(() => {
+    //     const state = stateNfo.dup();
+    //     if (rowsCount > 0) {
+    //         paint(state, viewMap);
+    //     }
+    //     setStateNfo(state);
+    //     //setViewMap(vm);
+    // }, [rowsCount]);
 
     /** [-2,0] not on screen ; -1:(row col number); [ci,cwidth] is the result */
     const xGetCol = (state: WSCanvasState, x: number, allowPartialCol: boolean = false) => {
@@ -430,7 +430,7 @@ export function WSCanvas(props: WSCanvasProps) {
         return [-2, 0];
     }
 
-    const recomputeOverridenRowHeight = (state: WSCanvasState) => {        
+    const recomputeOverridenRowHeight = (state: WSCanvasState) => {
         const canvas = canvasRef.current;
 
         if (canvas) {
@@ -463,7 +463,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    useEffect(() => {        
+    useEffect(() => {
         if (stateNfo.initialized) {
             if (overridenRowHeight === null && rowsCount > 0 && canvasRef.current && canvasRef.current.getContext('2d')) {
                 recomputeOverridenRowHeight(stateNfo);
@@ -592,8 +592,8 @@ export function WSCanvas(props: WSCanvasProps) {
             if (q) cellBackground = q;
         }
         ctx.fillStyle = isSelected ? selectionBackgroundColor : cellBackground;
-        
-        ctx.fillRect(x, y, cWidth, getRowHeight(cell.row));        
+
+        ctx.fillRect(x, y, cWidth, getRowHeight(cell.row));
 
         if (isSelected) {
             const leftBorder = cell.col === 0 || !state.selection.containsCell(new WSCanvasCellCoord(cell.row, cell.col - 1), selectionMode);
@@ -1056,15 +1056,20 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     useEffect(() => {
-        const state = stateNfo.dup();
-        state.viewRowsCount = computeViewRows(state, viewMap, horizontalScrollbarActive);
-        state.viewColsCount = computeViewCols(state, verticalScrollbarActive);
-        setStateNfo(state);
+        const newViewRowsCount = computeViewRows(stateNfo, viewMap, horizontalScrollbarActive);
+        const newViewColsCount = computeViewCols(stateNfo, verticalScrollbarActive);
+
+        if (newViewRowsCount !== stateNfo.viewRowsCount || newViewColsCount !== stateNfo.viewColsCount) {
+            const state = stateNfo.dup();
+            state.viewRowsCount = newViewRowsCount;
+            state.viewColsCount = newViewColsCount;
+            setStateNfo(state);
+        }
     }, [rowsCount, overridenRowHeight, stateNfo.widthBackup, stateNfo.heightBackup]);
 
     useEffect(() => {
         paint(stateNfo, viewMap);
-    }, [width, height, stateNfo, viewMap, debugSize, getCellData, setCellData]);
+    }, [width, height, stateNfo, debugSize, getCellData, setCellData]);
 
     //#region APPLY FILTER 
     useEffect(() => {
@@ -1099,16 +1104,16 @@ export function WSCanvas(props: WSCanvasProps) {
     }, [debouncedColumnWidth]);
     //#endregion    
 
-    const paint = (state: WSCanvasState, vm: ViewMap | null) => {        
+    const paint = (state: WSCanvasState, vm: ViewMap | null) => {
         //console.log("PAINT");
         let stateChanged = false;
         ++state.paintcnt;
 
         const colwavail = W - (verticalScrollbarActive ? scrollBarThk : 0) - rowNumberColWidth - 2;
         let colwsumbefore = 0;
-        for (let ci = 0; ci < colsCount; ++ci) colwsumbefore += colWidth(ci);                
+        for (let ci = 0; ci < colsCount; ++ci) colwsumbefore += colWidth(ci);
 
-        if ((state.paintcnt > 1 && colWidthExpand && colwsumbefore < colwavail && state.colWidthExpanded !== colwavail)) {            
+        if ((state.paintcnt > 1 && colWidthExpand && colwsumbefore < colwavail && state.colWidthExpanded !== colwavail)) {
             state.widthBackup = width;
             state.heightBackup = height;
             stateChanged = true;
@@ -1130,7 +1135,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     wtofillUsed += wtoadd;
                 }
                 state.colWidthExpanded = colwavail;
-                state.columnWidthOverrideTrack = JSON.stringify([...state.columnWidthOverride]);                
+                state.columnWidthOverrideTrack = JSON.stringify([...state.columnWidthOverride]);
                 recomputeOverridenRowHeight(state);
                 //paint(state, vm);
                 stateChanged = true;
