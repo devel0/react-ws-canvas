@@ -428,11 +428,14 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (ctx && getCellTextWrap) {
                         for (let ci = 0; ci < colsCount; ++ci) {
                             const cell = new WSCanvasCellCoord(ri, ci);
-                            if (getCellTextWrap(cell, props)) {
-                                const data = getCellData(cell);
-                                const txtWidth = ctx.measureText(data).width;
-                                const colXWidth = colGetXWidth(stateNfo, ci, showPartialColumns);
-                                rh *= Math.ceil(txtWidth / colXWidth[1]);
+                            const colXWidth = colGetXWidth(stateNfo, ci, showPartialColumns);
+                            const colW = colXWidth[1];
+                            if (colW > 0) {
+                                if (getCellTextWrap(cell, props)) {
+                                    const data = getCellData(cell);
+                                    const txtWidth = ctx.measureText(data).width;
+                                    rh *= Math.ceil(txtWidth / colW);
+                                }
                             }
                         }
                     }
@@ -444,9 +447,13 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    if (overridenRowHeight === null && rowsCount > 0 && canvasRef.current && canvasRef.current.getContext('2d')) {
-        recomputeOverridenRowHeight();
-    }
+    useEffect(() => {
+        if (stateNfo.initialized) {
+            if (overridenRowHeight === null && rowsCount > 0 && canvasRef.current && canvasRef.current.getContext('2d')) {
+                recomputeOverridenRowHeight();
+            }
+        }
+    }, [stateNfo.initialized]);
 
     const getRowHeight = (ri: number) => {
         if (overridenRowHeight !== null) {
@@ -2337,6 +2344,9 @@ export function WSCanvas(props: WSCanvasProps) {
             <b>scroll</b> => {stateNfo.viewScrollOffset.toString()}<br />
             <b>focused cell</b> => {stateNfo.focusedCell.toString()}<br />
             <b>rows</b> => cnt:{rowsCount}<br />
+            <b>viewmap size</b> => {viewMap ? viewMap.realToView.length : "null"}<br />
+            <b>override row height</b> => {overridenRowHeight ? overridenRowHeight.length : "null"}<br />
+            <b>first override rh</b> => {overridenRowHeight ? overridenRowHeight[0] : "null"}<br />
             <b>x</b>=> {stateNfo.verticalScrollClickStartCoord ? stateNfo.verticalScrollClickStartCoord.toString() : ""}
         </div> : null;
     }
