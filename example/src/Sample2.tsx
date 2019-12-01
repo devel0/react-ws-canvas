@@ -1,4 +1,4 @@
-import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode } from "./lib";
+import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasColumnToSortInfo } from "./lib";
 
 import React, { useState, useEffect } from "react";
 
@@ -82,8 +82,10 @@ export function Sample2(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
 
   api.onMouseDown = (e, cell) => {
     if (cell) {
-      const data = rows[cell.row] as MyData;
-      console.log("clicked cell row:" + cell.row + " col1:" + data.col1);
+      if (cell.row >= 0) {
+        const data = rows[cell.row] as MyData;
+        console.log("clicked cell row:" + cell.row + " col1:" + data.col1);
+      }
     }
   };
 
@@ -98,13 +100,7 @@ export function Sample2(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
       (q[cell.row] as any)[columns[cell.col].field] = value;
       setRows(q);
     }}
-    columnInitialSort={columns.map((c, idx) => {
-      return {
-        columnIndex: idx,
-        sortDirection: c.sortDirection,
-        sortOrder: c.sortOrder
-      } as WSCanvasColumnSortInfo
-    })}
+    columnInitialSort={WSCanvasColumnToSortInfo(columns)}
     getCellBackgroundColor={(cell, props) => {
       if (cell.row === 2) return "navy";
       if (cell.col === 1) return "lightyellow";

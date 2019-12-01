@@ -1,4 +1,4 @@
-import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasSelectMode } from "./lib";
+import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasSelectMode, WSCanvasColumnToSortInfo } from "./lib";
 
 import React, { useState, useEffect } from "react";
 
@@ -29,16 +29,16 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
 
         return aNr < bNr;
       },
-      // sortDirection: WSCanvasSortDirection.Descending,
-      // sortOrder: 1,
+      sortDirection: WSCanvasSortDirection.Descending,
+      sortOrder: 1,
     },
     {
       type: "number",
       header: "col2",
       field: "col2",
       lessThan: (a, b) => (a as number) < (b as number),
-      // sortDirection: WSCanvasSortDirection.Ascending,
-      // sortOrder: 0,
+      sortDirection: WSCanvasSortDirection.Ascending,
+      sortOrder: 0,
     },
     {
       type: "boolean",
@@ -93,8 +93,10 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
 
   api.onMouseDown = (e, cell) => {
     if (cell) {
-      const data = rows[cell.row] as MyData;
-      console.log("clicked cell row:" + cell.row + " col1:" + data.col1);
+      if (cell.row >= 0) {
+        const data = rows[cell.row] as MyData;
+        console.log("clicked cell row:" + cell.row + " col1:" + data.col1);
+      }
     }
   };
 
@@ -113,13 +115,7 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
       (q[cell.row] as any)[columns[cell.col].field] = value;
       setRows(q);
     }}
-    columnInitialSort={columns.map((c, idx) => {
-      return {
-        columnIndex: idx,
-        sortDirection: c.sortDirection,
-        sortOrder: c.sortOrder
-      } as WSCanvasColumnSortInfo
-    })}
+    columnInitialSort={WSCanvasColumnToSortInfo(columns)}
     // getCellBackgroundColor={(cell, props) => {
     //   // if (cell.row === 2) return "navy";
     //   if (cell.col === 1) return "lightyellow";
