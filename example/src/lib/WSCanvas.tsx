@@ -2243,8 +2243,9 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    const handleTouchStart = (e: TouchEvent) => {
-        if (e.touches.length > 1) return;
+    const handleTouchStart = (e: TouchEvent) => {        
+        e.preventDefault();
+        if (e.touches.length > 1) return;        
 
         const state = stateNfo.dup();
 
@@ -2271,27 +2272,30 @@ export function WSCanvas(props: WSCanvasProps) {
         setStateNfo(state);
     }
 
-    const handleTouchMove = (e: TouchEvent) => {
+    const handleTouchMove = (e: TouchEvent) => {        
+        e.preventDefault();
         if (e.touches.length > 1) return;
 
         const touch = e.touches.item(0);
-        if (touch && canvasRef.current) {
+        if (touch && canvasRef.current) {            
             const canv = canvasRef.current;
 
             const x = touch.clientX - canv.offsetLeft;
             const y = touch.clientY - canv.offsetTop;
 
-            const xs = stateNfo.touchStart[0];
-            const ys = stateNfo.touchStart[1];
+            const xs = stateNfo.touchCur[0];
+            const ys = stateNfo.touchCur[1];
 
             const dx = x - xs;
-            const dy = y - ys;
+            const dy = y - ys;           
+                        
+            if (dx === 0 && dy === 0) return;
 
             const state = stateNfo.dup();
             state.touchCur = [x, y];
 
             const ccoord = new WSCanvasCoord(x, y);
-            let prevent = false;
+            let matches = false;
 
             const isOverCell = computeIsOverCell(stateNfo, xs, ys, true);
 
@@ -2322,7 +2326,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 evalVerticalScrollMove(state, state.verticalScrollClickStartCoord.y, y);
 
-                prevent = true;
+                matches = true;
             } else if (onHorizontalScrollBar || state.horizontalScrollClickStartCoord) {
 
                 if (state.horizontalScrollClickStartCoord === null) {
@@ -2332,9 +2336,9 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 evalHorizontalScrollMove(state, state.horizontalScrollClickStartCoord.x, x);
 
-                prevent = true;
+                matches = true;
             } else if (isOverCell) {
-                const X_SENSITIVITY = width / 10;
+                const X_SENSITIVITY = width / 20;
                 const Y_SENSITIVITY = height / 25;
 
                 const delta = [dx, dy];
@@ -2347,13 +2351,13 @@ export function WSCanvas(props: WSCanvasProps) {
                         Math.max(0, Math.min(colsCount - state.viewColsCount, state.viewScrollOffset.col + deltaCol)));
                 }
 
-                prevent = true;
-            }
+                matches = true;
+            }            
 
-            setStateNfo(state);
-
-            if (prevent || state.horizontalScrollClickStartCoord !== null || state.verticalScrollClickStartCoord !== null)
+            if (matches || state.horizontalScrollClickStartCoord !== null || state.verticalScrollClickStartCoord !== null) {
                 e.preventDefault();
+                setStateNfo(state);
+            }
         }
     }
 
@@ -2456,11 +2460,8 @@ export function WSCanvas(props: WSCanvasProps) {
         DEBUG_CTL = debug ? <div ref={debugRef}>
             <b>paint cnt</b> => {stateNfo.paintcnt}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
-            <b>focused</b> => {stateNfo.focusedCell.toString()} - <b>focusedView</b> => {realCellToView(viewMap, stateNfo.focusedCell).toString()}<br />
-            <b>canv off</b> => left:{canvasRef.current ? canvasRef.current.offsetLeft : "null"}, top:{canvasRef.current ? canvasRef.current.offsetTop : "null"}<br />
-            <b>size</b> => bk:{stateNfo.widthBackup},{stateNfo.heightBackup} cur:{width},{height} W:{W},H:{H} dbgSizeH:{debugSize.height}<br />
-            <b>rows</b> => rows:{rowsCount} ; <b>viewrows</b> => {stateNfo.viewRowsCount} ; <b>viewCols</b> => {stateNfo.viewColsCount}<br />
-            <b>selection</b> => {stateNfo.viewSelection.toString()}<br />
+            <b>touch start</b> => {stateNfo.touchStart.toString()}<br/>
+            <b>touch move</b> => {stateNfo.touchCur.toString()}<br/>
             <b>dbg</b>=> {dbgNfo}
         </div> : null;
     }
