@@ -453,8 +453,16 @@ export function WSCanvas(props: WSCanvasProps) {
                             if (colW > 0) {
                                 if (getCellTextWrap(cell, props)) {
                                     const data = getCellData(cell);
-                                    const txtWidth = ctx.measureText(data).width;
-                                    rh *= Math.ceil(txtWidth / colW);
+                                    let cellFont = font;
+                                    if (getCellFont !== undefined) {
+                                        const q = getCellFont(cell, props);
+                                        if (q) cellFont = q;
+                                    }
+                                    ctx.font = font;                                    
+                                    const txtWidth = ctx.measureText(data).width;                                                                        
+                                    const f = Math.ceil(txtWidth / colW);
+                                    console.log("txtWidth(" + txtWidth.toFixed(1) +")/colW(" + colW.toFixed(1) + ")=" + (txtWidth/colW).toFixed(2) + " f=" + f.toFixed(2));
+                                    rh *= f;
                                 }
                             }
                         }
