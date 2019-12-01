@@ -371,16 +371,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             setStateNfo(state);
         }
-    }
-
-    const qViewRowsCount = computeViewRows(stateNfo, viewMap, horizontalScrollbarActive);
-    const qViewColsCount = computeViewCols(stateNfo, verticalScrollbarActive);
-    if (qViewRowsCount !== stateNfo.viewRowsCount || qViewColsCount !== stateNfo.viewColsCount) {
-        const state = stateNfo.dup();
-        state.viewRowsCount = qViewRowsCount;
-        state.viewColsCount = qViewColsCount;
-        setStateNfo(state);
-    }
+    }    
 
     //#endregion    
 
@@ -454,8 +445,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (ctx && getCellTextWrap) {
                         for (let ci = 0; ci < colsCount; ++ci) {
                             const cell = new WSCanvasCellCoord(ri, ci);
-                            const colXWidth = colGetXWidth(state, ci, showPartialColumns);
-                            const colW = colXWidth[1];
+                            const colW = overridenColWidth(state, ci);
                             if (colW > 0) {
                                 if (getCellTextWrap(cell, props)) {
                                     const data = getCellData(cell);
@@ -466,7 +456,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     }
                                     ctx.font = cellFont;
                                     const txtWidth = ctx.measureText(data).width;
-                                    const f = Math.ceil(txtWidth / colW);
+                                    const f = Math.ceil(txtWidth / colW);                                    
                                     rh *= f;
                                 }
                             }
@@ -478,6 +468,15 @@ export function WSCanvas(props: WSCanvasProps) {
                 setOverridenRowHeight(hs);
             }
         }
+    }
+    
+    const qViewRowsCount = computeViewRows(stateNfo, viewMap, horizontalScrollbarActive);
+    const qViewColsCount = computeViewCols(stateNfo, verticalScrollbarActive);
+    if (qViewRowsCount !== stateNfo.viewRowsCount || qViewColsCount !== stateNfo.viewColsCount) {        
+        const state = stateNfo.dup();
+        state.viewRowsCount = qViewRowsCount;
+        state.viewColsCount = qViewColsCount;                
+        setStateNfo(state);
     }
 
     useEffect(() => {
