@@ -1899,7 +1899,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const y = e.pageY - e.currentTarget.offsetTop;
         const ccoord = new WSCanvasCoord(x, y);
 
-        if (api.onPreviewMouseDown) api.onPreviewMouseDown(e, cellCoord ? viewCellToReal(viewMap, cellCoord) : null);
+        if (api.onPreviewMouseDown) api.onPreviewMouseDown(e, cellCoord );
 
         if (!e.defaultPrevented) {
 
@@ -2031,7 +2031,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 setStateNfo(state);
             }
 
-            if (api.onMouseDown) api.onMouseDown(e, cellCoord ? viewCellToReal(viewMap, cellCoord) : null);
+            if (api.onMouseDown) api.onMouseDown(e, cellCoord);
         }
     }
 
@@ -2189,7 +2189,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const ccoord = new WSCanvasCoord(x, y);
         const cell = canvasToCellCoord(stateNfo, viewMap, ccoord);
 
-        if (api.onPreviewMouseDoubleClick) api.onPreviewMouseDoubleClick(e, cell ? viewCellToReal(viewMap, cell) : null);
+        if (api.onPreviewMouseDoubleClick) api.onPreviewMouseDoubleClick(e, cell);
 
         if (!e.defaultPrevented) {
             if (cell) {
@@ -2207,7 +2207,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     setStateNfo(state);
                 }
 
-                if (api.onMouseDown) api.onMouseDown(e, viewCellToReal(viewMap, cell));
+                if (api.onMouseDown) api.onMouseDown(e, cell);
             }
         }
     }
@@ -2393,7 +2393,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const y = e.pageY - e.currentTarget.offsetTop;
         const cell = canvasToCellCoord(stateNfo, viewMap, new WSCanvasCoord(x, y));
 
-        if (api.onContextMenu) api.onContextMenu(e, cell ? viewCellToReal(viewMap, cell) : null);
+        if (api.onContextMenu) api.onContextMenu(e, cell);
     }
 
     useLayoutEffect(() => {
