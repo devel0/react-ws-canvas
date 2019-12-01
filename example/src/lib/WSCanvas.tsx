@@ -240,7 +240,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 ++q;
             }
         }
-        return q;
+        return Math.min(q, colsCount);
     };
 
     const filteredSortedRowsCount = () => (viewMap === null) ? rowsCount : viewMap.viewToReal.length;
@@ -367,13 +367,19 @@ export function WSCanvas(props: WSCanvasProps) {
 
             const vm = {} as ViewMap;
             filterAndSort(state, vm);
-            setViewMap(vm);
-
-            state.viewRowsCount = computeViewRows(stateNfo, viewMap, horizontalScrollbarActive);
-            state.viewColsCount = computeViewCols(stateNfo, verticalScrollbarActive);
+            setViewMap(vm);            
 
             setStateNfo(state);
         }
+    }
+
+    const qViewRowsCount = computeViewRows(stateNfo, viewMap, horizontalScrollbarActive);
+    const qViewColsCount = computeViewCols(stateNfo, verticalScrollbarActive);
+    if (qViewRowsCount !== stateNfo.viewRowsCount || qViewColsCount !== stateNfo.viewColsCount) {
+        const state = stateNfo.dup();
+        state.viewRowsCount = qViewRowsCount;
+        state.viewColsCount = qViewColsCount;
+        setStateNfo(state);
     }
 
     //#endregion    
@@ -458,9 +464,9 @@ export function WSCanvas(props: WSCanvasProps) {
                                         const q = getCellFont(cell, props);
                                         if (q) cellFont = q;
                                     }
-                                    ctx.font = font;                                    
-                                    const txtWidth = ctx.measureText(data).width;                                                                        
-                                    const f = Math.ceil(txtWidth / colW);                                    
+                                    ctx.font = cellFont;
+                                    const txtWidth = ctx.measureText(data).width;
+                                    const f = Math.ceil(txtWidth / colW);
                                     rh *= f;
                                 }
                             }
@@ -981,7 +987,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         // adjust scrollOffset.col
         if (viewCell.col >= state.viewScrollOffset.col + state.viewColsCount - 1) {
-            state.viewScrollOffset = state.viewScrollOffset.setCol(viewCell.col - state.viewColsCount + 1);
+            state.viewScrollOffset = state.viewScrollOffset.setCol(Math.max(0, viewCell.col - state.viewColsCount + 1));
         }
         else if (viewCell.col - frozenColsCount <= state.viewScrollOffset.col) {
             state.viewScrollOffset = state.viewScrollOffset.setCol(Math.max(0, viewCell.col - frozenColsCount));
@@ -1070,6 +1076,14 @@ export function WSCanvas(props: WSCanvasProps) {
     const computeIsOverCell = (state: WSCanvasState, x: number, y: number, allowPartialCol: boolean = false) => {
         return x >= state.tableCellsBBox.leftTop.x && x <= (allowPartialCol ? W : state.tableCellsBBox.rightBottom.x) &&
             y >= state.tableCellsBBox.leftTop.y && y <= state.tableCellsBBox.rightBottom.y;
+    }
+
+    if (stateNfo.widthBackup !== W || stateNfo.heightBackup !== H) {
+        const state = stateNfo.dup();
+        state.widthBackup = W;
+        state.heightBackup = H;
+        recomputeOverridenRowHeight(state);
+        setStateNfo(state);
     }
 
     useEffect(() => {
@@ -1241,7 +1255,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             const cWidth = overridenColWidth(state, ci);
 
                             const isSelected = highlightColNumber &&
-                                ((selectionMode === WSCanvasSelectMode.Row && state.viewSelection.bounds && state.viewSelection.bounds.size >1)
+                                ((selectionMode === WSCanvasSelectMode.Row && state.viewSelection.bounds && state.viewSelection.bounds.size > 1)
                                     || selectedViewColIdxs.has(ci));
 
                             ctx.fillStyle = cellNumberBackgroundColor;
@@ -2404,7 +2418,7 @@ export function WSCanvas(props: WSCanvasProps) {
             <b>focused</b> => {stateNfo.focusedCell.toString()}<br />
             <b>canv off</b> => left:{canvasRef.current ? canvasRef.current.offsetLeft : "null"}, top:{canvasRef.current ? canvasRef.current.offsetTop : "null"}<br />
             <b>size</b> => bk:{stateNfo.widthBackup},{stateNfo.heightBackup} cur:{width},{height} W:{W},H:{H} dbgSizeH:{debugSize.height}<br />
-            <b>rows</b> => rows:{rowsCount} ; <b>viewrows</b> => {stateNfo.viewRowsCount}<br />
+            <b>rows</b> => rows:{rowsCount} ; <b>viewrows</b> => {stateNfo.viewRowsCount} ; <b>viewCols</b> => {stateNfo.viewColsCount}<br />
             <b>selection</b> => {stateNfo.viewSelection.toString()}<br />
             <b>dbg</b>=> {dbgNfo}
         </div> : null;

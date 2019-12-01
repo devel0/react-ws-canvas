@@ -16,7 +16,7 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
   width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
   const [rows, setRows] = useState<MyData[]>([]);
 
-  const ROWS = 10;
+  const ROWS = 1000;
 
   const columns = [
     {
@@ -142,6 +142,7 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
     colWidth={(col) => 120}
     selectionMode={WSCanvasSelectMode.Row}
     showFilter={false}
+    showPartialColumns={true}
     showColNumber={true} showRowNumber={true}
     debug={debug} dbgDiv={dbgDiv}
     colWidthExpand={true}
