@@ -2243,9 +2243,16 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    const handleTouchStart = (e: TouchEvent) => {        
-        e.preventDefault();
-        if (e.touches.length > 1) return;        
+    const getTouchPos = (canvas: HTMLCanvasElement, e: TouchEvent) => {
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: e.touches[0].clientX - rect.left,
+            y: e.touches[0].clientY - rect.top
+        };
+    }
+
+    const handleTouchStart = (e: TouchEvent) => {
+        if (e.touches.length > 1) return;
 
         const state = stateNfo.dup();
 
@@ -2253,10 +2260,10 @@ export function WSCanvas(props: WSCanvasProps) {
 
         const touch = e.touches.item(0);
         if (touch && canvasRef.current) {
-            const canv = canvasRef.current;
+            const pos = getTouchPos(canvasRef.current, e);
 
-            const x = touch.clientX - canv.offsetLeft;
-            const y = touch.clientY - canv.offsetTop;
+            const x = pos.x;
+            const y = pos.y;
 
             state.touchCur = [x, y];
             state.touchStart = [x, y];
@@ -2272,23 +2279,22 @@ export function WSCanvas(props: WSCanvasProps) {
         setStateNfo(state);
     }
 
-    const handleTouchMove = (e: TouchEvent) => {        
-        e.preventDefault();
+    const handleTouchMove = (e: TouchEvent) => {
         if (e.touches.length > 1) return;
 
         const touch = e.touches.item(0);
         if (touch && canvasRef.current) {            
-            const canv = canvasRef.current;
+            const pos = getTouchPos(canvasRef.current, e);
 
-            const x = touch.clientX - canv.offsetLeft;
-            const y = touch.clientY - canv.offsetTop;
+            const x = pos.x;
+            const y = pos.y;
 
             const xs = stateNfo.touchCur[0];
             const ys = stateNfo.touchCur[1];
 
             const dx = x - xs;
-            const dy = y - ys;           
-                        
+            const dy = y - ys;
+
             if (dx === 0 && dy === 0) return;
 
             const state = stateNfo.dup();
@@ -2297,7 +2303,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const ccoord = new WSCanvasCoord(x, y);
             let matches = false;
 
-            const isOverCell = computeIsOverCell(stateNfo, xs, ys, true);
+            const isOverCell = computeIsOverCell(stateNfo, xs, ys, true);            
 
             state.cursorOverCell = isOverCell;
 
@@ -2318,7 +2324,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 );
 
             if (state.horizontalScrollClickStartCoord === null && (onVerticalScrollBar || state.verticalScrollClickStartCoord)) {
-
+                setDbgNfo("vert dx:" + dx + " dy:" + dy);
                 if (state.verticalScrollClickStartCoord === null) {
                     state.verticalScrollClickStartFactor = state.viewScrollOffset.row / (filteredSortedRowsCount() - state.viewRowsCount);
                     state.verticalScrollClickStartCoord = ccoord;
@@ -2328,7 +2334,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 matches = true;
             } else if (onHorizontalScrollBar || state.horizontalScrollClickStartCoord) {
-
+                setDbgNfo("horiz dx:" + dx + " dy:" + dy);
                 if (state.horizontalScrollClickStartCoord === null) {
                     state.horizontalScrollClickStartFactor = state.viewScrollOffset.col / (colsCount - state.viewColsCount);
                     state.horizontalScrollClickStartCoord = ccoord;
@@ -2339,7 +2345,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 matches = true;
             } else if (isOverCell) {
                 const X_SENSITIVITY = width / 20;
-                const Y_SENSITIVITY = height / 25;
+                const Y_SENSITIVITY = height / 25;                
 
                 const delta = [dx, dy];
                 if (Math.abs(delta[0]) > X_SENSITIVITY || Math.abs(delta[1]) > Y_SENSITIVITY) {
@@ -2352,7 +2358,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
 
                 matches = true;
-            }            
+            }
 
             if (matches || state.horizontalScrollClickStartCoord !== null || state.verticalScrollClickStartCoord !== null) {
                 e.preventDefault();
@@ -2460,8 +2466,8 @@ export function WSCanvas(props: WSCanvasProps) {
         DEBUG_CTL = debug ? <div ref={debugRef}>
             <b>paint cnt</b> => {stateNfo.paintcnt}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
-            <b>touch start</b> => {stateNfo.touchStart.toString()}<br/>
-            <b>touch move</b> => {stateNfo.touchCur.toString()}<br/>
+            <b>touch start</b> => {stateNfo.touchStart.toString()}<br />
+            <b>touch cur</b> => {stateNfo.touchCur.toString()}<br />
             <b>dbg</b>=> {dbgNfo}
         </div> : null;
     }
