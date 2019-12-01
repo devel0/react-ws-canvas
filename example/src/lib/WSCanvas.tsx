@@ -367,11 +367,11 @@ export function WSCanvas(props: WSCanvasProps) {
 
             const vm = {} as ViewMap;
             filterAndSort(state, vm);
-            setViewMap(vm);            
+            setViewMap(vm);
 
             setStateNfo(state);
         }
-    }    
+    }
 
     //#endregion    
 
@@ -456,7 +456,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     }
                                     ctx.font = cellFont;
                                     const txtWidth = ctx.measureText(data).width;
-                                    const f = Math.ceil(txtWidth / colW);                                    
+                                    const f = Math.ceil(txtWidth / colW);
                                     rh *= f;
                                 }
                             }
@@ -469,13 +469,13 @@ export function WSCanvas(props: WSCanvasProps) {
             }
         }
     }
-    
+
     const qViewRowsCount = computeViewRows(stateNfo, viewMap, horizontalScrollbarActive);
     const qViewColsCount = computeViewCols(stateNfo, verticalScrollbarActive);
-    if (qViewRowsCount !== stateNfo.viewRowsCount || qViewColsCount !== stateNfo.viewColsCount) {        
+    if (qViewRowsCount !== stateNfo.viewRowsCount || qViewColsCount !== stateNfo.viewColsCount) {
         const state = stateNfo.dup();
         state.viewRowsCount = qViewRowsCount;
-        state.viewColsCount = qViewColsCount;                
+        state.viewColsCount = qViewColsCount;
         setStateNfo(state);
     }
 
@@ -1187,7 +1187,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 let colsXMax = 0;
                 let rowsYMax = 0;
 
-                //#region GRID LINE BACKGROUND ( to make grid lines as diff result )
+                //#region GRID LINE BACKGROUND ( to make grid lines as diff result ) and sheet background after last row
                 {
                     const lastViewdCol = colGetXWidth(state, state.viewScrollOffset.col + state.viewColsCount - 1);
                     colsXMax = lastViewdCol[0] + lastViewdCol[1] + (showRowNumber ? 1 : 0);
@@ -1201,8 +1201,13 @@ export function WSCanvas(props: WSCanvasProps) {
                         stateChanged = true;
                     }
 
+                    const fW = (showPartialColumns && stateNfo.viewScrollOffset.col !== colsCount - state.viewColsCount) ? W : colsXMax;
+
                     ctx.fillStyle = gridLinesColor;
-                    ctx.fillRect(0, 0, (showPartialColumns && stateNfo.viewScrollOffset.col !== colsCount - state.viewColsCount) ? W : colsXMax, rowsYMax);
+                    ctx.fillRect(0, 0, fW, rowsYMax);
+
+                    ctx.fillStyle = sheetBackgroundColor;
+                    ctx.fillRect(0, rowsYMax, fW, H - rowsYMax);
                 }
                 //#endregion
 
@@ -1542,12 +1547,12 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
                 //#endregion
 
-                //#region CLEAR EXCEEDING TEXT ( after ending col cells )
+                //#region CLEAR EXCEEDING TEXT ( after ending col )                
                 if (!showPartialColumns || stateNfo.viewScrollOffset.col === colsCount - state.viewColsCount) {
                     ctx.fillStyle = sheetBackgroundColor;
                     ctx.fillRect(colsXMax, 0, W - colsXMax, H);
                 }
-                //#endregion
+                //#endregion                
 
                 //#region HORIZONTAL SCROLLBAR
                 if (horizontalScrollbarActive) {
