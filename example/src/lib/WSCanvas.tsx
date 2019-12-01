@@ -1706,10 +1706,10 @@ export function WSCanvas(props: WSCanvasProps) {
                 if (shift_key &&
                     (stateNfo.focusedCell.row !== state.focusedCell.row ||
                         stateNfo.focusedCell.col !== state.focusedCell.col)) {                                                        
-                    setSelectionByEndingCell(state, focusedViewCell, shift_key, !ctrl_key);
+                    setSelectionByEndingCell(state, realCellToView(viewMap, state.focusedCell), shift_key, !ctrl_key);
                 }
                 else
-                    setSelectionByEndingCell(state, focusedViewCell, false, true);
+                    setSelectionByEndingCell(state, realCellToView(viewMap, state.focusedCell), false, true);
 
                 let applyState = true;
 
