@@ -460,8 +460,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     }
                                     ctx.font = font;                                    
                                     const txtWidth = ctx.measureText(data).width;                                                                        
-                                    const f = Math.ceil(txtWidth / colW);
-                                    console.log("txtWidth(" + txtWidth.toFixed(1) +")/colW(" + colW.toFixed(1) + ")=" + (txtWidth/colW).toFixed(2) + " f=" + f.toFixed(2));
+                                    const f = Math.ceil(txtWidth / colW);                                    
                                     rh *= f;
                                 }
                             }
