@@ -54,6 +54,7 @@ export function WSCanvas(props: WSCanvasProps) {
         columnClickBehavior,
         showFilter,
         showPartialColumns,
+        showPartialRows,
         preventWheelOnBounds,
 
         getCellData,
@@ -978,14 +979,14 @@ export function WSCanvas(props: WSCanvasProps) {
 
         // adjust scrollOffset.row
         if (viewCell.row >= state.viewScrollOffset.row + state.viewRowsCount) {
-            state.viewScrollOffset = state.viewScrollOffset.setRow(viewCell.row - state.viewRowsCount + 1);
+            state.viewScrollOffset = state.viewScrollOffset.setRow(Math.max(0, viewCell.row - state.viewRowsCount + 1));
         }
         else if (viewCell.row - frozenRowsCount <= state.viewScrollOffset.row) {
             state.viewScrollOffset = state.viewScrollOffset.setRow(Math.max(0, viewCell.row - frozenRowsCount));
         }
 
         // adjust scrollOffset.col
-        if (viewCell.col >= state.viewScrollOffset.col + state.viewColsCount - 1) {
+        if (viewCell.col >= state.viewScrollOffset.col + state.viewColsCount) {
             state.viewScrollOffset = state.viewScrollOffset.setCol(Math.max(0, viewCell.col - state.viewColsCount + 1));
         }
         else if (viewCell.col - frozenColsCount <= state.viewScrollOffset.col) {
@@ -1203,11 +1204,17 @@ export function WSCanvas(props: WSCanvasProps) {
 
                     const fW = (showPartialColumns && stateNfo.viewScrollOffset.col !== colsCount - state.viewColsCount) ? W : colsXMax;
 
-                    ctx.fillStyle = gridLinesColor;
-                    ctx.fillRect(0, 0, fW, rowsYMax);
+                    if (showPartialRows) {
+                        ctx.fillStyle = gridLinesColor;
+                        ctx.fillRect(0, 0, fW, H);
+                    }
+                    else {
+                        ctx.fillStyle = gridLinesColor;
+                        ctx.fillRect(0, 0, fW, rowsYMax);
 
-                    ctx.fillStyle = sheetBackgroundColor;
-                    ctx.fillRect(0, rowsYMax, fW, H - rowsYMax);
+                        ctx.fillStyle = sheetBackgroundColor;
+                        ctx.fillRect(0, rowsYMax, fW, H - rowsYMax);
+                    }
                 }
                 //#endregion
 
@@ -1216,35 +1223,64 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 //#region CELLS
                 {
-                    const drawRows = (riFrom: number, riTo: number) => {
+                    let rowExceeded = false;
+                    let colExceeded = false;
+
+                    const drawRows = (riFrom: number, riTo: number, updateExceeded: boolean) => {
                         for (let vri = riFrom; vri <= riTo; ++vri) {
                             if (vri >= filteredSortedRowsCount()) break;
                             let x = 1;
                             if (showRowNumber) x = rowNumberColWidth + 2;
 
-                            const drawCols = (ciFrom: number, ciTo: number) => {
+                            const drawCols = (ciFrom: number, ciTo: number, updateExceededCol: boolean) => {
                                 for (let ci = ciFrom; ci <= ciTo; ++ci) {
                                     const cWidth = overridenColWidth(state, ci);
 
                                     redrawCellInternal(state, vm, new WSCanvasCellCoord(vri, ci), ctx, cWidth, x, y);
 
                                     x += cWidth + 1;
+
+                                    if (updateExceededCol && state.focusedCell.col === ciTo && x > W) {
+                                        colExceeded = true;
+                                        //return;
+                                    }
                                 }
                             }
 
-                            drawCols(0, frozenColsCount - 1);
+                            drawCols(0, frozenColsCount - 1, false);
                             drawCols(
                                 state.viewScrollOffset.col + frozenColsCount,
-                                state.viewScrollOffset.col + state.viewColsCount - ((showPartialColumns && stateNfo.viewScrollOffset.col !== colsCount - state.viewColsCount) ? 0 : 1));
+                                state.viewScrollOffset.col + state.viewColsCount - ((showPartialColumns && stateNfo.viewScrollOffset.col !== colsCount - state.viewColsCount) ? 0 : 1), true);
+
+                            if (colExceeded) return;
 
                             const ri = viewRowToRealRow(vm, vri);
                             const rh = getRowHeight(ri);
                             y += rh + 1;
                         }
+                        if (updateExceeded && state.focusedCell.row === riTo && y > H) {
+                            rowExceeded = true;
+                            //return;
+                        }
                     };
 
-                    drawRows(0, frozenRowsCount - 1);
-                    drawRows(state.viewScrollOffset.row + frozenRowsCount, Math.min(filteredSortedRowsCount() - 1, state.viewScrollOffset.row + state.viewRowsCount - 1));
+                    drawRows(0, frozenRowsCount - 1, false);
+                    drawRows(state.viewScrollOffset.row + frozenRowsCount,
+                        Math.min(filteredSortedRowsCount() - 1, state.viewScrollOffset.row + state.viewRowsCount - (showPartialRows ? 0 : 1)), true);
+
+                    if (colExceeded) {
+                        console.log("COL EXCEEDED");
+                        scrollTo(state, vm, state.focusedCell);
+                        paint(state, vm);
+                        return;
+                    }
+
+                    if (rowExceeded) {
+                        console.log("ROW EXCEEDED");
+                        scrollTo(state, vm, state.focusedCell);
+                        paint(state, vm);
+                        return;
+                    }
                 }
                 //#endregion
 
@@ -1438,7 +1474,8 @@ export function WSCanvas(props: WSCanvasProps) {
                     };
 
                     if (frozenRowsCount > 0) drawRowNumber(0, frozenRowsCount - 1);
-                    drawRowNumber(frozenRowsCount + state.viewScrollOffset.row, Math.min(filteredSortedRowsCount() - 1, state.viewScrollOffset.row + state.viewRowsCount - 1));
+                    drawRowNumber(frozenRowsCount + state.viewScrollOffset.row,
+                        Math.min(filteredSortedRowsCount() - 1, state.viewScrollOffset.row + state.viewRowsCount - (showPartialRows ? 0 : 1)));
                 }
                 //#endregion
 
@@ -2419,7 +2456,7 @@ export function WSCanvas(props: WSCanvasProps) {
         DEBUG_CTL = debug ? <div ref={debugRef}>
             <b>paint cnt</b> => {stateNfo.paintcnt}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
-            <b>focused</b> => {stateNfo.focusedCell.toString()}<br />
+            <b>focused</b> => {stateNfo.focusedCell.toString()} - <b>focusedView</b> => {realCellToView(viewMap, stateNfo.focusedCell).toString()}<br />
             <b>canv off</b> => left:{canvasRef.current ? canvasRef.current.offsetLeft : "null"}, top:{canvasRef.current ? canvasRef.current.offsetTop : "null"}<br />
             <b>size</b> => bk:{stateNfo.widthBackup},{stateNfo.heightBackup} cur:{width},{height} W:{W},H:{H} dbgSizeH:{debugSize.height}<br />
             <b>rows</b> => rows:{rowsCount} ; <b>viewrows</b> => {stateNfo.viewRowsCount} ; <b>viewCols</b> => {stateNfo.viewColsCount}<br />

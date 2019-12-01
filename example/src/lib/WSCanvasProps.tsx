@@ -50,6 +50,8 @@ export interface WSCanvasProps {
     showFilter: boolean;
     /** show or truncate partial columns */
     showPartialColumns: boolean;
+    /** show or truncate partial rows */
+    showPartialRows: boolean;
     /** prevent wheel default window scroll when scroll at top or bottom */
     preventWheelOnBounds: boolean;
 

@@ -31,6 +31,7 @@ export const WSCanvasPropsDefault = () => {
         columnClickBehavior: WSCanvasColumnClickBehavior.ToggleSort,
         showFilter: false,
         showPartialColumns: true,
+        showPartialRows: true,
         preventWheelOnBounds: true,
         
         getCellData: (cell) => null,

@@ -16,7 +16,7 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
   width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
   const [rows, setRows] = useState<MyData[]>([]);
 
-  const ROWS = 1000;
+  const ROWS = 5000;
 
   const columns = [
     {
