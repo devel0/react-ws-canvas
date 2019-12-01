@@ -164,6 +164,8 @@ export function WSCanvas(props: WSCanvasProps) {
     let H = height - debugSize.height - margin_padding_H;
 
     const viewRowToRealRow = (vm: ViewMap | null, viewRow: number) => {
+        if (viewRow < 0) return viewRow;
+
         if (vm === null)
             return viewRow;
         else
@@ -1316,6 +1318,10 @@ export function WSCanvas(props: WSCanvasProps) {
                             if (qSort) {
                                 let colTxt = "";
                                 ctx.textAlign = "right";
+
+                                if (window.devicePixelRatio !== 1)
+                                    ctx.font = (18 * window.devicePixelRatio) + "px Liberation Sans";
+
                                 switch (qSort.sortDirection) {
                                     case WSCanvasSortDirection.Ascending: colTxt = "\u25B4"; break;
                                     case WSCanvasSortDirection.Descending: colTxt = "\u25BE"; break;
@@ -2283,7 +2289,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (e.touches.length > 1) return;
 
         const touch = e.touches.item(0);
-        if (touch && canvasRef.current) {            
+        if (touch && canvasRef.current) {
             const pos = getTouchPos(canvasRef.current, e);
 
             const x = pos.x;
@@ -2303,7 +2309,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const ccoord = new WSCanvasCoord(x, y);
             let matches = false;
 
-            const isOverCell = computeIsOverCell(stateNfo, xs, ys, true);            
+            const isOverCell = computeIsOverCell(stateNfo, xs, ys, true);
 
             state.cursorOverCell = isOverCell;
 
@@ -2345,7 +2351,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 matches = true;
             } else if (isOverCell) {
                 const X_SENSITIVITY = width / 20;
-                const Y_SENSITIVITY = height / 25;                
+                const Y_SENSITIVITY = height / 25;
 
                 const delta = [dx, dy];
                 if (Math.abs(delta[0]) > X_SENSITIVITY || Math.abs(delta[1]) > Y_SENSITIVITY) {
