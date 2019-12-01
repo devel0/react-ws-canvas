@@ -39,7 +39,7 @@ export class WSCanvasState {
         this.resizingColStartNfo = [-2, 0];
         this.colWidthExpanded = 0;
 
-        this.selection = new WSCanvasSelection([]);
+        this.viewSelection = new WSCanvasSelection([]);
         this.columnsSort = [];
         this.cursorOverCell = false;
 
@@ -90,7 +90,8 @@ export class WSCanvasState {
     resizingColStartNfo: number[];
     colWidthExpanded: number;
 
-    selection: WSCanvasSelection;
+    /** view cell selection */
+    viewSelection: WSCanvasSelection;
     columnsSort: WSCanvasColumnSortInfo[];
     cursorOverCell: boolean;
 
