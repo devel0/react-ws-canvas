@@ -17,6 +17,7 @@ import moment from "moment";
 import 'moment/min/locales';
 import * as _ from 'lodash';
 import { WSCanvasFilter } from "./WSCanvasFilter";
+import ReactDOM from "react-dom";
 
 export interface ViewMap {
     viewToReal: number[];
@@ -109,7 +110,8 @@ export function WSCanvas(props: WSCanvasProps) {
         containerStyle,
         canvasStyle,
 
-        debug
+        debug,
+        dbgDiv
     } = props;
 
     //#region STATE AND INIT
@@ -131,9 +133,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const debouncedFilter = useDebounce(stateNfo.filtersTrack, filterDebounceMs);
     const debouncedColumnWidth = useDebounce(stateNfo.columnWidthOverrideTrack, recomputeRowHeightDebounceFilterMs);
 
-    const colNumberRowHeightFull = () => colNumberRowHeight + (showFilter ? rowHeight(-1) : 0);
-
-    const minH = (showColNumber ? colNumberRowHeightFull() : 0) + rowsCount * (rowHeight(-1) + 1) + scrollBarThk + 10;
+    const colNumberRowHeightFull = () => colNumberRowHeight + (showFilter ? rowHeight(-1) : 0);    
 
     let margin_padding_W = 0;
     let margin_padding_H = 0;
@@ -153,10 +153,13 @@ export function WSCanvas(props: WSCanvasProps) {
 
         margin_padding_W += (marginLeft + marginRight + paddingLeft + paddingRight);
         margin_padding_H += (marginTop + marginBottom + paddingTop + paddingBottom);
-    }
+    }    
+    
+    // TODO: fix
+    const minH = (showColNumber ? colNumberRowHeightFull() : 0) + /*viewrows here*/ rowsCount * (rowHeight(-1) + 1) + scrollBarThk + 10;
 
     let W = width - margin_padding_W;
-    let H = Math.max(height - debugSize.height - margin_padding_H, minH);
+    let H = height - debugSize.height - margin_padding_H;    
 
     const viewRowToRealRow = (vm: ViewMap | null, viewRow: number) => {
         if (vm === null)
@@ -2377,13 +2380,25 @@ export function WSCanvas(props: WSCanvasProps) {
         DEBUG_CTL = debug ? <div ref={debugRef}>
             <b>paint cnt</b> => {stateNfo.paintcnt}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
+            <b>focused</b> => {stateNfo.focusedCell.toString()}<br />
             <b>canv off</b> => left:{canvasRef.current ? canvasRef.current.offsetLeft : "null"}, top:{canvasRef.current ? canvasRef.current.offsetTop : "null"}<br />
-            <b>size</b> => bk:{stateNfo.widthBackup},{stateNfo.heightBackup} cur:{width},{height}<br />
+            <b>size</b> => bk:{stateNfo.widthBackup},{stateNfo.heightBackup} cur:{width},{height} W:{W},H:{H} dbgSizeH:{debugSize.height}<br />
             <b>rows</b> => rows:{rowsCount} ; <b>viewrows</b> => {stateNfo.viewRowsCount}<br />
             <b>dbg</b>=> {dbgNfo}
         </div> : null;
     }
     //#endregion
+
+    if (debug) {
+        if (dbgDiv && dbgDiv.current && DEBUG_CTL) {            
+            ReactDOM.render(DEBUG_CTL, dbgDiv.current);
+        }
+    }
+    else {
+        if (dbgDiv && dbgDiv.current) {
+            ReactDOM.unmountComponentAtNode(dbgDiv.current);
+        }
+    }
 
     return <div ref={containerRef}
         style={{
@@ -2393,9 +2408,9 @@ export function WSCanvas(props: WSCanvasProps) {
             overflow: "hidden"
         }}>
 
-        <div style={{ background: "lightcyan" }}>
+        {/* <div style={{ background: "lightcyan" }}>
             {DEBUG_CTL}
-        </div>
+        </div> */}
 
         <div ref={canvasDivRef}
             style={containerStyle === undefined ? baseDivContainerStyle : Object.assign(baseDivContainerStyle, containerStyle)}>

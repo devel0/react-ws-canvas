@@ -11,7 +11,8 @@ interface MyData {
   col6: Date;
 }
 
-export function Sample2(debug: boolean, width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
+export function Sample2(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
+  width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
   const [rows, setRows] = useState<MyData[]>([]);
 
   const ROWS = 5000;
@@ -122,7 +123,7 @@ export function Sample2(debug: boolean, width: number, height: number, api: WSCa
     rowHeight={() => 30}
     showFilter={true}
     showColNumber={true} showRowNumber={true}
-    debug={debug} colWidthExpand={false}
+    debug={debug} dbgDiv={dbgDiv} colWidthExpand={false}
     frozenRowsCount={0} frozenColsCount={0}
     rowsCount={rows.length} colsCount={columns.length} />
 }

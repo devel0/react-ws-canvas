@@ -89,5 +89,6 @@ export const WSCanvasPropsDefault = () => {
         canvasStyle: undefined,
 
         debug: false,
+        dbgDiv: undefined,
     } as WSCanvasProps;
 }

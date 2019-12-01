@@ -157,4 +157,6 @@ export interface WSCanvasProps {
 
     /** enable debug div ( for dev purpose ) */
     debug: boolean;
+    /** div where to place debug */
+    dbgDiv: React.RefObject<HTMLDivElement> | undefined;
 }

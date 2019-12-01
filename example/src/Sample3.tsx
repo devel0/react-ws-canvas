@@ -12,7 +12,8 @@ interface MyData {
   col7: string;
 }
 
-export function Sample3(debug: boolean, width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
+export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
+  width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
   const [rows, setRows] = useState<MyData[]>([]);
 
   const ROWS = 10;
@@ -81,13 +82,13 @@ export function Sample3(debug: boolean, width: number, height: number, api: WSCa
           col4: new Date(new Date().getTime() + (ri * 24 * 60 * 60 * 1000)), // +1 day
           col5: new Date(new Date().getTime() + (ri * 60 * 1000)), // +1 min
           col6: new Date(new Date().getTime() + (ri * 24 * 60 * 60 * 1000 + ri * 60 * 1000)), // +1 day +1min
-          col7: ri % 2 === 0 ? "short text" : "long text that will be wrapped"
+          col7: ri % 2 === 0 ? "short text" : "long text that will be wrapped because too long"
         });
       }
 
       setRows(_rows);
     }, 100);
-    
+
   }, []);
 
   api.onMouseDown = (e, cell) => {
@@ -102,9 +103,9 @@ export function Sample3(debug: boolean, width: number, height: number, api: WSCa
     width={width} height={height}
     containerStyle={{ margin: "2em" }}
     rowHoverColor={"rgba(248,248,248,1)"}
-        isCellReadonly={() => true}
-        cellCursor="pointer"
-        getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
+    isCellReadonly={() => true}
+    cellCursor="pointer"
+    getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
     columnClickBehavior={columnClickBehavior}
     getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
     setCellData={(cell, value) => {
@@ -138,11 +139,12 @@ export function Sample3(debug: boolean, width: number, height: number, api: WSCa
     getColumnLessThanOp={(col) => columns[col].lessThan}
     getCellType={(cell, data) => columns[cell.col].type}
     // rowHoverColor={"rgba(240,240,240,1)"}
-    colWidth={(col) => 120}                
+    colWidth={(col) => 120}
     selectionMode={WSCanvasSelectMode.Row}
-    showFilter={false}  
+    showFilter={false}
     showColNumber={true} showRowNumber={false}
-    debug={debug} colWidthExpand={true}
+    debug={debug} dbgDiv={dbgDiv}
+    colWidthExpand={true}
     frozenRowsCount={0} frozenColsCount={0}
     rowsCount={rows.length} colsCount={columns.length} />
 }

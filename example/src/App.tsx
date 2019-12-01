@@ -4,14 +4,16 @@ import './App.css';
 import { WSCanvasApi, WSCanvasCellCoord, useWindowSize, useElementSize, WSCanvasColumnClickBehavior } from './lib';
 import { Sample1 } from './Sample1';
 import { Sample2 } from './Sample2';
+import { Sample3 } from './Sample3';
 
 const App: React.FC = () => {
   const winSize = useWindowSize();
   const userDivRef = useRef<HTMLDivElement>(null);
   const userSize = useElementSize(userDivRef);
-  const [debug, setDebug] = useState(false);
+  const [debug, setDebug] = useState(true);
   const api = new WSCanvasApi();
   const [columnClickBehavior, setColumnClickBehavior] = useState(WSCanvasColumnClickBehavior.ToggleSort);
+  const dbgDiv = useRef<HTMLDivElement>(null);
 
   api.onMouseDown = (e, c) => {
     //  console.log("CELL CLICKED " + c);
@@ -62,8 +64,12 @@ const App: React.FC = () => {
       }}>toggleDebug</button>
     </div>
 
+    <div ref={dbgDiv}>
+
+    </div>
+
     <div>
-      {Sample2(debug, winSize.width, 400, api, columnClickBehavior)}
+      {Sample2(debug, dbgDiv, winSize.width, 500, api, columnClickBehavior)}
     </div>
 
     <div style={{ background: "lightgreen", margin: "1em" }}>
