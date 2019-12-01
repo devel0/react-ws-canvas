@@ -69,7 +69,7 @@ const App: React.FC = () => {
     </div>
 
     <div>
-      {Sample2(debug, dbgDiv, winSize.width, 500, api, columnClickBehavior)}
+      {Sample3(debug, dbgDiv, winSize.width, 500, api, columnClickBehavior)}
     </div>
 
     <div style={{ background: "lightgreen", margin: "1em" }}>

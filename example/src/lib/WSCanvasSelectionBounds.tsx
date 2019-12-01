@@ -11,6 +11,9 @@ export class WSEditorSelectionBounds {
     get minColIdx() { return this._minColIdx; }
     get maxRowIdx() { return this._maxRowIdx; }
     get maxColIdx() { return this._maxColIdx; }
+    get size() { 
+        return (this._maxColIdx - this.minColIdx + 1) * (this._maxRowIdx - this._minRowIdx + 1);
+    }
 
     constructor(rng: WSCanvasSelectionRange) {
         this._minRowIdx = rng.from.row < rng.to.row ? rng.from.row : rng.to.row;

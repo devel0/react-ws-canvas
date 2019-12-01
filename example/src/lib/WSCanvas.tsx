@@ -18,6 +18,7 @@ import 'moment/min/locales';
 import * as _ from 'lodash';
 import { WSCanvasFilter } from "./WSCanvasFilter";
 import ReactDOM from "react-dom";
+import { WSCanvasSelectMode } from "./WSCanvasSelectionMode";
 
 export interface ViewMap {
     viewToReal: number[];
@@ -949,7 +950,7 @@ export function WSCanvas(props: WSCanvasProps) {
     /** side effect on state ; NO side effect on vm */
     const focusCell = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearPreviousSel?: boolean) => {
         if (canvasRef.current) canvasRef.current.focus();
-        const viewCell = realCellToView(vm, cell);                
+        const viewCell = realCellToView(vm, cell);
         setSelectionByEndingCell(state, viewCell, endingCell, clearPreviousSel);
 
         state.focusedCell = cell;
@@ -1232,7 +1233,9 @@ export function WSCanvas(props: WSCanvasProps) {
                         for (let ci = ciFrom; ci <= ciTo; ++ci) {
                             const cWidth = overridenColWidth(state, ci);
 
-                            const isSelected = highlightColNumber && selectedViewColIdxs.has(ci);
+                            const isSelected = highlightColNumber &&
+                                ((selectionMode === WSCanvasSelectMode.Row && state.viewSelection.bounds && state.viewSelection.bounds.size >1)
+                                    || selectedViewColIdxs.has(ci));
 
                             ctx.fillStyle = cellNumberBackgroundColor;
                             ctx.fillRect(x, y, cWidth, colNumberRowHeightFull());
@@ -1705,7 +1708,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 if (shift_key &&
                     (stateNfo.focusedCell.row !== state.focusedCell.row ||
-                        stateNfo.focusedCell.col !== state.focusedCell.col)) {                                                        
+                        stateNfo.focusedCell.col !== state.focusedCell.col)) {
                     setSelectionByEndingCell(state, realCellToView(viewMap, state.focusedCell), shift_key, !ctrl_key);
                 }
                 else
@@ -2395,7 +2398,7 @@ export function WSCanvas(props: WSCanvasProps) {
             <b>canv off</b> => left:{canvasRef.current ? canvasRef.current.offsetLeft : "null"}, top:{canvasRef.current ? canvasRef.current.offsetTop : "null"}<br />
             <b>size</b> => bk:{stateNfo.widthBackup},{stateNfo.heightBackup} cur:{width},{height} W:{W},H:{H} dbgSizeH:{debugSize.height}<br />
             <b>rows</b> => rows:{rowsCount} ; <b>viewrows</b> => {stateNfo.viewRowsCount}<br />
-            <b>selection</b> => {stateNfo.viewSelection.toString()}<br/>
+            <b>selection</b> => {stateNfo.viewSelection.toString()}<br />
             <b>dbg</b>=> {dbgNfo}
         </div> : null;
     }

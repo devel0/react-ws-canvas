@@ -104,7 +104,7 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
     containerStyle={{ margin: "2em" }}
     rowHoverColor={"rgba(248,248,248,1)"}
     isCellReadonly={() => true}
-    cellCursor="pointer"
+    // cellCursor="pointer"
     getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
     columnClickBehavior={columnClickBehavior}
     getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
@@ -142,7 +142,7 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
     colWidth={(col) => 120}
     selectionMode={WSCanvasSelectMode.Row}
     showFilter={false}
-    showColNumber={true} showRowNumber={false}
+    showColNumber={true} showRowNumber={true}
     debug={debug} dbgDiv={dbgDiv}
     colWidthExpand={true}
     frozenRowsCount={0} frozenColsCount={0}

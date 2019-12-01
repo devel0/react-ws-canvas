@@ -23,7 +23,7 @@ export class WSCanvasSelection {
             }
             return res;
         }
-    }
+    }    
 
     /** return copy of this */
     dup(): WSCanvasSelection {
