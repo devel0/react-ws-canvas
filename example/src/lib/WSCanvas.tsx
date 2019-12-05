@@ -53,6 +53,7 @@ export function WSCanvas(props: WSCanvasProps) {
         highlightColNumber,
         columnClickBehavior,
         showFilter,
+        selectFirstOnFilter,
         showPartialColumns,
         showPartialRows,
         preventWheelOnBounds,
@@ -376,6 +377,12 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
+    useEffect(() => {
+        const vm = {} as ViewMap;
+        filterAndSort(stateNfo, vm);
+        setViewMap(vm);
+    }, [rowsCount]);
+
     //#endregion    
 
     // useEffect(() => {
@@ -620,10 +627,10 @@ export function WSCanvas(props: WSCanvasProps) {
         ctx.fillRect(x, y, cWidth, getRowHeight(cell.row));
 
         if (isSelected) {
-            const leftBorder = cell.col === 0 || !state.viewSelection.containsCell(new WSCanvasCellCoord(cell.row, cell.col - 1), selectionMode);
-            const rightBorder = cell.col === colsCount - 1 || !state.viewSelection.containsCell(new WSCanvasCellCoord(cell.row, cell.col + 1), selectionMode);
-            const topBorder = cell.row === 0 || !state.viewSelection.containsCell(new WSCanvasCellCoord(cell.row - 1, cell.col), selectionMode);
-            const bottomBorder = cell.row === filteredSortedRowsCount() - 1 || !state.viewSelection.containsCell(new WSCanvasCellCoord(cell.row + 1, cell.col), selectionMode);
+            const leftBorder = viewCell.col === 0 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row, viewCell.col - 1), selectionMode);
+            const rightBorder = viewCell.col === colsCount - 1 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row, viewCell.col + 1), selectionMode);
+            const topBorder = viewCell.row === 0 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row - 1, viewCell.col), selectionMode);
+            const bottomBorder = viewCell.row === filteredSortedRowsCount() - 1 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row + 1, viewCell.col), selectionMode);
 
             if (leftBorder || rightBorder || topBorder || bottomBorder) {
                 ctx.lineWidth = 1;
@@ -963,10 +970,10 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** side effect on state ; NO side effect on vm */
-    const focusCell = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearPreviousSel?: boolean) => {
+    const focusCell = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearPreviousSel?: boolean, dontApplySelect?: boolean) => {
         if (canvasRef.current) canvasRef.current.focus();
         const viewCell = realCellToView(vm, cell);
-        setSelectionByEndingCell(state, viewCell, endingCell, clearPreviousSel);
+        if (dontApplySelect === undefined || dontApplySelect === false) setSelectionByEndingCell(state, viewCell, endingCell, clearPreviousSel);
 
         state.focusedCell = cell;
         confirmCustomEdit(state, vm);
@@ -1114,7 +1121,7 @@ export function WSCanvas(props: WSCanvasProps) {
             if (viewMap) {
                 const viewRowToFocus = vm.viewToReal[0];
                 const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
-                focusCell(state, vm, q, true, false, true);
+                focusCell(state, vm, q, true, false, true, !selectFirstOnFilter);
                 rectifyScrollOffset(state, vm);
             }
 
@@ -1426,7 +1433,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     e.target.setSelectionRange(0, e.target.value.length);
                                 }}
                                 onBlur={(e) => { // workaround                                                                                                            
-                                    if (!canceling) e.target.focus();
+                                    if (!canceling && e.target) e.target.focus();
                                 }}
                                 onKeyDown={(e) => {
                                     switch (e.key) {
@@ -1899,7 +1906,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const y = e.pageY - e.currentTarget.offsetTop;
         const ccoord = new WSCanvasCoord(x, y);
 
-        if (api.onPreviewMouseDown) api.onPreviewMouseDown(e, cellCoord );
+        if (api.onPreviewMouseDown) api.onPreviewMouseDown(e, cellCoord);
 
         if (!e.defaultPrevented) {
 
@@ -2472,6 +2479,7 @@ export function WSCanvas(props: WSCanvasProps) {
         DEBUG_CTL = debug ? <div ref={debugRef}>
             <b>paint cnt</b> => {stateNfo.paintcnt}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
+            <b>rows cnt</b> => {rowsCount}<br />
             <b>touch start</b> => {stateNfo.touchStart.toString()}<br />
             <b>touch cur</b> => {stateNfo.touchCur.toString()}<br />
             <b>dbg</b>=> {dbgNfo}

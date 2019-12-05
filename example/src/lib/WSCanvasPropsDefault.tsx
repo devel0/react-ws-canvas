@@ -30,6 +30,7 @@ export const WSCanvasPropsDefault = () => {
         highlightColNumber: true,
         columnClickBehavior: WSCanvasColumnClickBehavior.ToggleSort,
         showFilter: false,
+        selectFirstOnFilter: false,
         showPartialColumns: true,
         showPartialRows: true,
         preventWheelOnBounds: true,

@@ -48,6 +48,8 @@ export interface WSCanvasProps {
     columnClickBehavior: WSCanvasColumnClickBehavior;
     /** show column filters row */
     showFilter: boolean;
+    /** whatever select first avail row after filtering */
+    selectFirstOnFilter: boolean;
     /** show or truncate partial columns */
     showPartialColumns: boolean;
     /** show or truncate partial rows */
