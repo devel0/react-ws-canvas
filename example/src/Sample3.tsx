@@ -148,13 +148,13 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
       getCellType={(cell, data) => columns[cell.col].type}
       // rowHoverColor={"rgba(240,240,240,1)"}
       colWidth={(col) => 120}
-      selectionMode={WSCanvasSelectMode.Row}
-      showFilter={false}
+      selectionMode={WSCanvasSelectMode.Cell}
+      showFilter={true}
       showPartialColumns={true}
       showColNumber={true} showRowNumber={true}
       debug={debug} dbgDiv={dbgDiv}
       colWidthExpand={true}
-      frozenRowsCount={0} frozenColsCount={0}
+      frozenRowsCount={1} frozenColsCount={1}
       rowsCount={rows.length} colsCount={columns.length} />
   </>
 }

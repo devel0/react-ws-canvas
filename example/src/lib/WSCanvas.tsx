@@ -25,6 +25,8 @@ export interface ViewMap {
     realToView: number[];
 }
 
+// TODO: isOverCell should true on last row when showPartialRows
+
 export function WSCanvas(props: WSCanvasProps) {
     useEffect(() => {
         if (debug) console.log("*** locale");
