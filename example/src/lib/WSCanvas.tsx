@@ -1775,14 +1775,15 @@ export function WSCanvas(props: WSCanvasProps) {
                                 case "Backspace":
                                 case "Delete":
                                     {
-                                        let cellRng = stateNfo.viewSelection.cells();
-                                        let cellIt = cellRng.next();
-                                        while (!cellIt.done) {
-                                            const cell = cellIt.value;
+                                        let viewCellRng = stateNfo.viewSelection.cells();
+                                        let viewCellIt = viewCellRng.next();
+                                        while (!viewCellIt.done) {
+                                            const viewCell = viewCellIt.value;
+                                            const cell = viewCellToReal(viewMap, viewCell);
                                             if (isCellReadonly === undefined || !isCellReadonly(cell)) {
                                                 setCellData(cell, "");
                                             }
-                                            cellIt = cellRng.next();
+                                            viewCellIt = viewCellRng.next();
                                         }
                                     }
                                     keyHandled = true;
