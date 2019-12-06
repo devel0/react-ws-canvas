@@ -117,7 +117,7 @@ export function Sample3(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
       width={width} height={height}
       containerStyle={{ margin: "2em" }}
       rowHoverColor={"rgba(248,248,248,1)"}
-      isCellReadonly={() => true}
+      // isCellReadonly={() => true}
       // cellCursor="pointer"
       getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
       columnClickBehavior={columnClickBehavior}
