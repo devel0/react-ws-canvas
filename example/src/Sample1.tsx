@@ -2,11 +2,12 @@ import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas } from "./lib";
 
 import React, { useState, useEffect } from "react";
 
-export function Sample1(width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
+export function Sample1(exampleInit: number, debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
+  width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
     const [rows, setRows] = useState<any[][]>([]);
   
-    const ROWS = 1000;
-    const COLS = 20;
+    const ROWS = 50000;
+    const COLS = 200;
   
     useEffect(() => {
   
@@ -20,11 +21,12 @@ export function Sample1(width: number, height: number, api: WSCanvasApi, columnC
       }
   
       setRows(_rows);
-    }, []);
+    }, [exampleInit]);
   
     return <WSCanvas
       api={api}
       width={width} height={height}
+      containerStyle={{ margin: "1em" }}
       columnClickBehavior={columnClickBehavior}
       getCellData={(cell) => rows[cell.row][cell.col]}
       setCellData={(cell, value) => {

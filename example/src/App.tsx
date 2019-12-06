@@ -26,10 +26,16 @@ const App: React.FC = () => {
     }
   }
 
+  const [example, setExample] = useState(3);
+  const [exampleInit, setExampleInit] = useState(0);
+
   return <div>
 
     <div ref={userDivRef} style={{ margin: 10 }}>
       <b>API </b>
+
+      <button onClick={() => { setExample(1); setExampleInit(exampleInit + 1); }}>example1</button>
+      <button onClick={() => { setExample(3); setExampleInit(exampleInit + 1); }}>example3</button>
 
       <button onClick={() => {
         if (api.clearSelection) api.clearSelection();
@@ -69,7 +75,9 @@ const App: React.FC = () => {
     </div>
 
     <div>
-      {Sample3(debug, dbgDiv, winSize.width, winSize.height * .8, api, columnClickBehavior)}
+      {example === 1 ?
+        Sample1(exampleInit, debug, dbgDiv, winSize.width, winSize.height * .8, api, columnClickBehavior) :
+        Sample3(exampleInit, debug, dbgDiv, winSize.width, winSize.height * .8, api, columnClickBehavior)}
     </div>
 
     <div style={{ background: "lightgreen", margin: "1em" }}>
