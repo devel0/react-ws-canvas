@@ -9,6 +9,7 @@ import { WSCanvasFilter } from "./WSCanvasFilter";
 
 export class WSCanvasState {
     constructor() {
+        this.filteredSortedRowsCount = 0;
         this.widthBackup = 0;
         this.heightBackup = 0;
 
@@ -57,6 +58,7 @@ export class WSCanvasState {
         this.initialized = false;
     }
 
+    filteredSortedRowsCount: number;
     widthBackup: number;
     heightBackup: number;
 

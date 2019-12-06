@@ -27,6 +27,7 @@ export interface ViewMap {
 
 export function WSCanvas(props: WSCanvasProps) {
     useEffect(() => {
+        if (debug) console.log("*** locale");
         const lang = navigator.language;
         moment.locale(lang);
     }, [navigator.language]);
@@ -169,8 +170,12 @@ export function WSCanvas(props: WSCanvasProps) {
 
         if (vm === null)
             return viewRow;
-        else
-            return vm.viewToReal[viewRow];
+        else {
+            if (vm.viewToReal)
+                return vm.viewToReal[viewRow];
+            else
+                return viewRow;
+        }
     }
 
     const viewColToRealCol = (vm: ViewMap | null, viewCol: number) => viewCol; // not yet impemented (eg. column order)
@@ -247,11 +252,11 @@ export function WSCanvas(props: WSCanvasProps) {
         return Math.min(q, colsCount);
     };
 
-    const filteredSortedRowsCount = () => (viewMap === null) ? rowsCount : viewMap.viewToReal.length;
+    //const filteredSortedRowsCount = () => (viewMap === null) ? rowsCount : viewMap.viewToReal.length;
 
     const verticalScrollbarActive =
         verticalScrollbarMode === WSCanvasScrollbarMode.on ||
-        (verticalScrollbarMode === WSCanvasScrollbarMode.auto && computeViewRows(stateNfo, viewMap, false) < filteredSortedRowsCount());
+        (verticalScrollbarMode === WSCanvasScrollbarMode.auto && computeViewRows(stateNfo, viewMap, false) < stateNfo.filteredSortedRowsCount);
 
     const horizontalScrollbarActive =
         horizontalScrollbarMode === WSCanvasScrollbarMode.on ||
@@ -359,6 +364,8 @@ export function WSCanvas(props: WSCanvasProps) {
             vm.viewToReal = filteredSortedToReal;
             vm.realToView = buildInverseView(filteredSortedToReal);
         }
+
+        state.filteredSortedRowsCount = (vm === null) ? rowsCount : vm.viewToReal.length;
     }
 
     if (!stateNfo.initialized) {
@@ -377,11 +384,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    useEffect(() => {
-        const vm = {} as ViewMap;
-        filterAndSort(stateNfo, vm);
-        setViewMap(vm);
-    }, [rowsCount]);
+
 
     //#endregion    
 
@@ -489,15 +492,6 @@ export function WSCanvas(props: WSCanvasProps) {
         setStateNfo(state);
     }
 
-    useEffect(() => {
-        if (stateNfo.initialized) {
-            if (overridenRowHeight === null && rowsCount > 0 && canvasRef.current && canvasRef.current.getContext('2d')) {
-                recomputeOverridenRowHeight(stateNfo);
-                paint(stateNfo, viewMap);
-            }
-        }
-    }, [stateNfo.initialized]);
-
     const canvasToViewRow = (state: WSCanvasState, ccoord: WSCanvasCoord) => {
         const py = ccoord.y;
 
@@ -505,7 +499,7 @@ export function WSCanvas(props: WSCanvasProps) {
         {
             let y = 3 + (showColNumber ? colNumberRowHeightFull() : 0);
             for (let ri = state.viewScrollOffset.row; ri < state.viewScrollOffset.row + state.viewRowsCount; ++ri) {
-                if (ri >= filteredSortedRowsCount()) break;
+                if (ri >= state.filteredSortedRowsCount) break;
                 if (py >= y && py < y + getRowHeight(ri)) return ri;
 
                 y += getRowHeight(ri) + 1;
@@ -538,7 +532,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (showRowNumber && ci[0] === -1) {
             let y = 3 + (showColNumber ? colNumberRowHeightFull() : 0);
             for (let vri = state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri) {
-                if (vri >= filteredSortedRowsCount()) break;
+                if (vri >= state.filteredSortedRowsCount) break;
 
                 if (py >= y && py < y + getRowHeight(vri))
                     return new WSCanvasCellCoord(viewRowToRealRow(vm, vri), -1);
@@ -556,7 +550,7 @@ export function WSCanvas(props: WSCanvasProps) {
             if (ci[0] !== -2) {
                 let y = 3 + (showColNumber ? colNumberRowHeightFull() : 0);
                 for (let vri = state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri) {
-                    if (vri >= filteredSortedRowsCount()) break;
+                    if (vri >= state.filteredSortedRowsCount) break;
 
                     const ri = viewRowToRealRow(vm, vri);
                     const rh = getRowHeight(ri);
@@ -580,7 +574,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         let y = 1;
         for (let ri = state.viewScrollOffset.row; ri < state.viewScrollOffset.row + state.viewRowsCount; ++ri) {
-            if (ri >= filteredSortedRowsCount()) break;
+            if (ri >= state.filteredSortedRowsCount) break;
 
             if (ri === cell.row) {
                 let resy = y + (showColNumber ? colNumberRowHeightFull() : 0);
@@ -604,6 +598,7 @@ export function WSCanvas(props: WSCanvasProps) {
      * 
      */
     const redrawCellInternal = (state: WSCanvasState, vm: ViewMap | null, viewCell: WSCanvasCellCoord, ctx: CanvasRenderingContext2D, cWidth: number, x: number, y: number) => {
+
         const cell = viewCellToReal(vm, viewCell)!;
         const isSelected = (
             ((selectFocusedCellOrRow && state.viewSelection.ranges.length === 1) || state.viewSelection.ranges.length > 1) ||
@@ -630,7 +625,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const leftBorder = viewCell.col === 0 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row, viewCell.col - 1), selectionMode);
             const rightBorder = viewCell.col === colsCount - 1 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row, viewCell.col + 1), selectionMode);
             const topBorder = viewCell.row === 0 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row - 1, viewCell.col), selectionMode);
-            const bottomBorder = viewCell.row === filteredSortedRowsCount() - 1 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row + 1, viewCell.col), selectionMode);
+            const bottomBorder = viewCell.row === state.filteredSortedRowsCount - 1 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row + 1, viewCell.col), selectionMode);
 
             if (leftBorder || rightBorder || topBorder || bottomBorder) {
                 ctx.lineWidth = 1;
@@ -723,6 +718,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     ctx.textAlign = "right";
                     break;
                 case "text":
+                    // console.log("draw cell: " + viewCell.toString() + " y:" + y + " txt:" + cellData);
                     str = cellData;
                     break;
             }
@@ -813,7 +809,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const horizontalScrollHanleLen = (state: WSCanvasState) => Math.max(minScrollHandleLen, (W - scrollBarThk) / colsCount * state.viewColsCount);
-    const verticalScrollHandleLen = (state: WSCanvasState) => Math.max(minScrollHandleLen, (H - scrollBarThk) / filteredSortedRowsCount() * state.viewRowsCount);
+    const verticalScrollHandleLen = (state: WSCanvasState) => Math.max(minScrollHandleLen, (H - scrollBarThk) / state.filteredSortedRowsCount * state.viewRowsCount);
 
     /** @returns true if side effects on state */
     const paintHorizontalScrollbar = (state: WSCanvasState, ctx: CanvasRenderingContext2D, factor: number) => {
@@ -1014,7 +1010,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const onVerticalScrollHandle = state.verticalScrollHandleRect && state.verticalScrollHandleRect.contains(ccoord);
             if (onVerticalScrollHandle) {
                 if (state.verticalScrollClickStartCoord === null) {
-                    state.verticalScrollClickStartFactor = (state.viewScrollOffset.row + frozenRowsCount) / (filteredSortedRowsCount() - state.viewRowsCount);
+                    state.verticalScrollClickStartFactor = (state.viewScrollOffset.row + frozenRowsCount) / (state.filteredSortedRowsCount - state.viewRowsCount);
                     state.verticalScrollClickStartCoord = ccoord;
                 }
             } else if (state.verticalScrollBarRect) {
@@ -1022,7 +1018,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 state.verticalScrollClickStartFactor = factor;
                 state.verticalScrollClickStartCoord = ccoord;
 
-                const newRowScrollOffset = Math.max(0, Math.trunc((filteredSortedRowsCount() - state.viewRowsCount) * factor));
+                const newRowScrollOffset = Math.max(0, Math.trunc((state.filteredSortedRowsCount - state.viewRowsCount) * factor));
                 state.viewScrollOffset = state.viewScrollOffset.setRow(newRowScrollOffset);
             }
             return true;
@@ -1058,7 +1054,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const ctx = canvas.getContext("2d");
             if (ctx) {
                 const factor = Math.min(1, Math.max(0, factoryStart + (deltay / (H - scrollBarThk - verticalScrollHandleLen(state) - 1))));
-                const newRowScrollOffset = Math.max(0, Math.trunc((filteredSortedRowsCount() - state.viewRowsCount) * factor));
+                const newRowScrollOffset = Math.max(0, Math.trunc((state.filteredSortedRowsCount - state.viewRowsCount) * factor));
                 state.viewScrollOffset = state.viewScrollOffset.setRow(newRowScrollOffset);
             }
         }
@@ -1087,70 +1083,23 @@ export function WSCanvas(props: WSCanvasProps) {
             y >= state.tableCellsBBox.leftTop.y && y <= state.tableCellsBBox.rightBottom.y;
     }
 
+    /*
     if (stateNfo.widthBackup !== W || stateNfo.heightBackup !== H) {
         const state = stateNfo.dup();
-        state.widthBackup = W;
-        state.heightBackup = H;
-        recomputeOverridenRowHeight(state);
+        recomputeGeometry(state);
         setStateNfo(state);
     }
-
-    useEffect(() => {
-        const newViewRowsCount = computeViewRows(stateNfo, viewMap, horizontalScrollbarActive);
-        const newViewColsCount = computeViewCols(stateNfo, verticalScrollbarActive);
-
-        if (newViewRowsCount !== stateNfo.viewRowsCount || newViewColsCount !== stateNfo.viewColsCount) {
-            const state = stateNfo.dup();
-            state.viewRowsCount = newViewRowsCount;
-            state.viewColsCount = newViewColsCount;
-            setStateNfo(state);
-        }
-    }, [rowsCount, overridenRowHeight, stateNfo.widthBackup, stateNfo.heightBackup]);
-
-    useEffect(() => {
-        paint(stateNfo, viewMap);
-    }, [width, height, stateNfo, debugSize, getCellData, setCellData]);
-
-    //#region APPLY FILTER 
-    useEffect(() => {
-        const vm = {} as ViewMap;
-        const state = stateNfo.dup();
-        if (stateNfo.initialized) {
-            filterAndSort(state, vm);
-
-            if (viewMap) {
-                const viewRowToFocus = vm.viewToReal[0];
-                const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
-                focusCell(state, vm, q, true, false, true, !selectFirstOnFilter);
-                rectifyScrollOffset(state, vm);
-            }
-
-            setViewMap(vm);
-            setStateNfo(state);
-        }
-    }, [debouncedFilter]);
-    //#endregion
-
-    //#region RECOMPUTE ROW HEIGHT when COLUMN WIDTH changes
-    useEffect(() => {
-        if (overridenRowHeight !== null && canvasRef.current && canvasRef.current.getContext('2d')) {
-            const state = stateNfo.dup();
-            // state.viewRowsCount = computeViewRows(state, viewMap, horizontalScrollbarActive);
-            // state.viewColsCount = computeViewCols(state, verticalScrollbarActive);
-            recomputeOverridenRowHeight(state);
-            paint(state, viewMap);
-            setStateNfo(state);
-        }
-    }, [debouncedColumnWidth]);
-    //#endregion    
+*/
 
     /**
-     *      
+     *=====================================================================================================
      * PAINT
-     * 
+     *=====================================================================================================
      **/
     const paint = (state: WSCanvasState, vm: ViewMap | null) => {
-        //console.log("PAINT");
+        if (debug) {
+            console.log("PAINT");            
+        }
         let stateChanged = false;
         ++state.paintcnt;
 
@@ -1235,9 +1184,11 @@ export function WSCanvas(props: WSCanvasProps) {
                     let rowExceeded = false;
                     let colExceeded = false;
 
+                    let rowDrawCnt = 0;
+
                     const drawRows = (riFrom: number, riTo: number, updateExceeded: boolean) => {
                         for (let vri = riFrom; vri <= riTo; ++vri) {
-                            if (vri >= filteredSortedRowsCount()) break;
+                            if (vri >= state.filteredSortedRowsCount) break;
                             let x = 1;
                             if (showRowNumber) x = rowNumberColWidth + 2;
 
@@ -1256,40 +1207,43 @@ export function WSCanvas(props: WSCanvasProps) {
                                 }
                             }
 
-                            drawCols(0, frozenColsCount - 1, false);
+                            if (frozenColsCount > 0) drawCols(0, frozenColsCount - 1, false);
                             drawCols(
                                 state.viewScrollOffset.col + frozenColsCount,
                                 state.viewScrollOffset.col + state.viewColsCount - ((showPartialColumns && stateNfo.viewScrollOffset.col !== colsCount - state.viewColsCount) ? 0 : 1), true);
 
-                            if (colExceeded) return;
+                            ++rowDrawCnt;
 
                             const ri = viewRowToRealRow(vm, vri);
                             const rh = getRowHeight(ri);
                             y += rh + 1;
+
+                            if (colExceeded) {
+                                continue;
+                            }
                         }
                         if (updateExceeded && state.focusedCell.row === riTo && y > H) {
                             rowExceeded = true;
-                            //return;
                         }
                     };
 
-                    drawRows(0, frozenRowsCount - 1, false);
+                    if (frozenRowsCount > 0) drawRows(0, frozenRowsCount - 1, false);
                     drawRows(state.viewScrollOffset.row + frozenRowsCount,
-                        Math.min(filteredSortedRowsCount() - 1, state.viewScrollOffset.row + state.viewRowsCount - (showPartialRows ? 0 : 1)), true);
+                        Math.min(state.filteredSortedRowsCount - 1, state.viewScrollOffset.row + state.viewRowsCount - (showPartialRows ? 0 : 1)), true);
 
-                    if (colExceeded) {
-                        console.log("COL EXCEEDED");
+                    if (colExceeded && state.viewColsCount > 1) {
                         scrollTo(state, vm, state.focusedCell);
+                        if (debug) console.log("paintfrom:1");
                         paint(state, vm);
                         return;
                     }
-
+/*
                     if (rowExceeded) {
-                        console.log("ROW EXCEEDED");
                         scrollTo(state, vm, state.focusedCell);
+                        if (debug) console.log("paintfrom:2");
                         paint(state, vm);
                         return;
-                    }
+                    }*/
                 }
                 //#endregion
 
@@ -1488,7 +1442,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                     if (frozenRowsCount > 0) drawRowNumber(0, frozenRowsCount - 1);
                     drawRowNumber(frozenRowsCount + state.viewScrollOffset.row,
-                        Math.min(filteredSortedRowsCount() - 1, state.viewScrollOffset.row + state.viewRowsCount - (showPartialRows ? 0 : 1)));
+                        Math.min(state.filteredSortedRowsCount - 1, state.viewScrollOffset.row + state.viewRowsCount - (showPartialRows ? 0 : 1)));
                 }
                 //#endregion
 
@@ -1613,7 +1567,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 //#region VERTICAL SCROLLBAR
                 if (verticalScrollbarActive) {
-                    const scrollFactor = state.viewScrollOffset.row / (filteredSortedRowsCount() - state.viewRowsCount);
+                    const scrollFactor = state.viewScrollOffset.row / (state.filteredSortedRowsCount - state.viewRowsCount);
                     if (paintVerticalScrollbar(state, ctx, scrollFactor)) stateChanged = true;
                 }
                 //#endregion
@@ -1660,8 +1614,8 @@ export function WSCanvas(props: WSCanvasProps) {
                     case "ArrowDown":
                         keyHandled = true;
                         if (ctrl_key)
-                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setRow(filteredSortedRowsCount() - 1));
-                        else if (focusedViewCell.row < filteredSortedRowsCount() - 1) {
+                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setRow(state.filteredSortedRowsCount - 1));
+                        else if (focusedViewCell.row < state.filteredSortedRowsCount - 1) {
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextRow());
                         }
                         break;
@@ -1693,7 +1647,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     case "PageDown":
                         keyHandled = true;
                         state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setRow(
-                            Math.min(focusedViewCell.row + state.viewRowsCount, filteredSortedRowsCount() - 1)));
+                            Math.min(focusedViewCell.row + state.viewRowsCount, state.filteredSortedRowsCount - 1)));
                         break;
 
                     case "PageUp":
@@ -1712,7 +1666,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     case "End":
                         keyHandled = true;
                         if (ctrl_key)
-                            state.focusedCell = viewCellToReal(viewMap, new WSCanvasCellCoord(filteredSortedRowsCount() - 1, colsCount - 1));
+                            state.focusedCell = viewCellToReal(viewMap, new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, colsCount - 1));
                         else
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setCol(colsCount - 1));
                         break;
@@ -1882,6 +1836,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             break;
                     }
 
+                    if (debug) console.log("paintfrom:3");
                     paint(state, viewMap);
                     applyState = true;
                 } else {
@@ -1926,12 +1881,12 @@ export function WSCanvas(props: WSCanvasProps) {
                             state.viewSelection = new WSCanvasSelection([
                                 new WSCanvasSelectionRange(
                                     realCellToView(viewMap, new WSCanvasCellCoord(0, 0)),
-                                    realCellToView(viewMap, new WSCanvasCellCoord(filteredSortedRowsCount() - 1, colsCount - 1))
+                                    realCellToView(viewMap, new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, colsCount - 1))
                                 )
                             ]);
                         } else if (cellCoord.col === -1) { // ROW SELECTIONS                        
                             state.focusedFilterColIdx = -1;
-                            if (filteredSortedRowsCount() > 0) {
+                            if (state.filteredSortedRowsCount > 0) {
                                 if (shift_key && state.viewSelection.ranges.length > 0) {
                                     const lastSelectionBounds = state.viewSelection.ranges[state.viewSelection.ranges.length - 1].bounds;
 
@@ -1998,25 +1953,25 @@ export function WSCanvas(props: WSCanvasProps) {
 
                                     case WSCanvasColumnClickBehavior.Select:
                                         {
-                                            if (filteredSortedRowsCount() > 0) {
+                                            if (state.filteredSortedRowsCount > 0) {
                                                 if (shift_key && state.viewSelection.ranges.length > 0) {
                                                     const lastSelectionBounds = state.viewSelection.ranges[state.viewSelection.ranges.length - 1].bounds;
 
                                                     if (cellCoord.col < lastSelectionBounds.minColIdx) {
                                                         state.viewSelection.ranges.push(new WSCanvasSelectionRange(
                                                             new WSCanvasCellCoord(0, cellCoord.col),
-                                                            new WSCanvasCellCoord(filteredSortedRowsCount() - 1, lastSelectionBounds.minColIdx - 1)
+                                                            new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, lastSelectionBounds.minColIdx - 1)
                                                         ));
                                                     } else if (cellCoord.col > lastSelectionBounds.maxColIdx) {
                                                         state.viewSelection.ranges.push(new WSCanvasSelectionRange(
                                                             new WSCanvasCellCoord(0, lastSelectionBounds.maxColIdx + 1),
-                                                            new WSCanvasCellCoord(filteredSortedRowsCount() - 1, cellCoord.col)
+                                                            new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, cellCoord.col)
                                                         ));
                                                     }
                                                 } else {
                                                     const newRngSel = new WSCanvasSelectionRange(
                                                         new WSCanvasCellCoord(0, cellCoord.col),
-                                                        new WSCanvasCellCoord(filteredSortedRowsCount() - 1, cellCoord.col));
+                                                        new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, cellCoord.col));
                                                     if (ctrl_key) {
                                                         state.viewSelection.ranges.push(newRngSel);
                                                     }
@@ -2086,7 +2041,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         let onHandle = false;
                         if (qCol[0] > -2) {
                             let tryResizingCol = qCol[0];
-                            let colX = colGetXWidth(stateNfo, tryResizingCol);
+                            let colX = colGetXWidth(stateNfo, tryResizingCol, showPartialColumns);
                             cwidth = colX[1];
                             let skip = false; // workaround avoid cursor flicker
 
@@ -2094,7 +2049,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                 skip = true;
                             } else if (x - colX[0] > RESIZE_HANDLE_TOL) {
                                 ++tryResizingCol;
-                                colX = colGetXWidth(stateNfo, tryResizingCol);
+                                colX = colGetXWidth(stateNfo, tryResizingCol, showPartialColumns);
                                 cwidth = colX[1];
                             }
 
@@ -2163,6 +2118,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     const startWidth = state.resizingColStartNfo[1];
                     const newWidth = startWidth + (x - startX);
 
+                    console.log("NEW WIDTH:" + newWidth);
                     state.columnWidthOverride.set(state.resizingCol, newWidth);
                     state.columnWidthOverrideTrack = JSON.stringify([...state.columnWidthOverride]);
                 }
@@ -2184,7 +2140,9 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
             }
 
-            if (stateUpdated) setStateNfo(state!);
+            if (stateUpdated) {
+                setStateNfo(state!);
+            }
 
             if (api.onMouseMove) api.onMouseMove(e);
         }
@@ -2233,24 +2191,27 @@ export function WSCanvas(props: WSCanvasProps) {
                     state.viewScrollOffset = state.viewScrollOffset.setCol(Math.min(state.viewScrollOffset.col + 1, colsCount - state.viewColsCount));
                 }
                 else {
-                    if (!preventWheelOnBounds && state.viewScrollOffset.row === filteredSortedRowsCount() - state.viewRowsCount) prevent = false;
-                    state.viewScrollOffset = state.viewScrollOffset.setRow(Math.min(state.viewScrollOffset.row + 1, filteredSortedRowsCount() - state.viewRowsCount));
+                    if (!preventWheelOnBounds && state.viewScrollOffset.row === state.filteredSortedRowsCount - state.viewRowsCount) prevent = false;
+                    state.viewScrollOffset = state.viewScrollOffset.setRow(Math.min(state.viewScrollOffset.row + 1, state.filteredSortedRowsCount - state.viewRowsCount));
                 }
             }
             else if (e.deltaY < 0) {
+                console.log("SCROLL UP");
                 if (shift_key) {
                     if (!preventWheelOnBounds && state.viewScrollOffset.col === 0) prevent = false;
-                    state.viewScrollOffset = state.viewScrollOffset.setCol(Math.max(0, state.viewScrollOffset.col - 1));
+                    state.viewScrollOffset = state.viewScrollOffset.setCol(Math.max(0, state.viewScrollOffset.col - (showPartialRows ? 2 : 1)));
                 }
                 else {
                     if (!preventWheelOnBounds && state.viewScrollOffset.row === 0) prevent = false;
-                    state.viewScrollOffset = state.viewScrollOffset.setRow(Math.max(0, state.viewScrollOffset.row - 1));
+                    state.viewScrollOffset = state.viewScrollOffset.setRow(Math.max(0, state.viewScrollOffset.row - (showPartialRows ? 2 : 1)));
                 }
             }
 
             setStateNfo(state);
 
-            if (prevent) e.preventDefault();
+            if (prevent) {
+                e.preventDefault();
+            }
 
             if (api.onMouseWheel) api.onMouseWheel(e);
         }
@@ -2308,6 +2269,8 @@ export function WSCanvas(props: WSCanvasProps) {
             const dx = x - xs;
             const dy = y - ys;
 
+            console.log("touch dx:" + dx + " dy:" + dy);
+
             if (dx === 0 && dy === 0) return;
 
             const state = stateNfo.dup();
@@ -2337,9 +2300,8 @@ export function WSCanvas(props: WSCanvasProps) {
                 );
 
             if (state.horizontalScrollClickStartCoord === null && (onVerticalScrollBar || state.verticalScrollClickStartCoord)) {
-                setDbgNfo("vert dx:" + dx + " dy:" + dy);
                 if (state.verticalScrollClickStartCoord === null) {
-                    state.verticalScrollClickStartFactor = state.viewScrollOffset.row / (filteredSortedRowsCount() - state.viewRowsCount);
+                    state.verticalScrollClickStartFactor = state.viewScrollOffset.row / (state.filteredSortedRowsCount - state.viewRowsCount);
                     state.verticalScrollClickStartCoord = ccoord;
                 }
 
@@ -2347,7 +2309,6 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 matches = true;
             } else if (onHorizontalScrollBar || state.horizontalScrollClickStartCoord) {
-                setDbgNfo("horiz dx:" + dx + " dy:" + dy);
                 if (state.horizontalScrollClickStartCoord === null) {
                     state.horizontalScrollClickStartFactor = state.viewScrollOffset.col / (colsCount - state.viewColsCount);
                     state.horizontalScrollClickStartCoord = ccoord;
@@ -2357,16 +2318,16 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 matches = true;
             } else if (isOverCell) {
-                const X_SENSITIVITY = width / 20;
-                const Y_SENSITIVITY = height / 25;
+                const X_SENSITIVITY = 1; //width / 20;
+                const Y_SENSITIVITY = 1; //height / 25;
 
                 const delta = [dx, dy];
                 if (Math.abs(delta[0]) > X_SENSITIVITY || Math.abs(delta[1]) > Y_SENSITIVITY) {
-                    const deltaRow = -Math.trunc(delta[1] / Y_SENSITIVITY);
-                    const deltaCol = -Math.trunc(delta[0] / X_SENSITIVITY);
+                    const deltaRow = delta[1] > 0 ? -1 : 1; // -Math.trunc(delta[1] / Y_SENSITIVITY);
+                    const deltaCol = delta[0] > 0 ? -1 : 1;// -Math.trunc(delta[0] / X_SENSITIVITY);
 
                     state.viewScrollOffset = new WSCanvasCellCoord(
-                        Math.max(0, Math.min(filteredSortedRowsCount() - state.viewRowsCount, state.viewScrollOffset.row + deltaRow)),
+                        Math.max(0, Math.min(state.filteredSortedRowsCount - state.viewRowsCount, state.viewScrollOffset.row + deltaRow)),
                         Math.max(0, Math.min(colsCount - state.viewColsCount, state.viewScrollOffset.col + deltaCol)));
                 }
 
@@ -2403,9 +2364,139 @@ export function WSCanvas(props: WSCanvasProps) {
         if (api.onContextMenu) api.onContextMenu(e, cell);
     }
 
+    /**
+    *=====================================================================================================
+    * EFFECTS
+    *=====================================================================================================
+    **/
+
+    //#region EFFECTS
+
+
+    // const recomputeGeometry = (state: WSCanvasState) => {
+    //     console.log("recompute geom " + new Date().getTime());
+    //     if (overridenRowHeight !== null && canvasRef.current && canvasRef.current.getContext('2d')) {            
+    //         state.widthBackup = W;
+    //         state.heightBackup = H;
+    //         state.viewRowsCount = computeViewRows(state, viewMap, horizontalScrollbarActive);
+    //         state.viewColsCount = computeViewCols(state, verticalScrollbarActive);
+    //         recomputeOverridenRowHeight(state);            
+    //     }
+    // }
+
+    useEffect(() => {
+        if (debug) console.log("*** state.initialized");
+        if (stateNfo.initialized) {
+            if (overridenRowHeight === null && rowsCount > 0 && canvasRef.current && canvasRef.current.getContext('2d')) {
+                const state = stateNfo.dup();
+                const vm = {} as ViewMap;
+                filterAndSort(state, vm);
+                recomputeGeometry2(state, vm);
+                //recomputeOverridenRowHeight(stateNfo);
+                if (debug) console.log("paintfrom:4");
+                paint(stateNfo, viewMap);
+                setViewMap(vm);
+                setStateNfo(state);
+            }
+        }
+    }, [stateNfo.initialized]);
+
+    const recomputeGeometry2 = (state: WSCanvasState, vm: ViewMap) => {
+        //filterAndSort(state, vm);
+
+        const newViewRowsCount = computeViewRows(state, vm, horizontalScrollbarActive);
+        const newViewColsCount = computeViewCols(state, verticalScrollbarActive);
+
+        if (newViewRowsCount !== state.viewRowsCount || newViewColsCount !== state.viewColsCount) {
+            state.viewRowsCount = newViewRowsCount;
+            state.viewColsCount = newViewColsCount;
+        }
+
+        recomputeOverridenRowHeight(state);
+    }
+
+    //#region RECOMPUTE ROW HEIGHT when COLUMN WIDTH changes
+    useEffect(() => {
+        if (debug) console.log("*** debounceCol");
+        const state = stateNfo.dup();
+        const vm = {} as ViewMap;
+        filterAndSort(state, vm);
+        recomputeGeometry2(state, vm);
+        setViewMap(vm);
+        setStateNfo(state);
+    }, [debouncedColumnWidth]);
+    //#endregion 
+
+    useEffect(() => {
+        if (debug) console.log("*** rowsCount");
+        const state = stateNfo.dup();
+        const vm = {} as ViewMap;
+
+        filterAndSort(state, vm);
+        recomputeGeometry2(state, vm);
+        if (debug) console.log("paintfrom:5");
+        paint(state, vm);
+        // recomputeGeometry2(state, vm);
+
+        setViewMap(vm);
+        setStateNfo(state);
+    }, [rowsCount]);
+
+    useEffect(() => {
+        if (debug) console.log("*** rowHeight");
+        // const state = stateNfo.dup();
+        // const vm = {} as ViewMap;
+
+        // recomputeGeometry2(state, vm);
+
+        // setViewMap(vm);
+        // setStateNfo(state);
+    }, [overridenRowHeight]);
+
+    //#region APPLY FILTER 
+    useEffect(() => {
+        if (debug) console.log("*** debounceFilter");
+        // const vm = {} as ViewMap;
+        // const state = stateNfo.dup();
+        // if (stateNfo.initialized) {
+        //     filterAndSort(state, vm);
+
+        //     if (viewMap) {
+        //         const viewRowToFocus = vm.viewToReal[0];
+        //         const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
+        //         focusCell(state, vm, q, true, false, true, !selectFirstOnFilter);
+        //         rectifyScrollOffset(state, vm);
+        //     }
+
+        //     setViewMap(vm);
+        //     setStateNfo(state);
+        // }
+    }, [debouncedFilter]);
+    //#endregion     
+
+    useEffect(() => {
+        if (debug) console.log("*** resize");
+        if (debug) console.log("paintfrom:6");
+        paint(stateNfo, viewMap);
+    }, [width, height, debugSize, stateNfo.widthBackup, stateNfo.heightBackup]);
+
+    useEffect(() => {
+        if (debug) console.log("*** state, vm");
+        if (debug) console.log("paintfrom:7");        
+        paint(stateNfo, viewMap);
+    }, [stateNfo]);
+
+    useEffect(() => {
+        if (debug) console.log("*** getcell, setcell");
+        // paint(stateNfo, viewMap);
+    }, [getCellData, setCellData]);
+
     useLayoutEffect(() => {
+        if (debug) console.log("*** layout");
         if (canvasRef.current) {
-            canvasRef.current.addEventListener("wheel", handleWheel);
+
+            // https://github.com/inuyaksa/jquery.nicescroll/issues/799#issuecomment-482200470
+            canvasRef.current.addEventListener("wheel", handleWheel, { passive: false });
             canvasRef.current.addEventListener("touchstart", handleTouchStart);
             canvasRef.current.addEventListener("touchmove", handleTouchMove, { passive: false });
             canvasRef.current.addEventListener("touchend", handleTouchEnd);
@@ -2420,6 +2511,8 @@ export function WSCanvas(props: WSCanvasProps) {
         }
         return () => { };
     }, [canvasRef, stateNfo]);
+
+    //#endregion
 
     //#region API
     {
@@ -2479,10 +2572,9 @@ export function WSCanvas(props: WSCanvasProps) {
         DEBUG_CTL = debug ? <div ref={debugRef}>
             <b>paint cnt</b> => {stateNfo.paintcnt}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
-            <b>rows cnt</b> => {rowsCount}<br />
-            <b>touch start</b> => {stateNfo.touchStart.toString()}<br />
-            <b>touch cur</b> => {stateNfo.touchCur.toString()}<br />
-            <b>dbg</b>=> {dbgNfo}
+            <b>rows cnt</b> => {rowsCount} ; filtered:{stateNfo.filteredSortedRowsCount} ; focused:{stateNfo.focusedCell.toString()} ; scroll:{stateNfo.viewScrollOffset.toString()}<br />
+            <b>col width overr</b> => {stateNfo.columnWidthOverrideTrack}<br />
+            <b>cursorOverCell</b>=> {String(stateNfo.cursorOverCell)}
         </div> : null;
     }
     //#endregion

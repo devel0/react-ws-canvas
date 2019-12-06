@@ -10,7 +10,7 @@ const App: React.FC = () => {
   const winSize = useWindowSize();
   const userDivRef = useRef<HTMLDivElement>(null);
   const userSize = useElementSize(userDivRef);
-  const [debug, setDebug] = useState(true);
+  const [debug, setDebug] = useState(false);
   const api = new WSCanvasApi();
   const [columnClickBehavior, setColumnClickBehavior] = useState(WSCanvasColumnClickBehavior.ToggleSort);
   const dbgDiv = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ const App: React.FC = () => {
       }}>columnClickSelect</button>
 
       <button onClick={() => {
-        setDebug(!debug);        
+        setDebug(!debug);
       }}>toggleDebug</button>
     </div>
 
@@ -69,7 +69,7 @@ const App: React.FC = () => {
     </div>
 
     <div>
-      {Sample3(debug, dbgDiv, winSize.width, 500, api, columnClickBehavior)}
+      {Sample3(debug, dbgDiv, winSize.width, winSize.height * .8, api, columnClickBehavior)}
     </div>
 
     <div style={{ background: "lightgreen", margin: "1em" }}>
