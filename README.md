@@ -4,7 +4,7 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.4.1](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/b439aa8e9c194c948a1b05f5514da0bfd1ff32ba/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.4.1](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/5f28b555fd1bc0ce1009ebb32bfc57ca7932b5f6/example) )
 
 ---
 
@@ -19,7 +19,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - **canvas based** high performance datagrid ( able to scroll with ease millions of rows maintaining immediate cell focus and editing features )
 
-50000 rows x 200 cols example
+50000 rows x 200 cols example ( [LIVE EXAMPLE](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) : click example1 button )
 
 ![](doc/50000rows_200cols.gif)
 
