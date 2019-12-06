@@ -444,15 +444,14 @@ export function WSCanvas(props: WSCanvasProps) {
         return [-2, 0];
     }
 
-    const recomputeOverridenRowHeight = (state: WSCanvasState) => {
+    const recomputeOverridenRowHeight = (state: WSCanvasState, onlyRowIdx?: number) => {
         const canvas = canvasRef.current;
 
         if (canvas) {
             const ctx = canvas.getContext("2d");
 
             if (ctx && rowsCount > 0) {
-                const hs: number[] = [];
-                for (let ri = 0; ri < rowsCount; ++ri) {
+                const rowHeightComputed = (ri: number) => {
                     let rh = rowHeight(-1);
 
                     if (ctx && getCellTextWrap) {
@@ -475,10 +474,20 @@ export function WSCanvas(props: WSCanvasProps) {
                             }
                         }
                     }
-
-                    hs.push(rh);
+                    return rh;
                 }
-                setOverridenRowHeight(hs);
+
+                if (onlyRowIdx && overridenRowHeight) {
+                    const hs = overridenRowHeight.slice();
+                    hs[onlyRowIdx] = rowHeightComputed(onlyRowIdx);
+                    setOverridenRowHeight(hs);
+                } else {
+                    const hs: number[] = [];
+                    for (let ri = 0; ri < rowsCount; ++ri) {
+                        hs.push(rowHeightComputed(ri));
+                    }
+                    setOverridenRowHeight(hs);
+                }
             }
         }
     }
@@ -1097,8 +1106,10 @@ export function WSCanvas(props: WSCanvasProps) {
      *=====================================================================================================
      **/
     const paint = (state: WSCanvasState, vm: ViewMap | null) => {
+        if (!state.initialized) return;
+
         if (debug) {
-            console.log("PAINT");            
+            console.log("PAINT");
         }
         let stateChanged = false;
         ++state.paintcnt;
@@ -1237,13 +1248,13 @@ export function WSCanvas(props: WSCanvasProps) {
                         paint(state, vm);
                         return;
                     }
-/*
-                    if (rowExceeded) {
-                        scrollTo(state, vm, state.focusedCell);
-                        if (debug) console.log("paintfrom:2");
-                        paint(state, vm);
-                        return;
-                    }*/
+                    /*
+                                        if (rowExceeded) {
+                                            scrollTo(state, vm, state.focusedCell);
+                                            if (debug) console.log("paintfrom:2");
+                                            paint(state, vm);
+                                            return;
+                                        }*/
                 }
                 //#endregion
 
@@ -1814,6 +1825,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             }
 
                             if (!keyHandled && (isCellReadonly === undefined || !isCellReadonly(cell))) {
+                                keyHandled = true;
                                 const prevData = getCellData(cell);
                                 if (getCellType) {
                                     const type = getCellType(cell, prevData);
@@ -1837,6 +1849,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     }
 
                     if (debug) console.log("paintfrom:3");
+                    recomputeOverridenRowHeight(state, cell.row);
                     paint(state, viewMap);
                     applyState = true;
                 } else {
@@ -2482,7 +2495,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     useEffect(() => {
         if (debug) console.log("*** state, vm");
-        if (debug) console.log("paintfrom:7");        
+        if (debug) console.log("paintfrom:7");
         paint(stateNfo, viewMap);
     }, [stateNfo]);
 
