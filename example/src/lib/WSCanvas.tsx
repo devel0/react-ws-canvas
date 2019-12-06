@@ -469,7 +469,8 @@ export function WSCanvas(props: WSCanvasProps) {
                                     ctx.font = cellFont;
                                     const txtWidth = ctx.measureText(data).width;
                                     const f = Math.ceil(txtWidth / colW);
-                                    rh *= f;
+                                    const q = rh * f;
+                                    if (q > rh) rh = q;
                                 }
                             }
                         }
