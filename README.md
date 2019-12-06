@@ -43,9 +43,9 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/frozen-rows-cols.png)
 
-- [wrap][21] text cells (*development*)
+- [wrap][21] text cells
 
-![](doc/text-wrap.png)
+![](doc/text-wrap.gif)
 
 - rows and cols numbering can be [shown or hidden][5]
 
