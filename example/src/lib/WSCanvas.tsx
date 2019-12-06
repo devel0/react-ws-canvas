@@ -2469,21 +2469,22 @@ export function WSCanvas(props: WSCanvasProps) {
     //#region APPLY FILTER 
     useEffect(() => {
         if (debug) console.log("*** debounceFilter");
-        // const vm = {} as ViewMap;
-        // const state = stateNfo.dup();
-        // if (stateNfo.initialized) {
-        //     filterAndSort(state, vm);
+        const vm = {} as ViewMap;
+        const state = stateNfo.dup();
+        if (stateNfo.initialized) {
+            filterAndSort(state, vm);
+            recomputeGeometry2(state, vm);
 
-        //     if (viewMap) {
-        //         const viewRowToFocus = vm.viewToReal[0];
-        //         const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
-        //         focusCell(state, vm, q, true, false, true, !selectFirstOnFilter);
-        //         rectifyScrollOffset(state, vm);
-        //     }
+            if (viewMap) {
+                const viewRowToFocus = vm.viewToReal[0];
+                const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
+                focusCell(state, vm, q, true, false, true, !selectFirstOnFilter);
+                rectifyScrollOffset(state, vm);
+            }
 
-        //     setViewMap(vm);
-        //     setStateNfo(state);
-        // }
+            setViewMap(vm);
+            setStateNfo(state);
+        }
     }, [debouncedFilter]);
     //#endregion     
 
