@@ -34,9 +34,10 @@ export const WSCanvasPropsDefault = () => {
         showPartialColumns: true,
         showPartialRows: true,
         preventWheelOnBounds: true,
-        
+
         getCellData: (cell) => null,
-        setCellData: (cell, value) => { },
+        setCellData: (cells) => { },
+        clearCellData: (selection, viewCellToReal) => { },
         getCellCustomEdit: undefined,
         getColumnHeader: undefined,
         getColumnLessThanOp: undefined,

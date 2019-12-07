@@ -125,9 +125,27 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
       columnClickBehavior={columnClickBehavior}
       getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
-      setCellData={(cell, value) => {
+      setCellData={(cells) => {
         const q = rows.slice();
-        (q[cell.row] as any)[columns[cell.col].field] = value;
+        for (let i = 0; i < cells.length; ++i) {
+          const cell = cells[i].coord;
+          const value = cells[i].value;
+          (q[cell.row] as any)[columns[cell.col].field] = value;
+        }
+        setRows(q);
+      }}
+      clearCellData={(selection, viewCellToReal, isCellReadonly) => {
+        const q = rows.slice();
+        let viewCellRng = selection.cells();
+        let viewCellIt = viewCellRng.next();
+        while (!viewCellIt.done) {
+          const viewCell = viewCellIt.value;
+          const cell = viewCellToReal(viewCell);
+          if (isCellReadonly === undefined || !isCellReadonly(cell)) {
+            (q[cell.row] as any)[columns[cell.col].field] = "";
+          }
+          viewCellIt = viewCellRng.next();
+        }
         setRows(q);
       }}
       columnInitialSort={WSCanvasColumnToSortInfo(columns)}

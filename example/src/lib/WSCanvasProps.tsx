@@ -5,6 +5,12 @@ import { WSCanvasColumnType, WSCanvasColumnClickBehavior } from "./WSCanvasColum
 import { WSCanvasApi } from "./WSCanvasApi";
 import { CSSProperties } from "react";
 import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
+import { WSCanvasSelection } from "./WSCanvasSelection";
+
+export interface WSCanvasCellDataNfo {
+    coord: WSCanvasCellCoord;
+    value: any;
+}
 
 /** see WSCanvasPropsDefault for default values */
 export interface WSCanvasProps {
@@ -60,7 +66,11 @@ export interface WSCanvasProps {
     /** retrieve data from a cell */
     getCellData: (coord: WSCanvasCellCoord) => any;
     /** set data of a cell */
-    setCellData: (coord: WSCanvasCellCoord, value: any) => void;
+    setCellData: (cells: WSCanvasCellDataNfo[]) => void;
+    /** clear selected cells */
+    clearCellData: (selection: WSCanvasSelection,
+        viewCellToReal: (viewCell: WSCanvasCellCoord) => WSCanvasCellCoord,
+        isCellReadonly?: (coord: WSCanvasCellCoord) => boolean | undefined) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor */
     getCellCustomEdit?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => JSX.Element | undefined,
     /** header of given col */
