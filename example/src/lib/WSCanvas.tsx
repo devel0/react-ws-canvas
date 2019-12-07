@@ -1500,7 +1500,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         x += overridenColWidth(state, ci);
                     }
                     ctx.moveTo(x, 0);
-                    ctx.lineTo(x, rowsYMax);
+                    ctx.lineTo(x, showPartialRows ? H : rowsYMax);
                     ctx.stroke();
                 }
                 //#endregion
