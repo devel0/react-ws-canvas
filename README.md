@@ -147,9 +147,27 @@ const App: React.FC = () => {
     rowsCount={rows.length} colsCount={COLS}
     showColNumber={true} showRowNumber={true} showFilter={true}
     getCellData={(cell) => rows[cell.row][cell.col]}
-    setCellData={(cell, value) => {
+    setCellData={(cells) => {
       const q = rows.slice();
-      q[cell.row][cell.col] = value;
+      for (let i = 0; i < cells.length; ++i) {
+        const cell = cells[i].coord;
+        const value = cells[i].value;
+        q[cell.row][cell.col] = value;
+      }
+      setRows(q);
+    }}
+    clearCellData={(selection, viewCellToReal, isCellReadonly) => {
+      const q = rows.slice();
+      let viewCellRng = selection.cells();
+      let viewCellIt = viewCellRng.next();
+      while (!viewCellIt.done) {
+        const viewCell = viewCellIt.value;
+        const cell = viewCellToReal(viewCell);
+        if (isCellReadonly === undefined || !isCellReadonly(cell)) {
+          q[cell.row][cell.col] = "";
+        }
+        viewCellIt = viewCellRng.next();
+      }
       setRows(q);
     }}
   />;
