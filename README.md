@@ -29,7 +29,9 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
   - "date", "time", "datetime": smart date insertion ( typing 121030 results in 12/10/2030 ) browser locale supported
   - "number": sci numbers ( typing 12e-3 results in 0.012 displayed ) browser locale support for decimal separators
 
-- [cell or row][2] selection mode]
+- [properties default values][22]
+
+- [cell or row][2] selection mode
 
 ![](doc/selection-mode-cells.png)
 
@@ -102,6 +104,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [19]: https://github.com/devel0/react-ws-canvas/blob/eea7a9f653fe827300291b3b5b3e6870d9ff4692/example/src/Sample2.tsx#L100-L109
 [20]: https://github.com/devel0/react-ws-canvas/blob/eea7a9f653fe827300291b3b5b3e6870d9ff4692/example/src/lib/WSCanvasProps.tsx#L143-L146
 [21]: https://github.com/devel0/react-ws-canvas/blob/10556d1e377e8258077f4a87cffb21f722c7e4e6/example/src/lib/WSCanvasProps.tsx#L103-L104
+[22]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/lib/WSCanvasPropsDefault.tsx#L13
 
 ## quickstart
 
