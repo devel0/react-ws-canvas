@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { WSCanvas, useWindowSize, WSCanvasColumnClickBehavior } from 'react-ws-canvas'; // use './lib' for development or exec 'cd lib; yarn build'
+import { WSCanvas, useWindowSize, WSCanvasColumnClickBehavior } from './lib';
 
 const AppQuickStart: React.FC = () => {
   const [rows, setRows] = useState<any[][]>([]);
