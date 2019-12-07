@@ -1929,8 +1929,8 @@ export function WSCanvas(props: WSCanvasProps) {
                             state.focusedFilterColIdx = -1;
                             state.viewSelection = new WSCanvasSelection([
                                 new WSCanvasSelectionRange(
-                                    realCellToView(viewMap, new WSCanvasCellCoord(0, 0)),
-                                    realCellToView(viewMap, new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, colsCount - 1))
+                                    new WSCanvasCellCoord(0, 0),
+                                    new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, colsCount - 1)
                                 )
                             ]);
                         } else if (cellCoord.col === -1) { // ROW SELECTIONS                        
