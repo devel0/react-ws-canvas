@@ -3,6 +3,7 @@ import { WSCanvasScrollbarMode } from "./WSCanvasScrollbarMode";
 import { WSCanvasSelectMode } from "./WSCanvasSelectionMode";
 import { WSCanvasApi } from "./WSCanvasApi";
 import { WSCanvasColumnClickBehavior } from "./WSCanvasColumn";
+import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 
 const DEFAULT_ROW_HEIGHT = 30;
 const DEFAULT_COL_WIDTH = 120;
@@ -35,9 +36,10 @@ export const WSCanvasPropsDefault = () => {
         showPartialRows: true,
         preventWheelOnBounds: true,
 
-        getCellData: (cell) => null,
-        setCellData: (cells) => { },
-        clearCellData: (selection, viewCellToReal) => { },
+        getCellData: (cell) => null,                
+        prepareCellDataset: () => null,
+        setCellData: (dataset: any, cell: WSCanvasCellCoord, value: any) => {},
+        commitCellDataset: (dataset: any) => {},        
         getCellCustomEdit: undefined,
         getColumnHeader: undefined,
         getColumnLessThanOp: undefined,

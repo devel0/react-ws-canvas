@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { WSCanvas, useWindowSize, WSCanvasColumnClickBehavior } from 'react-ws-canvas';
+import { WSCanvas, useWindowSize, WSCanvasColumnClickBehavior } from 'react-ws-canvas'; // use './lib' for development or exec 'cd lib; yarn build'
 
 const AppQuickStart: React.FC = () => {
   const [rows, setRows] = useState<any[][]>([]);
@@ -28,11 +28,9 @@ const AppQuickStart: React.FC = () => {
     showColNumber={true} showRowNumber={true}
     columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
     getCellData={(cell) => rows[cell.row][cell.col]}
-    setCellData={(cell, value) => {
-      const q = rows.slice();
-      q[cell.row][cell.col] = value;
-      setRows(q);
-    }}
+    prepareCellDataset={() => rows.slice()}
+    commitCellDataset={(q) => setRows(q)}
+    setCellData={(q, cell, value) => q[cell.row][cell.col] = value}
   />;
 }
 

@@ -29,29 +29,9 @@ export function Sample1(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
     containerStyle={{ margin: "1em" }}
     columnClickBehavior={columnClickBehavior}
     getCellData={(cell) => rows[cell.row][cell.col]}
-    setCellData={(cells) => {
-      const q = rows.slice();      
-      for (let i = 0; i < cells.length; ++i) {
-        const cell = cells[i].coord;
-        const value = cells[i].value;
-        q[cell.row][cell.col] = value;
-      }      
-      setRows(q);
-    }}
-    clearCellData={(selection, viewCellToReal, isCellReadonly) => {
-      const q = rows.slice();
-      let viewCellRng = selection.cells();
-      let viewCellIt = viewCellRng.next();
-      while (!viewCellIt.done) {
-        const viewCell = viewCellIt.value;
-        const cell = viewCellToReal(viewCell);
-        if (isCellReadonly === undefined || !isCellReadonly(cell)) {
-          q[cell.row][cell.col] = "";          
-        }
-        viewCellIt = viewCellRng.next();
-      }
-      setRows(q);
-    }}
+    prepareCellDataset={() => rows.slice()}
+    commitCellDataset={(q) => setRows(q)}
+    setCellData={(q, cell, value) => q[cell.row][cell.col] = value}
     colWidth={(ci) => {
       let w = 50;
       for (let i = 0; i < ci; ++i) {

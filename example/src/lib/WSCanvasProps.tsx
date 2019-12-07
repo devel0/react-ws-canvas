@@ -65,12 +65,12 @@ export interface WSCanvasProps {
 
     /** retrieve data from a cell */
     getCellData: (coord: WSCanvasCellCoord) => any;
-    /** set data of a cell */
-    setCellData: (cells: WSCanvasCellDataNfo[]) => void;
-    /** clear selected cells */
-    clearCellData: (selection: WSCanvasSelection,
-        viewCellToReal: (viewCell: WSCanvasCellCoord) => WSCanvasCellCoord,
-        isCellReadonly?: (coord: WSCanvasCellCoord) => boolean | undefined) => void;
+    /** retrieve cells dataset copy */
+    prepareCellDataset: () => any;
+    /** apply change to dataset */
+    setCellData: (dataset: any, cell: WSCanvasCellCoord, value: any) => void;
+    /** set cell dataset state */
+    commitCellDataset: (dataset: any) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor */
     getCellCustomEdit?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => JSX.Element | undefined,
     /** header of given col */

@@ -125,29 +125,9 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
       columnClickBehavior={columnClickBehavior}
       getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
-      setCellData={(cells) => {
-        const q = rows.slice();
-        for (let i = 0; i < cells.length; ++i) {
-          const cell = cells[i].coord;
-          const value = cells[i].value;
-          (q[cell.row] as any)[columns[cell.col].field] = value;
-        }
-        setRows(q);
-      }}
-      clearCellData={(selection, viewCellToReal, isCellReadonly) => {
-        const q = rows.slice();
-        let viewCellRng = selection.cells();
-        let viewCellIt = viewCellRng.next();
-        while (!viewCellIt.done) {
-          const viewCell = viewCellIt.value;
-          const cell = viewCellToReal(viewCell);
-          if (isCellReadonly === undefined || !isCellReadonly(cell)) {
-            (q[cell.row] as any)[columns[cell.col].field] = "";
-          }
-          viewCellIt = viewCellRng.next();
-        }
-        setRows(q);
-      }}
+      prepareCellDataset={() => rows.slice()}
+      commitCellDataset={(q) => setRows(q)}
+      setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}
       columnInitialSort={WSCanvasColumnToSortInfo(columns)}
       // getCellBackgroundColor={(cell, props) => {
       //   // if (cell.row === 2) return "navy";
@@ -173,7 +153,7 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       showFilter={true}
       showPartialColumns={true} showPartialRows={true}
       showColNumber={true} showRowNumber={true}
-      debug={debug} dbgDiv={dbgDiv}      
+      debug={debug} dbgDiv={dbgDiv}
       colWidthExpand={true}
       frozenRowsCount={1} frozenColsCount={1}
       rowsCount={rows.length} colsCount={columns.length} />
