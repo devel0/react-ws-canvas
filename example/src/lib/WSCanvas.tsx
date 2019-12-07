@@ -64,7 +64,7 @@ export function WSCanvas(props: WSCanvasProps) {
         getCellData,
         prepareCellDataset,
         setCellData: setCellData,
-        commitCellDataset,        
+        commitCellDataset,
         getCellCustomEdit,
         getColumnHeader,
         getColumnLessThanOp,
@@ -1628,7 +1628,17 @@ export function WSCanvas(props: WSCanvasProps) {
         return stateChanged;
     };
 
-    const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {
+    const entireGridSel = (state: WSCanvasState) => {
+        state.focusedFilterColIdx = -1;
+        state.viewSelection = new WSCanvasSelection([
+            new WSCanvasSelectionRange(
+                new WSCanvasCellCoord(0, 0),
+                new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, colsCount - 1)
+            )
+        ]);
+    }
+
+    const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {        
         if (api.onPreviewKeyDown) api.onPreviewKeyDown(e);
 
         if (!e.defaultPrevented) {
@@ -1647,12 +1657,14 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
             };
 
+            if (debug) console.log("key:" + e.key + " ctrl:" + String(ctrl_key));
+
             const focusedViewCell = new WSCanvasCellCoord(
                 realRowToViewRow(viewMap, state.focusedCell.row),
                 realColToViewCol(viewMap, state.focusedCell.col),
                 state.focusedCell.filterRow);
 
-            if (state.editMode !== WSCanvasEditMode.F2 && state.focusedFilterColIdx === -1) {
+            if (state.editMode !== WSCanvasEditMode.F2 && state.focusedFilterColIdx === -1) {                
                 //const focusedViewCell = viewCellToReal
                 switch (e.key) {
                     case "ArrowDown":
@@ -1727,6 +1739,17 @@ export function WSCanvas(props: WSCanvasProps) {
                     case "Escape":
                         keyHandled = true;
                         state.editMode = WSCanvasEditMode.none;
+                        break;
+
+                    case "a":
+                    case "a":
+                        if (ctrl_key) {
+                            keyHandled = true;
+                            entireGridSel(state);
+                            e.preventDefault();
+                            setStateNfo(state);
+                            return;
+                        }
                         break;
 
                     case "c":
@@ -1814,11 +1837,11 @@ export function WSCanvas(props: WSCanvasProps) {
                                             const viewCell = viewCellIt.value;
                                             const cell = viewCellToReal(viewMap, viewCell);
                                             if (isCellReadonly === undefined || !isCellReadonly(cell)) {
-                                                setCellData(ds, cell, "");                                                
+                                                setCellData(ds, cell, "");
                                             }
                                             viewCellIt = viewCellRng.next();
                                         }
-                                        commitCellDataset(ds);                                     
+                                        commitCellDataset(ds);
                                     }
                                     keyHandled = true;
                                     break;
@@ -1926,13 +1949,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (cellCoord) {
                         e.preventDefault();
                         if (cellCoord.row === -1 && cellCoord.col === -1) { // ENTIRE GRID SEL                        
-                            state.focusedFilterColIdx = -1;
-                            state.viewSelection = new WSCanvasSelection([
-                                new WSCanvasSelectionRange(
-                                    new WSCanvasCellCoord(0, 0),
-                                    new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, colsCount - 1)
-                                )
-                            ]);
+                            entireGridSel(state);
                         } else if (cellCoord.col === -1) { // ROW SELECTIONS                        
                             state.focusedFilterColIdx = -1;
                             if (state.filteredSortedRowsCount > 0) {
@@ -2537,14 +2554,14 @@ export function WSCanvas(props: WSCanvasProps) {
     useLayoutEffect(() => {
         if (debug) console.log("*** layout");
         if (canvasRef.current) {
-
+            
             // https://github.com/inuyaksa/jquery.nicescroll/issues/799#issuecomment-482200470
             canvasRef.current.addEventListener("wheel", handleWheel, { passive: false });
             canvasRef.current.addEventListener("touchstart", handleTouchStart);
             canvasRef.current.addEventListener("touchmove", handleTouchMove, { passive: false });
             canvasRef.current.addEventListener("touchend", handleTouchEnd);
             return () => {
-                if (canvasRef.current) {
+                if (canvasRef.current) {                    
                     canvasRef.current.removeEventListener("wheel", handleWheel);
                     canvasRef.current.removeEventListener("touchstart", handleTouchStart);
                     canvasRef.current.removeEventListener("touchmove", handleTouchMove);
