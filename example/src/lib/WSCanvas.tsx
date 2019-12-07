@@ -208,6 +208,8 @@ export function WSCanvas(props: WSCanvasProps) {
             return rowHeight(ri);
     }
 
+    // TODO: more robust computeviewRows that satisfy frozenRows, allowPartialRows
+    /** no side effects on state,vm */    
     const computeViewRows = (state: WSCanvasState, vm: ViewMap | null, withHorizontalScrollbar: boolean) => {
         const h = H - (showColNumber ? (colNumberRowHeightFull() + 1) : 0) - 2;
         const hAvailOrig = h - (withHorizontalScrollbar ? scrollBarThk : 0);
@@ -511,7 +513,7 @@ export function WSCanvas(props: WSCanvasProps) {
         // on data cells
         {
             let y = 3 + (showColNumber ? colNumberRowHeightFull() : 0);
-            for (let ri = state.viewScrollOffset.row; ri < state.viewScrollOffset.row + state.viewRowsCount; ++ri) {
+            for (let ri = state.viewScrollOffset.row; ri < state.viewScrollOffset.row + state.viewRowsCount + (showPartialRows ? 1 : 0); ++ri) {
                 if (ri >= state.filteredSortedRowsCount) break;
                 if (py >= y && py < y + getRowHeight(ri)) return ri;
 
@@ -581,7 +583,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (q.row === -2) break;
                     if (q.row !== -3) return q;
                 }
-                for (let vri = frozenRowsCount + state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri) {
+                for (let vri = frozenRowsCount + state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount + (showPartialRows ? 1 : 0); ++vri) {
                     const q = evalRow(vri);
                     if (q.row === -2) break;
                     if (q.row !== -3) return q;
@@ -991,7 +993,8 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** side effect on state ; NO side effect on vm */
-    const focusCell = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearPreviousSel?: boolean, dontApplySelect?: boolean) => {
+    const focusCell = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord,
+        scrollTo?: boolean, endingCell?: boolean, clearPreviousSel?: boolean, dontApplySelect?: boolean) => {
         if (canvasRef.current) canvasRef.current.focus();
         const viewCell = realCellToView(vm, cell);
         if (dontApplySelect === undefined || dontApplySelect === false) setSelectionByEndingCell(state, viewCell, endingCell, clearPreviousSel);
@@ -1181,7 +1184,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     for (let vri = state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri)
                         rowsYMax += getRowHeight(viewRowToRealRow(vm, vri)) + 1;
 
-                    const newTableCellsBBox = new WSCanvasRect(new WSCanvasCoord(0, 0), new WSCanvasCoord(colsXMax, rowsYMax));
+                    const newTableCellsBBox = new WSCanvasRect(new WSCanvasCoord(0, 0), new WSCanvasCoord(colsXMax, showPartialRows ? H : rowsYMax));
                     if (!state.tableCellsBBox.equals(newTableCellsBBox)) {
                         state.tableCellsBBox = newTableCellsBBox;
                         stateChanged = true;
@@ -1213,8 +1216,9 @@ export function WSCanvas(props: WSCanvasProps) {
 
                     let rowDrawCnt = 0;
 
-                    const drawRows = (riFrom: number, riTo: number, updateExceeded: boolean) => {
-                        for (let vri = riFrom; vri <= riTo; ++vri) {
+                    const drawRows = (vriFrom: number, vriTo: number, updateExceeded: boolean) => {
+                        const riTo = viewRowToRealRow(vm, vriTo);
+                        for (let vri = vriFrom; vri <= vriTo; ++vri) {
                             if (vri >= state.filteredSortedRowsCount) break;
                             let x = 1;
                             if (showRowNumber) x = rowNumberColWidth + 2;
@@ -1258,12 +1262,18 @@ export function WSCanvas(props: WSCanvasProps) {
                     drawRows(state.viewScrollOffset.row + frozenRowsCount,
                         Math.min(state.filteredSortedRowsCount - 1, state.viewScrollOffset.row + state.viewRowsCount - (showPartialRows ? 0 : 1)), true);
 
+                    // autoscroll when click on partial column
                     if (colExceeded && state.viewColsCount > 1) {
                         scrollTo(state, vm, state.focusedCell);
                         if (debug) console.log("paintfrom:1");
                         paint(state, vm);
                         return;
                     }
+
+                    // autoscroll when click on partial row
+                    // TODO:
+
+
                     /*
                                         if (rowExceeded) {
                                             scrollTo(state, vm, state.focusedCell);
@@ -1599,7 +1609,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
                 //#endregion
 
-                if (debug) {
+                if (debug) {                    
                     ctx.beginPath();
                     ctx.strokeStyle = "red";
                     ctx.rect(0, 0, W - 1, H - 1);
@@ -2394,17 +2404,6 @@ export function WSCanvas(props: WSCanvasProps) {
     //#region EFFECTS
 
 
-    // const recomputeGeometry = (state: WSCanvasState) => {
-    //     console.log("recompute geom " + new Date().getTime());
-    //     if (overridenRowHeight !== null && canvasRef.current && canvasRef.current.getContext('2d')) {            
-    //         state.widthBackup = W;
-    //         state.heightBackup = H;
-    //         state.viewRowsCount = computeViewRows(state, viewMap, horizontalScrollbarActive);
-    //         state.viewColsCount = computeViewCols(state, verticalScrollbarActive);
-    //         recomputeOverridenRowHeight(state);            
-    //     }
-    // }
-
     useEffect(() => {
         if (debug) console.log("*** state.initialized");
         if (stateNfo.initialized) {
@@ -2422,9 +2421,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }, [stateNfo.initialized]);
 
-    const recomputeGeometry2 = (state: WSCanvasState, vm: ViewMap) => {
-        //filterAndSort(state, vm);
-
+    const recomputeGeometry1 = (state: WSCanvasState, vm: ViewMap) => {
         const newViewRowsCount = computeViewRows(state, vm, horizontalScrollbarActive);
         const newViewColsCount = computeViewCols(state, verticalScrollbarActive);
 
@@ -2432,6 +2429,12 @@ export function WSCanvas(props: WSCanvasProps) {
             state.viewRowsCount = newViewRowsCount;
             state.viewColsCount = newViewColsCount;
         }
+    }
+
+    const recomputeGeometry2 = (state: WSCanvasState, vm: ViewMap) => {
+        //filterAndSort(state, vm);
+
+        recomputeGeometry1(state, vm);
 
         recomputeOverridenRowHeight(state);
     }

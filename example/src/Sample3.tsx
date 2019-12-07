@@ -171,9 +171,9 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       colWidth={(col) => 120}
       selectionMode={WSCanvasSelectMode.Cell}
       showFilter={true}
-      showPartialColumns={true}
+      showPartialColumns={true} showPartialRows={true}
       showColNumber={true} showRowNumber={true}
-      debug={debug} dbgDiv={dbgDiv}
+      debug={debug} dbgDiv={dbgDiv}      
       colWidthExpand={true}
       frozenRowsCount={1} frozenColsCount={1}
       rowsCount={rows.length} colsCount={columns.length} />
