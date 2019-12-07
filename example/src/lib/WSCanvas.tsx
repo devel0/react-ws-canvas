@@ -562,8 +562,8 @@ export function WSCanvas(props: WSCanvasProps) {
         {
             if (ci[0] !== -2) {
                 let y = 3 + (showColNumber ? colNumberRowHeightFull() : 0);
-                for (let vri = state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri) {
-                    if (vri >= state.filteredSortedRowsCount) break;
+                const evalRow = (vri: number) => {
+                    if (vri >= state.filteredSortedRowsCount) return new WSCanvasCellCoord(-2, -2); // sign to break loop
 
                     const ri = viewRowToRealRow(vm, vri);
                     const rh = getRowHeight(ri);
@@ -573,6 +573,18 @@ export function WSCanvas(props: WSCanvasProps) {
                     }
 
                     y += getRowHeight(ri) + 1;
+
+                    return new WSCanvasCellCoord(-3, -3); // sign to continue loop
+                }
+                for (let vri = 0; vri < frozenRowsCount; ++vri) {
+                    const q = evalRow(vri);
+                    if (q.row === -2) break;
+                    if (q.row !== -3) return q;
+                }
+                for (let vri = frozenRowsCount + state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri) {
+                    const q = evalRow(vri);
+                    if (q.row === -2) break;
+                    if (q.row !== -3) return q;
                 }
             }
 
