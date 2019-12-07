@@ -87,8 +87,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [4]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L26
 [5]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L31-L34
 [6]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L48-L49
-[7]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/Sample1.tsx#L29-L34
-[8]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/Sample2.tsx#L81-L86
+[7]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/Sample2.tsx#L98-L100
+[8]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/Sample3.tsx#L128-L130
 [9]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L27-L28
 [10]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasApi.tsx#L7
 [11]: https://github.com/devel0/react-ws-canvas/blob/38997638bb5f1f043164fdf73802490cfafa06c3/example/src/App.tsx#L15
@@ -119,13 +119,13 @@ yarn add react-ws-canvas
 
 ```ts
 import React, { useState, useEffect } from 'react';
-import { WSCanvas, useWindowSize } from 'react-ws-canvas';
+import { WSCanvas, useWindowSize, WSCanvasColumnClickBehavior } from 'react-ws-canvas';
 
-const App: React.FC = () => {
+const AppQuickStart: React.FC = () => {
   const [rows, setRows] = useState<any[][]>([]);
   const winSize = useWindowSize();
 
-  const ROWS = 1000;
+  const ROWS = 500000;
   const COLS = 20;
 
   useEffect(() => {
@@ -145,35 +145,16 @@ const App: React.FC = () => {
   return <WSCanvas
     width={winSize.width} height={winSize.height}
     rowsCount={rows.length} colsCount={COLS}
-    showColNumber={true} showRowNumber={true} showFilter={true}
+    showColNumber={true} showRowNumber={true}
+    columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
     getCellData={(cell) => rows[cell.row][cell.col]}
-    setCellData={(cells) => {
-      const q = rows.slice();
-      for (let i = 0; i < cells.length; ++i) {
-        const cell = cells[i].coord;
-        const value = cells[i].value;
-        q[cell.row][cell.col] = value;
-      }
-      setRows(q);
-    }}
-    clearCellData={(selection, viewCellToReal, isCellReadonly) => {
-      const q = rows.slice();
-      let viewCellRng = selection.cells();
-      let viewCellIt = viewCellRng.next();
-      while (!viewCellIt.done) {
-        const viewCell = viewCellIt.value;
-        const cell = viewCellToReal(viewCell);
-        if (isCellReadonly === undefined || !isCellReadonly(cell)) {
-          q[cell.row][cell.col] = "";
-        }
-        viewCellIt = viewCellRng.next();
-      }
-      setRows(q);
-    }}
+    prepareCellDataset={() => rows.slice()}
+    commitCellDataset={(q) => setRows(q)}
+    setCellData={(q, cell, value) => q[cell.row][cell.col] = value}
   />;
 }
 
-export default App;
+export default AppQuickStart;
 ```
 
 - run the app
