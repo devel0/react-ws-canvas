@@ -1779,19 +1779,6 @@ export function WSCanvas(props: WSCanvasProps) {
                                 case "Delete":
                                     {
                                         clearCellData(stateNfo.viewSelection, (viewCell) => viewCellToReal(viewMap, viewCell));
-
-                                        // const cellsData : WSCanvasCellDataNfo[] = [];
-                                        // let viewCellRng = stateNfo.viewSelection.cells();
-                                        // let viewCellIt = viewCellRng.next();
-                                        // while (!viewCellIt.done) {
-                                        //     const viewCell = viewCellIt.value;
-                                        //     // const cell = viewCellToReal(viewMap, viewCell);
-                                        //     // if (isCellReadonly === undefined || !isCellReadonly(cell)) {
-                                        //     //     cellsData.push({ coord: cell, value: "" });
-                                        //     // }
-                                        //     viewCellIt = viewCellRng.next();
-                                        // }
-                                        // setCellData(cellsData);
                                     }
                                     keyHandled = true;
                                     break;
