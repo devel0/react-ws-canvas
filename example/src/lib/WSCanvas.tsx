@@ -39,6 +39,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         width,
         height,
+        dataSource,
         rowsCount,
         colsCount,
         colWidth,
@@ -2500,7 +2501,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         setViewMap(vm);
         setStateNfo(state);
-    }, [rowsCount]);
+    }, [rowsCount,dataSource]);
 
     useEffect(() => {
         if (debug) console.log("*** rowHeight");

@@ -14,6 +14,7 @@ export const WSCanvasPropsDefault = () => {
 
         width: window.innerWidth,
         height: window.innerHeight,
+        dataSource: null,
         rowsCount: 1000,
         colsCount: 50,
         colWidth: () => DEFAULT_COL_WIDTH,

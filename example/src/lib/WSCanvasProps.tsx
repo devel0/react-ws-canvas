@@ -20,6 +20,8 @@ export interface WSCanvasProps {
     width: number;
     /** height of canvas */
     height: number;
+    /** datasource to sync refresh */
+    dataSource: any;
     /** nr of rows in the grid */
     rowsCount: number;
     /** nr of cols in the grid */
