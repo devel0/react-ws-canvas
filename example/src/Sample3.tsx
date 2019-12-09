@@ -117,7 +117,7 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
 
     <WSCanvas
       api={api}
-      width={width} height={height}
+      width={width} height={Math.max(300, height * .9)}
       containerStyle={{ margin: "2em" }}
       rowHoverColor={"rgba(248,248,248,1)"}
       // isCellReadonly={() => true}
