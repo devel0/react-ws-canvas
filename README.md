@@ -79,7 +79,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/cell-style-customization.png)
 
-- container and canvas [styles][20]
+- container [height min][23] and canvas [styles][20]
 
 - each individual [cell type][14] can be customized
 
@@ -107,6 +107,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [20]: https://github.com/devel0/react-ws-canvas/blob/eea7a9f653fe827300291b3b5b3e6870d9ff4692/example/src/lib/WSCanvasProps.tsx#L143-L146
 [21]: https://github.com/devel0/react-ws-canvas/blob/10556d1e377e8258077f4a87cffb21f722c7e4e6/example/src/lib/WSCanvasProps.tsx#L103-L104
 [22]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/lib/WSCanvasPropsDefault.tsx#L13
+[23]: https://github.com/devel0/react-ws-canvas/blob/e756188d46ffe9fc96bc68d66de65aa6af42b146/example/src/Sample3.tsx#L120
 
 ## quickstart
 
