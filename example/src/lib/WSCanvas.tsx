@@ -2230,6 +2230,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (getCellType && getCellType(cell, data) === "boolean") {
                         const boolVal = data as boolean;
                         singleSetCellData(cell, !boolVal);
+                        paint(stateNfo, viewMap);
                         return;
                     }
 
