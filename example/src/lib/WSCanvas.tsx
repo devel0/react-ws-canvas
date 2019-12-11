@@ -720,7 +720,10 @@ export function WSCanvas(props: WSCanvasProps) {
             switch (cellType) {
                 case "boolean":
                     const val = cellData as boolean;
-                    if (val === true) str = "\u25FC"; // https://www.rapidtables.com/code/text/unicode-characters.html                                        
+                    if (val === true)
+                        str = "\u25FC"; // https://www.rapidtables.com/code/text/unicode-characters.html                                        
+                    else
+                        str = "\u2610";
                     ctx.textAlign = "center";
                     break;
                 case "date":
@@ -1144,7 +1147,7 @@ export function WSCanvas(props: WSCanvasProps) {
         let stateChanged = false;
         ++state.paintcnt;
 
-        const colwavail = W - (verticalScrollbarActive ? scrollBarThk : 0) - (showRowNumber ? (rowNumberColWidth - 2) : 0);
+        const colwavail = W - (verticalScrollbarActive ? scrollBarThk : 0) - (showRowNumber ? (rowNumberColWidth + 1) : 0) - 6;
         let colwsumbefore = 0;
         for (let ci = 0; ci < colsCount; ++ci) colwsumbefore += colWidth(ci);
 
