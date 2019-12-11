@@ -1639,7 +1639,7 @@ export function WSCanvas(props: WSCanvasProps) {
         ]);
     }
 
-    const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {        
+    const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {
         if (api.onPreviewKeyDown) api.onPreviewKeyDown(e);
 
         if (!e.defaultPrevented) {
@@ -1665,7 +1665,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 realColToViewCol(viewMap, state.focusedCell.col),
                 state.focusedCell.filterRow);
 
-            if (state.editMode !== WSCanvasEditMode.F2 && state.focusedFilterColIdx === -1) {                
+            if (state.editMode !== WSCanvasEditMode.F2 && state.focusedFilterColIdx === -1) {
                 //const focusedViewCell = viewCellToReal
                 switch (e.key) {
                     case "ArrowDown":
@@ -2501,7 +2501,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         setViewMap(vm);
         setStateNfo(state);
-    }, [rowsCount,dataSource]);
+    }, [rowsCount, dataSource]);
 
     useEffect(() => {
         if (debug) console.log("*** rowHeight");
@@ -2556,14 +2556,14 @@ export function WSCanvas(props: WSCanvasProps) {
     useLayoutEffect(() => {
         if (debug) console.log("*** layout");
         if (canvasRef.current) {
-            
+
             // https://github.com/inuyaksa/jquery.nicescroll/issues/799#issuecomment-482200470
             canvasRef.current.addEventListener("wheel", handleWheel, { passive: false });
             canvasRef.current.addEventListener("touchstart", handleTouchStart);
             canvasRef.current.addEventListener("touchmove", handleTouchMove, { passive: false });
             canvasRef.current.addEventListener("touchend", handleTouchEnd);
             return () => {
-                if (canvasRef.current) {                    
+                if (canvasRef.current) {
                     canvasRef.current.removeEventListener("wheel", handleWheel);
                     canvasRef.current.removeEventListener("touchstart", handleTouchStart);
                     canvasRef.current.removeEventListener("touchmove", handleTouchMove);
@@ -2611,6 +2611,7 @@ export function WSCanvas(props: WSCanvasProps) {
             setStateNfo(state);
         }
         api.currentState = () => stateNfo;
+        api.paint = () => paint(stateNfo, viewMap);
 
         //api.currentState = () => { return stateNfo; }
     }

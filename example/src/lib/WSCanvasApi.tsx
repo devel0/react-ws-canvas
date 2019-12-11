@@ -14,8 +14,10 @@ export class WSCanvasApi {
     focusCell: (coord: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearSelection?: boolean) => void;
     scrollTo: (coord: WSCanvasCellCoord) => void;
     setSorting: (sorting: WSCanvasColumnSortInfo[]) => void;
-    
+
     currentState: () => WSCanvasState;
+
+    paint: () => void;
 
     onPreviewKeyDown?: (e: React.KeyboardEvent<HTMLCanvasElement>) => void;
     onKeyDown?: (e: React.KeyboardEvent<HTMLCanvasElement>) => void;
@@ -48,7 +50,8 @@ export class WSCanvasApi {
         this.focusCell = () => { };
         this.scrollTo = () => { };
         this.setSorting = () => { };
-        
+
         this.currentState = () => new WSCanvasState();
+        this.paint = () => { };
     }
 }
