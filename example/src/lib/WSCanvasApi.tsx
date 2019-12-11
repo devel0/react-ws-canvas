@@ -15,7 +15,7 @@ export class WSCanvasApi {
     scrollTo: (coord: WSCanvasCellCoord) => void;
     setSorting: (sorting: WSCanvasColumnSortInfo[]) => void;
 
-    currentState: () => WSCanvasState;
+    onStateChanged?: (state:WSCanvasState) => void;
 
     paint: () => void;
 
@@ -51,7 +51,7 @@ export class WSCanvasApi {
         this.scrollTo = () => { };
         this.setSorting = () => { };
 
-        this.currentState = () => new WSCanvasState();
+        this.onStateChanged = undefined;
         this.paint = () => { };
     }
 }
