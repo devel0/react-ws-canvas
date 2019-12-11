@@ -32,6 +32,14 @@ export function getWindowSize() {
     } as GraphicsSize;
 }
 
+export function isMobile() {
+    const agent = navigator.userAgent;
+    return agent.match(/Android/i) ||
+        agent.match(/iPhone|iPad|IPod/i) ||
+        agent.match(/Opera Mini/i) ||
+        agent.match(/IEMobile/i);
+}
+
 export function useWindowSize() {
     const [windowSize, setWindowSize] = useState(getWindowSize);
 
@@ -41,8 +49,10 @@ export function useWindowSize() {
 
     useLayoutEffect(() => {
         handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        if (!isMobile()) window.addEventListener('resize', handleResize);
+        return () => {
+            if (!isMobile()) window.removeEventListener('resize', handleResize);
+        }
     }, []);
 
     return windowSize;
@@ -55,18 +65,18 @@ export function getElementSize(div: HTMLElement) {
     } as GraphicsSize;
 }
 
-export function useElementSize(elRef: React.RefObject<HTMLElement>) {
+export function useElementSize(elRef: React.RefObject<HTMLElement>) {    
     const [elSize, setElSize] = useState(elRef.current ? getElementSize(elRef.current) : { width: 0, height: 0 } as GraphicsSize);
 
     const handleResize = () => {
         if (elRef.current) {
-            const size = getElementSize(elRef.current);
+            const size = getElementSize(elRef.current);            
             setElSize(size);
         }
     };
 
-    useLayoutEffect(() => {
-        if (elRef.current) {
+    useEffect(() => {    
+        if (elRef.current) {            
             handleResize();
             window.addEventListener("resize", handleResize);
             return () => {
@@ -75,7 +85,7 @@ export function useElementSize(elRef: React.RefObject<HTMLElement>) {
             }
         }
         return () => { };
-    }, [elRef.current]);
+    }, [elRef]);
 
     return elSize;
 }
