@@ -12,6 +12,8 @@ export class WSCanvasSelection {
 
     get ranges() { return this._ranges; }
 
+    get empty() { return this._ranges.length === 0; }
+
     get bounds() {
         if (this._ranges.length === 0)
             return null;
@@ -23,7 +25,7 @@ export class WSCanvasSelection {
             }
             return res;
         }
-    }    
+    }
 
     /** return copy of this */
     dup(): WSCanvasSelection {
