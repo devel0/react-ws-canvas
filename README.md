@@ -55,7 +55,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - if column numbering visible automatic sort can be customized through [less-than-op][6]
 
-- [column click behavior][12] can be full column select or column toggle sort
+- [column click behavior][12] can be full column select, column toggle sort or none to disable sort/select behavior
 
 - [column header][15] can be customized
 
