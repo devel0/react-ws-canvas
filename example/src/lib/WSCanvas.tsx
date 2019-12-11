@@ -1136,7 +1136,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (!state.initialized) return;
 
         if (debug) {
-            console.log("PAINT");
+            console.log("PAINT (rows:" + rowsCount + ")");            
         }
         let stateChanged = false;
         ++state.paintcnt;
@@ -2231,7 +2231,9 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (getCellType && getCellType(cell, data) === "boolean") {
                         const boolVal = data as boolean;
                         singleSetCellData(cell, !boolVal);
-                        paint(stateNfo, viewMap);
+                        const state = stateNfo.dup();
+                        paint(state, viewMap);
+                        setStateNfo(state);
                         return;
                     }
 
@@ -2449,9 +2451,9 @@ export function WSCanvas(props: WSCanvasProps) {
                 const vm = {} as ViewMap;
                 filterAndSort(state, vm);
                 recomputeGeometry2(state, vm);
-                //recomputeOverridenRowHeight(stateNfo);
+                recomputeOverridenRowHeight(state);
                 if (debug) console.log("paintfrom:4");
-                paint(stateNfo, viewMap);
+                paint(state, viewMap);
                 setViewMap(vm);
                 setStateNfo(state);
             }
@@ -2503,16 +2505,16 @@ export function WSCanvas(props: WSCanvasProps) {
         setStateNfo(state);
     }, [rowsCount, dataSource]);
 
-    useEffect(() => {
-        if (debug) console.log("*** rowHeight");
-        // const state = stateNfo.dup();
-        // const vm = {} as ViewMap;
+    // useEffect(() => {
+    //     if (debug) console.log("*** rowHeight");
+    //     // const state = stateNfo.dup();
+    //     // const vm = {} as ViewMap;
 
-        // recomputeGeometry2(state, vm);
+    //     // recomputeGeometry2(state, vm);
 
-        // setViewMap(vm);
-        // setStateNfo(state);
-    }, [overridenRowHeight]);
+    //     // setViewMap(vm);
+    //     // setStateNfo(state);
+    // }, [overridenRowHeight]);
 
     //#region APPLY FILTER 
     useEffect(() => {
@@ -2548,10 +2550,10 @@ export function WSCanvas(props: WSCanvasProps) {
         paint(stateNfo, viewMap);
     }, [stateNfo]);
 
-    useEffect(() => {
-        if (debug) console.log("*** getcell, setcell");
-        // paint(stateNfo, viewMap);
-    }, [getCellData, prepareCellDataset, setCellData, commitCellDataset]);
+    // useEffect(() => {
+    //     if (debug) console.log("*** getcell, setcell");
+    //     // paint(stateNfo, viewMap);
+    // }, [getCellData, prepareCellDataset, setCellData, commitCellDataset]);
 
     useLayoutEffect(() => {
         if (debug) console.log("*** layout");
@@ -2561,7 +2563,8 @@ export function WSCanvas(props: WSCanvasProps) {
             canvasRef.current.addEventListener("wheel", handleWheel, { passive: false });
             canvasRef.current.addEventListener("touchstart", handleTouchStart);
             canvasRef.current.addEventListener("touchmove", handleTouchMove, { passive: false });
-            canvasRef.current.addEventListener("touchend", handleTouchEnd);
+            canvasRef.current.addEventListener("touchend", handleTouchEnd);            
+
             return () => {
                 if (canvasRef.current) {
                     canvasRef.current.removeEventListener("wheel", handleWheel);
@@ -2633,11 +2636,11 @@ export function WSCanvas(props: WSCanvasProps) {
         const stateNfoSize = debug ? JSON.stringify(stateNfo).length : 0;
 
         DEBUG_CTL = debug ? <div ref={debugRef}>
-            <b>paint cnt</b> => {stateNfo.paintcnt}<br />
+            <b>paint cnt</b> => {stateNfo.paintcnt} ; <b>W:</b> => {W.toFixed(0)} x <b>H:</b> => {H.toFixed(0)}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
             <b>rows cnt</b> => {rowsCount} ; filtered:{stateNfo.filteredSortedRowsCount} ; focused:{stateNfo.focusedCell.toString()} ; scroll:{stateNfo.viewScrollOffset.toString()}<br />
-            <b>col width overr</b> => {stateNfo.columnWidthOverrideTrack}<br />
-            <b>cursorOverCell</b>=> {String(stateNfo.cursorOverCell)} ; <b>sel</b> => {stateNfo.viewSelection.toString()}
+            {/* <b>col width overr</b> => {stateNfo.columnWidthOverrideTrack}<br />
+            <b>cursorOverCell</b>=> {String(stateNfo.cursorOverCell)} ; <b>sel</b> => {stateNfo.viewSelection.toString()} */}
         </div> : null;
     }
     //#endregion
