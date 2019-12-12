@@ -111,7 +111,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [21]: https://github.com/devel0/react-ws-canvas/blob/10556d1e377e8258077f4a87cffb21f722c7e4e6/example/src/lib/WSCanvasProps.tsx#L103-L104
 [22]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/lib/WSCanvasPropsDefault.tsx#L13
 [23]: https://github.com/devel0/react-ws-canvas/blob/e756188d46ffe9fc96bc68d66de65aa6af42b146/example/src/Sample3.tsx#L120
-[24]: https://github.com/devel0/react-ws-canvas/blob/f45a4cd136143f48914fbe41bdfc99bb939d170c/example/src/Sample3.tsx#L158-L193
+[24]: https://github.com/devel0/react-ws-canvas/blob/0507546976788845a4617fe77312503481f95209/example/src/Sample3.tsx#L158-L198
 
 ## quickstart
 
@@ -257,5 +257,6 @@ Because I need a library to publish and either a working example to test/debug t
 - **TODO**
   - type 'select' for cell with combobox integrated
   - date picker when F2 (or double click) on date type cell
+  - isOverCell should true on last row when showPartialRows
 - deployment
   - remove any `from "react-ws-canvas";`
