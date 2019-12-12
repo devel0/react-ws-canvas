@@ -141,16 +141,14 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       // getCellTextColor={(cell, props) => {
       //   if (cell.row === 2) return "white";
       // }}
-      getCellTextWrap={(cell, props) => {
-        if (columns[cell.col].wrapText) return columns[cell.col].wrapText;
-      }}
+      getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }}
       // getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
       getColumnHeader={(col) => columns[col].header}
       rowHeight={() => 35} textMargin={5}
       getColumnLessThanOp={(col) => columns[col].lessThan}
       getCellType={(cell, data) => columns[cell.col].type}
       // rowHoverColor={"rgba(240,240,240,1)"}
-      colWidth={(col) => 120}
+      colWidth={(col) => columns[col].width || 100}
       selectionMode={WSCanvasSelectMode.Cell}
       showFilter={true}
       showPartialColumns={true} showPartialRows={true}
