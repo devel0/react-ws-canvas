@@ -74,7 +74,9 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - [api][10] available for control interactions ( [example][11] )
 
-- each individual cell [custom edit][13] ( F2 ) control can be customized ( [example][24] )
+- each individual cell [custom edit][13] ( F2 ) control can be customized ( [example][24] : through keyboard F2, arrows then enter )
+
+![](doc/custom-combobox.gif)
 
 - [cell style][19] customization
 
