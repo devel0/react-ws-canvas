@@ -126,7 +126,12 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
       columnClickBehavior={columnClickBehavior}
       dataSource={rows}
-      getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
+      getCellData={(cell) => {        
+        const fieldname = columns[cell.col].field;
+        const val = (rows[cell.row] as any)[columns[cell.col].field];
+        if (fieldname === "col1") return "( " + val + " )";
+        return val;
+      }}
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
       setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}

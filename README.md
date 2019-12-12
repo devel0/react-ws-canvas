@@ -170,6 +170,22 @@ export default AppQuickStart;
 yarn start
 ```
 
+## tips
+
+- prepare column info using [WSCanvasColumn][1000] ( [example][1001] ) then attach required prop using hint provided from WSCanvasColumn field documentation ( ie. `getColumnHeader={(col) => columns[col].header}` )
+
+- to allow read/write cell set `getCellData`, `prepareCellDataset`, `setCellData`, `commitCellDataset` ( [example][1002] )
+
+- to ensure data sync with view set [dataSource][1003]
+
+- to inhibit column sorting set `columnClickBehavior` to [None][1004]
+
+[1000]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L17]
+[1001]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L21]
+[1002]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128-L132]
+[1003]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128]
+[1004]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L8]
+
 ## how to contribute ( quickstart )
 
 - clone repo
