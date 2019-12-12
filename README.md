@@ -73,7 +73,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - [api][10] available for control interactions ( [example][11] )
 
-- each individual cell [custom edit][13] ( F2 ) control can be customized
+- each individual cell [custom edit][13] ( F2 ) control can be customized ( [example][24] )
 
 - [cell style][19] customization
 
@@ -108,6 +108,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [21]: https://github.com/devel0/react-ws-canvas/blob/10556d1e377e8258077f4a87cffb21f722c7e4e6/example/src/lib/WSCanvasProps.tsx#L103-L104
 [22]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/lib/WSCanvasPropsDefault.tsx#L13
 [23]: https://github.com/devel0/react-ws-canvas/blob/e756188d46ffe9fc96bc68d66de65aa6af42b146/example/src/Sample3.tsx#L120
+[24]: https://github.com/devel0/react-ws-canvas/blob/f45a4cd136143f48914fbe41bdfc99bb939d170c/example/src/Sample3.tsx#L158-L193
 
 ## quickstart
 
@@ -182,12 +183,12 @@ yarn start
 
 - transform data on-the-fly using `getCellData` ( [example][1005] )
 
-[1000]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L17]
-[1001]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L21]
-[1002]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128-L132]
-[1003]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128]
-[1004]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L8]
-[1005]: [https://github.com/devel0/react-ws-canvas/blob/71250c44e7dae6dab2b6979ec8747030b7c59148/example/src/Sample3.tsx#L129-L134]
+[1000]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L17
+[1001]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L21
+[1002]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128-L132
+[1003]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128
+[1004]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L8
+[1005]: https://github.com/devel0/react-ws-canvas/blob/71250c44e7dae6dab2b6979ec8747030b7c59148/example/src/Sample3.tsx#L129-L134
 
 ## how to contribute ( quickstart )
 
