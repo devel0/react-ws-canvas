@@ -308,6 +308,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     for (let ri = 0; ri < rowsCount; ++ri) filteredToReal.push(ri);
                 }
             }
+            else return;
         }
 
         //
@@ -319,7 +320,7 @@ export function WSCanvas(props: WSCanvasProps) {
         } else {
             const filteredSortedToReal = new Array<number>(filteredToReal.length);
 
-            const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");
+            const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");            
 
             for (let si = 0; si < orderedColumnSort.length; ++si) {
                 const columnSort = orderedColumnSort[si];
@@ -350,6 +351,11 @@ export function WSCanvas(props: WSCanvasProps) {
                             cellData: getCellData(new WSCanvasCellCoord(filteredToReal[fsri], columnSort.columnIndex))
                         });
                 }
+                // if (debug) {
+                //     for (let i=0; i < colData.length; ++i) {
+                //         console.log(colData[i].ri + " - " + colData[i].cellData);
+                //     }
+                // }
 
                 colData.sort((a, b) => {
                     const valA = a.cellData;
@@ -362,6 +368,13 @@ export function WSCanvas(props: WSCanvasProps) {
                     else
                         return ascRes;
                 });
+                
+                // if (debug) {
+                //     console.log("-----------");
+                //     for (let i=0; i < colData.length; ++i) {
+                //         console.log(colData[i].ri + " - " + colData[i].cellData);
+                //     }
+                // }
 
                 for (let fsri = 0; fsri < filteredSortedToReal.length; ++fsri) {
                     filteredSortedToReal[fsri] = colData[fsri].ri;
@@ -1148,9 +1161,9 @@ export function WSCanvas(props: WSCanvasProps) {
         let stateChanged = false;
         ++state.paintcnt;
 
-        const colwavail = W - (verticalScrollbarActive ? scrollBarThk : 0) - (showRowNumber ? (rowNumberColWidth + 1) : 0) - 6;
+        const colwavail = W - (verticalScrollbarActive ? scrollBarThk : 0) - (showRowNumber ? (rowNumberColWidth + 1) : 0);
         let colwsumbefore = 0;
-        for (let ci = 0; ci < colsCount; ++ci) colwsumbefore += colWidth(ci);
+        for (let ci = 0; ci < colsCount; ++ci) colwsumbefore += colWidth(ci) + 1;
 
         if ((state.paintcnt > 1 && colWidthExpand && colwsumbefore < colwavail && state.colWidthExpanded !== colwavail)) {
 
@@ -1720,7 +1733,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.prevCol());
                         break;
 
-                    case "Tab":                        
+                    case "Tab":
                         keyHandled = true;
                         if (focusedViewCell.col < colsCount - 1)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol());
