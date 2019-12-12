@@ -1,6 +1,12 @@
-import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasSelectMode, WSCanvasColumnToSortInfo } from "./lib";
+import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum } from "./lib";
 
 import React, { useState, useEffect, useLayoutEffect } from "react";
+
+enum MyEnum {
+  first,
+  second,
+  third
+}
 
 interface MyData {
   col1: string;
@@ -10,6 +16,7 @@ interface MyData {
   col5: Date;
   col6: Date;
   col7: string;
+  cboxcol: MyEnum;
 }
 
 export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
@@ -60,6 +67,11 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       field: "col5"
     },
     {
+      type: "text",
+      header: "cbox",
+      field: "cboxcol"
+    },
+    {
       type: "datetime",
       header: "col6",
       field: "col6"
@@ -85,7 +97,8 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
         col4: new Date(new Date().getTime() + (ri * 24 * 60 * 60 * 1000)), // +1 day
         col5: new Date(new Date().getTime() + (ri * 60 * 1000)), // +1 min
         col6: new Date(new Date().getTime() + (ri * 24 * 60 * 60 * 1000 + ri * 60 * 1000)), // +1 day +1min
-        col7: ri % 2 === 0 ? "short text" : "long text that will be wrapped because too long"
+        col7: ri % 2 === 0 ? "short text" : "long text that will be wrapped because too long",
+        cboxcol: (ri % 3) as MyEnum
       });
     }
 
@@ -126,15 +139,58 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
       columnClickBehavior={columnClickBehavior}
       dataSource={rows}
-      getCellData={(cell) => {        
+      getCellData={(cell) => {
         const fieldname = columns[cell.col].field;
         const val = (rows[cell.row] as any)[columns[cell.col].field];
-        if (fieldname === "col1") return "( " + val + " )";
+        switch (fieldname) {
+          case "col1": return "( " + val + " )";
+          case "cboxcol": {
+            const q = mapEnum(MyEnum).find((x) => x.value === val);
+            if (q) return q.name;
+          }
+        }
+
         return val;
       }}
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
       setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}
+      getCellCustomEdit={(cell, props) => {
+        const fieldname = columns[cell.col].field;
+
+        if (fieldname === "cboxcol") {
+
+          const options = mapEnum(MyEnum).map((x) => {
+            return {
+              value: x.value,
+              label: x.name
+            }
+          });
+
+          return <div>
+            <select
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Tab" || e.key === "Enter") {
+                  e.preventDefault();
+                  api.closeCustomEdit();
+                }
+              }}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                const qval: MyEnum = val;
+                const row = rows[cell.row];
+                row.cboxcol = qval;
+              }}>
+              {mapEnum(MyEnum).map((x) =>
+                <option value={x.value}>{x.name}</option>
+              )}
+            </select>
+          </div>
+
+        }
+        return undefined;
+      }}
       columnInitialSort={WSCanvasColumnToSortInfo(columns)}
       // getCellBackgroundColor={(cell, props) => {
       //   // if (cell.row === 2) return "navy";
@@ -160,7 +216,7 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       showColNumber={true} showRowNumber={true}
       debug={debug} dbgDiv={dbgDiv}
       colWidthExpand={true}
-      frozenRowsCount={1} frozenColsCount={1}
+      frozenRowsCount={0} frozenColsCount={0}
       rowsCount={rows.length} colsCount={columns.length} />
   </>
 }

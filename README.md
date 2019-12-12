@@ -180,11 +180,14 @@ yarn start
 
 - to inhibit column sorting set `columnClickBehavior` to [None][1004]
 
+- transform data on-the-fly using `getCellData` ( [example][1005] )
+
 [1000]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L17]
 [1001]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L21]
 [1002]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128-L132]
 [1003]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128]
 [1004]: [https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L8]
+[1005]: [https://github.com/devel0/react-ws-canvas/blob/71250c44e7dae6dab2b6979ec8747030b7c59148/example/src/Sample3.tsx#L129-L134]
 
 ## how to contribute ( quickstart )
 

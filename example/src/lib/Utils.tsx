@@ -117,3 +117,19 @@ export function stringIsValidNumber(n: string) {
 
     return (q && q.length > 0) || false;
 }
+
+export interface IEnumValue {
+    name: string;
+    value: number;
+}
+
+/** creates an array of {value:number, name:string} suitable for menuitem and options array creation */
+export function mapEnum(e: any) {
+    const res = new Array<IEnumValue>();
+    for (const item in e) {
+        if (isNaN(Number(item))) {
+            res.push({ value: e[item], name: item });
+        }
+    }
+    return res;
+}

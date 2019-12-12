@@ -320,7 +320,7 @@ export function WSCanvas(props: WSCanvasProps) {
         } else {
             const filteredSortedToReal = new Array<number>(filteredToReal.length);
 
-            const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");            
+            const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");
 
             for (let si = 0; si < orderedColumnSort.length; ++si) {
                 const columnSort = orderedColumnSort[si];
@@ -368,7 +368,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     else
                         return ascRes;
                 });
-                
+
                 // if (debug) {
                 //     console.log("-----------");
                 //     for (let i=0; i < colData.length; ++i) {
@@ -612,20 +612,22 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** (NO side effects on state) */
-    const cellToCanvasCoord = (state: WSCanvasState, cell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {
+    const viewCellToCanvasCoord = (state: WSCanvasState, viewCell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {
+        const cell = viewCellToReal(viewMap, viewCell);
         const colXW = colGetXWidth(state, cell.col, allowPartialCol);
-        if (cell.filterRow) return new WSCanvasCoord(colXW[0], colNumberRowHeight + filterTextMargin, colXW[1]);
+        if (viewCell.filterRow) return new WSCanvasCoord(colXW[0], colNumberRowHeight + filterTextMargin, colXW[1]);
 
         let y = 1;
-        for (let ri = state.viewScrollOffset.row; ri < state.viewScrollOffset.row + state.viewRowsCount; ++ri) {
-            if (ri >= state.filteredSortedRowsCount) break;
+        for (let vri = state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri) {
+            if (vri >= state.filteredSortedRowsCount) break;
 
-            if (ri === cell.row) {
+            if (vri === viewCell.row) {
                 let resy = y + (showColNumber ? colNumberRowHeightFull() : 0);
 
                 return new WSCanvasCoord(colXW[0], resy, colXW[1]);
             }
 
+            const ri = viewRowToRealRow(viewMap, vri);
             y += getRowHeight(ri) + 1;
         }
         return null;
@@ -846,7 +848,7 @@ export function WSCanvas(props: WSCanvasProps) {
     /** side effect on state ; NO side effect on vm */
     const confirmCustomEdit = (state: WSCanvasState, vm: ViewMap | null) => {
         if (state.customEditCell !== null) {
-            singleSetCellData(viewCellToReal(vm, state.customEditCell), state.customEditValue);
+            //singleSetCellData(state.customEditCell, /* viewCellToReal(vm, state.customEditCell),*/ state.customEditValue);
             closeCustomEdit(state);
         }
     }
@@ -971,7 +973,8 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const openCellCustomEdit = (state: WSCanvasState) => {
         if (canvasRef.current) {
-            const xy = cellToCanvasCoord(state, state.focusedCell);
+            const viewCell = realCellToView(viewMap, state.focusedCell);
+            const xy = viewCellToCanvasCoord(state, viewCell);
             const cell = state.focusedCell;
             if (isCellReadonly && isCellReadonly(cell)) return;
 
@@ -1418,7 +1421,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         stateChanged = true;
                     }
 
-                    const ccoord = cellToCanvasCoord(state,
+                    const ccoord = viewCellToCanvasCoord(state,
                         new WSCanvasCellCoord(0, state.focusedFilterColIdx, true),
                         showPartialColumns);
 
@@ -1558,8 +1561,10 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
 
                 if (state.focusedFilterColIdx === -1 && state.customEditCell !== null) {
-                    const ccoord = cellToCanvasCoord(state, state.customEditCell);
+                    const viewCell = realCellToView(vm, state.customEditCell);
+                    const ccoord = viewCellToCanvasCoord(state, viewCell);
                     if (ccoord) {
+                        console.log("ceditcell:" + state.customEditCell.toString() + " x:" + ccoord.x.toFixed(0) + " y:" + ccoord.y.toFixed(0));
                         let defaultEdit = true;
 
                         const ceditStyle = {
@@ -1889,7 +1894,11 @@ export function WSCanvas(props: WSCanvasProps) {
                                     break;
                             }
 
-                            if (!keyHandled && (isCellReadonly === undefined || !isCellReadonly(cell))) {
+                            //
+                            // fist character [direct editing]
+                            //
+                            if (!keyHandled && (isCellReadonly === undefined || !isCellReadonly(cell)) &&
+                                (getCellCustomEdit === undefined || getCellCustomEdit(cell, props) === undefined)) {
                                 if (getCellType) {
                                     const prevData = getCellData(cell);
                                     const type = getCellType(cell, prevData);
@@ -2682,8 +2691,7 @@ export function WSCanvas(props: WSCanvasProps) {
             handleKeyDown(e);
         }
 
-        // TODO: sorted
-        api.cellToCanvasCoord = (cell) => cellToCanvasCoord(stateNfo, cell);
+        api.cellToCanvasCoord = (cell) => viewCellToCanvasCoord(stateNfo, realCellToView(viewMap, cell));
         api.canvasCoordToCellCoord = (ccoord) => canvasToCellCoord(stateNfo, viewMap, ccoord);
         api.focusCell = (cell, scrollTo, endingCell, clearSelection) => {
             const state = stateNfo.dup();
@@ -2730,6 +2738,7 @@ export function WSCanvas(props: WSCanvasProps) {
             <b>paint cnt</b> => {stateNfo.paintcnt} ; <b>W:</b> => {W.toFixed(0)} x <b>H:</b> => {H.toFixed(0)}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
             <b>rows cnt</b> => {rowsCount} ; filtered:{stateNfo.filteredSortedRowsCount} ; focused:{stateNfo.focusedCell.toString()} ; scroll:{stateNfo.viewScrollOffset.toString()}<br />
+            <b>custom edit val</b> => {stateNfo.customEditValue}<br />
             {/* <b>col width overr</b> => {stateNfo.columnWidthOverrideTrack}<br />
             <b>cursorOverCell</b>=> {String(stateNfo.cursorOverCell)} ; <b>sel</b> => {stateNfo.viewSelection.toString()} */}
         </div> : null;
