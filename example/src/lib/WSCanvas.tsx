@@ -2592,7 +2592,7 @@ export function WSCanvas(props: WSCanvasProps) {
             filterAndSort(state, vm);
             recomputeGeometry2(state, vm);
 
-            if (viewMap) {
+            if (stateNfo.focusedFilterColIdx >= 0 && viewMap) {
                 const viewRowToFocus = vm.viewToReal[0];
                 const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
                 focusCell(state, vm, q, true, false, true, !selectFirstOnFilter);
