@@ -160,20 +160,25 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
 
         if (fieldname === "cboxcol") {
 
-          const options = mapEnum(MyEnum).map((x) => {
-            return {
-              value: x.value,
-              label: x.name
-            }
-          });
+          const origVal = rows[cell.row].cboxcol;
 
           return <div>
             <select
-              autoFocus
+              autoFocus              
+              defaultValue={rows[cell.row].cboxcol}
               onKeyDown={(e) => {
-                if (e.key === "Tab" || e.key === "Enter") {
-                  e.preventDefault();
-                  api.closeCustomEdit();
+                switch (e.key) {
+                  case "Tab":
+                  case "Enter":
+                    e.preventDefault();
+                    api.closeCustomEdit();
+                    break;
+                  case "Escape":
+                    const q = props.prepareCellDataset();
+                    props.setCellData(q, cell, origVal);
+                    props.commitCellDataset(q);
+                    api.closeCustomEdit();
+                    break;
                 }
               }}
               onChange={(e) => {
