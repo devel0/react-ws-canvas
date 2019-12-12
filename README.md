@@ -78,7 +78,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/custom-combobox.gif)
 
-- [cell style][19] customization
+- [cell style][19] customization and [text align][25]
 
 ![](doc/cell-style-customization.png)
 
@@ -112,6 +112,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [22]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/lib/WSCanvasPropsDefault.tsx#L13
 [23]: https://github.com/devel0/react-ws-canvas/blob/e756188d46ffe9fc96bc68d66de65aa6af42b146/example/src/Sample3.tsx#L120
 [24]: https://github.com/devel0/react-ws-canvas/blob/0507546976788845a4617fe77312503481f95209/example/src/Sample3.tsx#L158-L198
+[25]: https://github.com/devel0/react-ws-canvas/blob/4029b9f278824215ca2ffdf65cabe6e2ccf32c4c/example/src/lib/WSCanvasProps.tsx#L89
 
 ## quickstart
 
