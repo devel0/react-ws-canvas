@@ -28,6 +28,7 @@ export function Sample1(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
     width={width} height={height}
     containerStyle={{ margin: "1em" }}
     columnClickBehavior={columnClickBehavior}
+    dataSource={rows}
     getCellData={(cell) => rows[cell.row][cell.col]}
     prepareCellDataset={() => rows.slice()}
     commitCellDataset={(q) => setRows(q)}

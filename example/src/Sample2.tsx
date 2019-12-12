@@ -95,6 +95,7 @@ export function Sample2(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
     containerStyle={{ margin: "2em" }}
     columnClickBehavior={columnClickBehavior}
     getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
+    dataSource={rows}
     prepareCellDataset={() => rows.slice()}
     commitCellDataset={(q) => setRows(q)}
     setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}
