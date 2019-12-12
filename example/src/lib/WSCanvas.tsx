@@ -25,8 +25,6 @@ export interface ViewMap {
     realToView: number[];
 }
 
-// TODO: isOverCell should true on last row when showPartialRows
-
 export function WSCanvas(props: WSCanvasProps) {
     useEffect(() => {
         if (debug) console.log("*** locale");
@@ -1563,8 +1561,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 if (state.focusedFilterColIdx === -1 && state.customEditCell !== null) {
                     const viewCell = realCellToView(vm, state.customEditCell);
                     const ccoord = viewCellToCanvasCoord(state, viewCell);
-                    if (ccoord) {
-                        console.log("ceditcell:" + state.customEditCell.toString() + " x:" + ccoord.x.toFixed(0) + " y:" + ccoord.y.toFixed(0));
+                    if (ccoord) {                        
                         let defaultEdit = true;
 
                         const ceditStyle = {
@@ -2238,7 +2235,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     const startWidth = state.resizingColStartNfo[1];
                     const newWidth = startWidth + (x - startX);
 
-                    console.log("NEW WIDTH:" + newWidth);
+                    // console.log("NEW WIDTH:" + newWidth);
                     state.columnWidthOverride.set(state.resizingCol, newWidth);
                     state.columnWidthOverrideTrack = JSON.stringify([...state.columnWidthOverride]);
                 }
@@ -2322,7 +2319,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
             }
             else if (e.deltaY < 0) {
-                console.log("SCROLL UP");
+                // console.log("SCROLL UP");
                 if (shift_key) {
                     if (!preventWheelOnBounds && state.viewScrollOffset.col === 0) prevent = false;
                     state.viewScrollOffset = state.viewScrollOffset.setCol(Math.max(0, state.viewScrollOffset.col - (showPartialRows ? 2 : 1)));
