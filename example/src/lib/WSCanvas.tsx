@@ -838,6 +838,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
+    /** side effect on state */
     const closeCustomEdit = (state: WSCanvasState) => {
         if (stateNfo.customEditCell !== null) {
             state.customEditCell = null;
@@ -1556,8 +1557,8 @@ export function WSCanvas(props: WSCanvasProps) {
                             overflow: "hidden",
                             left: canvasRef.current.offsetLeft + ccoord.x + textMargin + 1,
                             top: canvasRef.current.offsetTop + ccoord.y + textMargin,
-                            width: overridenColWidth(state, state.customEditCell.col) - textMargin - 2,
-                            height: getRowHeight(state.customEditCell.row) - textMargin
+                            // width: overridenColWidth(state, state.customEditCell.col) - textMargin - 2,
+                            // height: getRowHeight(state.customEditCell.row) - textMargin
                         } as CSSProperties;
 
                         if (getCellCustomEdit) {
@@ -1657,7 +1658,7 @@ export function WSCanvas(props: WSCanvasProps) {
         ]);
     }
 
-    const handleKeyDown = async (e: React.KeyboardEvent<HTMLCanvasElement>) => {
+    const handleKeyDown = async (e: React.KeyboardEvent) => {
         if (api.onPreviewKeyDown) api.onPreviewKeyDown(e);
 
         if (!e.defaultPrevented) {
@@ -1676,7 +1677,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
             };
 
-            if (debug) console.log("key:" + e.key + " ctrl:" + String(ctrl_key));
+            if (debug) console.log("key:" + e.key + " ctrl:" + String(ctrl_key) + " editmode:" + state.editMode);
 
             const focusedViewCell = new WSCanvasCellCoord(
                 realRowToViewRow(viewMap, state.focusedCell.row),
@@ -1717,6 +1718,14 @@ export function WSCanvas(props: WSCanvasProps) {
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setCol(0));
                         else if (focusedViewCell.col > 0)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.prevCol());
+                        break;
+
+                    case "Tab":                        
+                        keyHandled = true;
+                        if (focusedViewCell.col < colsCount - 1)
+                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol());
+                        else if (focusedViewCell.row < rowsCount - 1)
+                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextRow().setCol(0));
                         break;
 
                     case "PageDown":
@@ -2633,6 +2642,31 @@ export function WSCanvas(props: WSCanvasProps) {
             state.viewSelection = selection;
             setStateNfo(state);
             if (api.onStateChanged) api.onStateChanged(state);
+        }
+        api.confirmCustomEdit = () => {
+            confirmCustomEdit(stateNfo, viewMap);
+        }
+        api.closeCustomEdit = () => {
+            const state = stateNfo.dup();
+            closeCustomEdit(state);
+            setStateNfo(state);
+        }
+        api.goToNextCell = () => {
+            const state = stateNfo.dup();
+            const focusedViewCell = new WSCanvasCellCoord(
+                realRowToViewRow(viewMap, stateNfo.focusedCell.row),
+                realColToViewCol(viewMap, stateNfo.focusedCell.col),
+                stateNfo.focusedCell.filterRow);
+            if (focusedViewCell.col < colsCount - 1)
+                state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol());
+            else if (focusedViewCell.row < rowsCount - 1)
+                state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextRow().setCol(0));
+            setStateNfo(state);
+            paint(state, viewMap);
+            if (api.onStateChanged) api.onStateChanged(state);
+        }
+        api.triggerKey = (e: React.KeyboardEvent) => {
+            handleKeyDown(e);
         }
 
         // TODO: sorted

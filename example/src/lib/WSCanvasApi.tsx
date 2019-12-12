@@ -14,13 +14,17 @@ export class WSCanvasApi {
     focusCell: (coord: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearSelection?: boolean) => void;
     scrollTo: (coord: WSCanvasCellCoord) => void;
     setSorting: (sorting: WSCanvasColumnSortInfo[]) => void;
+    confirmCustomEdit: () => void;
+    closeCustomEdit: () => void;
+    goToNextCell: () => void;
+    triggerKey: (e:React.KeyboardEvent) => void;
 
     onStateChanged?: (state:WSCanvasState) => void;
 
     paint: () => void;
 
-    onPreviewKeyDown?: (e: React.KeyboardEvent<HTMLCanvasElement>) => void;
-    onKeyDown?: (e: React.KeyboardEvent<HTMLCanvasElement>) => void;
+    onPreviewKeyDown?: (e: React.KeyboardEvent) => void;
+    onKeyDown?: (e: React.KeyboardEvent) => void;
 
     /** cell click ( row=-1 if column header click ; col=-1 if row header click ) */
     onPreviewMouseDown?: (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
@@ -50,6 +54,10 @@ export class WSCanvasApi {
         this.focusCell = () => { };
         this.scrollTo = () => { };
         this.setSorting = () => { };
+        this.confirmCustomEdit = () => {};
+        this.closeCustomEdit = () => {};
+        this.goToNextCell = () => {};
+        this.triggerKey = () => {};
 
         this.onStateChanged = undefined;
         this.paint = () => { };
