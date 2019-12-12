@@ -254,4 +254,8 @@ Because I need a library to publish and either a working example to test/debug t
 
 ## development notes
 
-- remove any `from "react-ws-canvas";`
+- **TODO**
+  - type 'select' for cell with combobox integrated
+  - date picker when F2 (or double click) on date type cell
+- deployment
+  - remove any `from "react-ws-canvas";`
