@@ -798,34 +798,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 break;
         }
 
-        const textWrap = getCellTextWrap && getCellTextWrap(cell, props);
-        if (textWrap && RH > RSINGLE) {
-            ctx.textBaseline = "bottom";
-
-            //posY = y + getRowHeight(viewCell.row) / 2 - textMargin / 2 + 2;   
-            posY = y + textMargin + 2 + RSINGLE / 2;
-
-            var words = str.split(' ');
-            let wc = words.length;
-            const maxLineW = cWidth - 2 * textMargin;
-
-            let line = "";
-            for (let i = 0; i < wc; ++i) {
-                const appendline = (i > 0 ? (" " + words[i]) : words[i]);
-                const w = ctx.measureText(line + appendline).width;
-                if (w > maxLineW) {
-                    ctx.fillText(line, posX, posY);
-                    posY += getRowHeight(-1);
-                    line = words[i];
-                } else {
-                    line += appendline;
-                }
-            }
-            if (line.length > 0) {
-                ctx.fillText(line, posX, posY);
-            }
-        }
-        else {
+        const drawBool = () => {
             const cellType = getCellType ? _cellType : "text";
             if (cellType === "boolean") {
                 const bx = x + cWidth / 2;
@@ -842,8 +815,41 @@ export function WSCanvas(props: WSCanvasProps) {
                     ctx.strokeRect(bx - bw / 2, by - bh / 2, bw, bh);
                     ctx.stroke();
                 }
+                return true;
             }
-            else
+            return false;
+        }
+
+        const textWrap = getCellTextWrap && getCellTextWrap(cell, props);
+        if (textWrap && RH > RSINGLE) {
+            if (!drawBool()) {
+                ctx.textBaseline = "bottom";
+
+                //posY = y + getRowHeight(viewCell.row) / 2 - textMargin / 2 + 2;   
+                posY = y + textMargin + 2 + RSINGLE / 2;
+
+                var words = str.split(' ');
+                let wc = words.length;
+                const maxLineW = cWidth - 2 * textMargin;
+
+                let line = "";
+                for (let i = 0; i < wc; ++i) {
+                    const appendline = (i > 0 ? (" " + words[i]) : words[i]);
+                    const w = ctx.measureText(line + appendline).width;
+                    if (w > maxLineW) {
+                        ctx.fillText(line, posX, posY);
+                        posY += getRowHeight(-1);
+                        line = words[i];
+                    } else {
+                        line += appendline;
+                    }
+                }
+                if (line.length > 0) {
+                    ctx.fillText(line, posX, posY);
+                }
+            }
+        } else {
+            if (!drawBool())
                 ctx.fillText(str, posX, posY);
         }
 
