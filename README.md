@@ -4,7 +4,7 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.5.4](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/4029b9f278824215ca2ffdf65cabe6e2ccf32c4c/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.7.0](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/cdd013cda94264770b3e62840148e716ac4e76c5/example) )
 
 ---
 
@@ -59,6 +59,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 - [column click behavior][12] can be full column select, column toggle sort or none to disable sort/select behavior
 
 - [column header][15] can be customized
+
+- canvas size can be specified through width, height ( [fullwidth][https://github.com/devel0/react-ws-canvas/blob/cdd013cda94264770b3e62840148e716ac4e76c5/example/src/Sample3.tsx#L138] option available )
 
 - column width can be changed intractively using mouse
 
