@@ -736,7 +736,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (val === true)
                         str = "\u25FC"; // https://www.rapidtables.com/code/text/unicode-characters.html                                        
                     else
-                        str = "\u2610";
+                        str = "\u25A2";
                     ctx.textAlign = "center";
                     break;
                 case "date":
