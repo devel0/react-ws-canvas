@@ -16,8 +16,10 @@ export interface WSCanvasCellDataNfo {
 export interface WSCanvasProps {
     api: WSCanvasApi;
 
+    /** width 100% */
+    fullwidth: boolean;
     /** width of canvas */
-    width: number;
+    width: number;    
     /** height of canvas */
     height: number;
     /** datasource to sync refresh */

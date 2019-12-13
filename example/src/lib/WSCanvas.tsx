@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useLayoutEffect, CSSProperties } from "react";
-import useDebounce, { useElementSize, toColumnName } from "./Utils";
+import useDebounce, { useElementSize, toColumnName, useWindowSize, useDivMarginPadding } from "./Utils";
 import { WSCanvasProps, WSCanvasCellDataNfo } from "./WSCanvasProps";
 import { WSCanvasEditMode } from "./WSCanvasEditMode";
 import { WSCanvasState } from "./WSCanvasState";
@@ -32,9 +32,12 @@ export function WSCanvas(props: WSCanvasProps) {
         moment.locale(lang);
     }, [navigator.language]);
 
+    const winSize = useWindowSize();
+
     const {
         api,
 
+        fullwidth,
         width,
         height,
         dataSource,
@@ -142,31 +145,11 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const colNumberRowHeightFull = () => colNumberRowHeight + (showFilter ? rowHeight(-1) : 0);
 
-    let margin_padding_W = 0;
-    let margin_padding_H = 0;
+    const margin_padding = useDivMarginPadding(canvasDivRef);
+    const container_margin_padding = useDivMarginPadding(containerRef, true);
 
-    if (canvasDivRef.current) {
-        const csty = getComputedStyle(canvasDivRef.current);
-
-        const marginLeft = csty.marginLeft ? parseFloat(csty.marginLeft) : 0;
-        const marginRight = csty.marginRight ? parseFloat(csty.marginRight) : 0;
-        const marginTop = csty.marginTop ? parseFloat(csty.marginTop) : 0;
-        const marginBottom = csty.marginBottom ? parseFloat(csty.marginBottom) : 0;
-
-        const paddingLeft = csty.paddingLeft ? parseFloat(csty.paddingLeft) : 0;
-        const paddingRight = csty.paddingRight ? parseFloat(csty.paddingRight) : 0;
-        const paddingTop = csty.paddingTop ? parseFloat(csty.paddingTop) : 0;
-        const paddingBottom = csty.paddingBottom ? parseFloat(csty.paddingBottom) : 0;
-
-        margin_padding_W += (marginLeft + marginRight + paddingLeft + paddingRight);
-        margin_padding_H += (marginTop + marginBottom + paddingTop + paddingBottom);
-    }
-
-    // TODO: fix
-    const minH = (showColNumber ? colNumberRowHeightFull() : 0) + /*viewrows here*/ rowsCount * (rowHeight(-1) + 1) + scrollBarThk + 10;
-
-    let W = width - margin_padding_W;
-    let H = height - debugSize.height - margin_padding_H;
+    let W = fullwidth ? (winSize.width - container_margin_padding[0]) : (width - margin_padding[0]);
+    let H = height - debugSize.height - margin_padding[1];
 
     const viewRowToRealRow = (vm: ViewMap | null, viewRow: number) => {
         if (viewRow < 0) return viewRow;
@@ -402,8 +385,6 @@ export function WSCanvas(props: WSCanvasProps) {
             if (api.onStateChanged) api.onStateChanged(state);
         }
     }
-
-
 
     //#endregion    
 
@@ -1181,9 +1162,8 @@ export function WSCanvas(props: WSCanvasProps) {
     const paint = (state: WSCanvasState, vm: ViewMap | null) => {
         if (!state.initialized) return;
 
-        if (debug) {
-            console.log("PAINT (rows:" + rowsCount + ")");
-        }
+        if (debug) console.log("PAINT (rows:" + rowsCount + ")");
+        
         let stateChanged = false;
         ++state.paintcnt;
 
@@ -1193,7 +1173,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         if ((state.paintcnt > 1 && colWidthExpand && colwsumbefore < colwavail && state.colWidthExpanded !== colwavail)) {
 
-            state.widthBackup = width;
+            state.widthBackup = winSize.width;
             state.heightBackup = height;
             stateChanged = true;
 
@@ -2634,22 +2614,17 @@ export function WSCanvas(props: WSCanvasProps) {
     }, [debouncedFilter]);
     //#endregion     
 
-    useEffect(() => {
+    useEffect(() => {        
         if (debug) console.log("*** resize");
         if (debug) console.log("paintfrom:6");
         paint(stateNfo, viewMap);
-    }, [width, height, debugSize, stateNfo.widthBackup, stateNfo.heightBackup]);
+    }, [winSize, width, height, debugSize, stateNfo.widthBackup, stateNfo.heightBackup]);
 
     useEffect(() => {
         if (debug) console.log("*** state, vm");
         if (debug) console.log("paintfrom:7");
         paint(stateNfo, viewMap);
     }, [stateNfo]);
-
-    // useEffect(() => {
-    //     if (debug) console.log("*** getcell, setcell");
-    //     // paint(stateNfo, viewMap);
-    // }, [getCellData, prepareCellDataset, setCellData, commitCellDataset]);
 
     useLayoutEffect(() => {
         if (debug) console.log("*** layout");
@@ -2783,15 +2758,11 @@ export function WSCanvas(props: WSCanvasProps) {
 
     return <div ref={containerRef}
         style={{
-            width: width,
+            width: W,
             height: height,
             border: debug ? "1px solid blue" : "",
             overflow: "hidden"
         }}>
-
-        {/* <div style={{ background: "lightcyan" }}>
-            {DEBUG_CTL}
-        </div> */}
 
         <div ref={canvasDivRef}
             style={containerStyle === undefined ? baseDivContainerStyle : Object.assign(baseDivContainerStyle, containerStyle)}>

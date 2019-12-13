@@ -1,6 +1,6 @@
-import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum } from "./lib";
+import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize } from "./lib";
 
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 
 enum MyEnum {
   first,
@@ -116,7 +116,10 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
     }
   };
 
-  return <>
+  const divRef = useRef<HTMLDivElement>(null);
+  const divSize = useElementSize(divRef);
+
+  return <div ref={divRef} style={{ margin: "1em", background: "yellow" }}>
     <button onClick={() => {
       const q = rows.slice(1);
       setRows(q);
@@ -126,31 +129,41 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       const q = rows.slice();
       q[0].col7 = "NEW DESC";
       setRows(q);
-    }}>CHANGE ROW</button>
+    }}>CHANGE ROW</button>    
 
     <WSCanvas
-      api={api}
-      width={width} height={Math.max(300, height * .9)}
-      // dataSource={rows}
-      containerStyle={{ margin: "2em" }}
-      rowHoverColor={"rgba(248,248,248,1)"}
-      // isCellReadonly={() => true}
-      // cellCursor="pointer"
-      getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
+      api={api} debug={debug} dbgDiv={dbgDiv}
+
+      containerStyle={{ margin: "1em" }}
+      fullwidth
+      // width={divSize.width}
+      height={Math.max(300, height * .9)}      
+
+      frozenRowsCount={0} frozenColsCount={0}
       columnClickBehavior={columnClickBehavior}
+      columnInitialSort={WSCanvasColumnToSortInfo(columns)}      
+      colWidth={(col) => columns[col].width || 100} colWidthExpand={true}
+      showFilter={true}
+      showPartialColumns={true} showPartialRows={true}
+      showColNumber={true} showRowNumber={true}      
+
+      rowsCount={rows.length} colsCount={columns.length} 
       dataSource={rows}
       getCellData={(cell) => {
         const fieldname = columns[cell.col].field;
-        const val = (rows[cell.row] as any)[columns[cell.col].field];
-        switch (fieldname) {
-          case "col1": return "( " + val + " )";
-          case "cboxcol": {
-            const q = mapEnum(MyEnum).find((x) => x.value === val);
-            if (q) return q.name;
+        const row = rows[cell.row];
+        if (row) {
+          const val = (row as any)[columns[cell.col].field];
+          switch (fieldname) {
+            case "col1": return "( " + val + " )";
+            case "cboxcol": {
+              const q = mapEnum(MyEnum).find((x) => x.value === val);
+              if (q) return q.name;
+            }
           }
-        }
 
-        return val;
+          return val;
+        }
       }}
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
@@ -197,32 +210,16 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
         }
         return undefined;
       }}
-      columnInitialSort={WSCanvasColumnToSortInfo(columns)}
-      // getCellBackgroundColor={(cell, props) => {
-      //   // if (cell.row === 2) return "navy";
-      //   if (cell.col === 1) return "lightyellow";
-      // }}
-      // getCellFont={(cell, props) => {
-      //   if (cell.col === 1) return "bold " + props.font;
-      // }}
-      // getCellTextColor={(cell, props) => {
-      //   if (cell.row === 2) return "white";
-      // }}
-      getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }}
-      // getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
+      getColumnLessThanOp={(col) => columns[col].lessThan}            
+
+      getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}      
+      getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }}      
+      getCellType={(cell, data) => columns[cell.col].type}      
       getColumnHeader={(col) => columns[col].header}
+
+      rowHoverColor={"rgba(248,248,248,1)"}                              
       rowHeight={() => 35} textMargin={5}
-      getColumnLessThanOp={(col) => columns[col].lessThan}
-      getCellType={(cell, data) => columns[cell.col].type}
-      // rowHoverColor={"rgba(240,240,240,1)"}
-      colWidth={(col) => columns[col].width || 100}
-      selectionMode={WSCanvasSelectMode.Cell}
-      showFilter={true}
-      showPartialColumns={true} showPartialRows={true}
-      showColNumber={true} showRowNumber={true}
-      debug={debug} dbgDiv={dbgDiv}
-      colWidthExpand={true}
-      frozenRowsCount={0} frozenColsCount={0}
-      rowsCount={rows.length} colsCount={columns.length} />
-  </>
+      selectionMode={WSCanvasSelectMode.Cell}                              
+      />
+  </div>
 }

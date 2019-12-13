@@ -20,6 +20,55 @@ export default function useDebounce(value: any, ms: number) {
     return debouncedValue;
 }
 
+export function getComputedStyleMarginPadding(elt: Element) {
+    const csty = getComputedStyle(elt);
+
+    const marginLeft = csty.marginLeft ? parseFloat(csty.marginLeft) : 0;
+    const marginRight = csty.marginRight ? parseFloat(csty.marginRight) : 0;
+    const marginTop = csty.marginTop ? parseFloat(csty.marginTop) : 0;
+    const marginBottom = csty.marginBottom ? parseFloat(csty.marginBottom) : 0;
+
+    const paddingLeft = csty.paddingLeft ? parseFloat(csty.paddingLeft) : 0;
+    const paddingRight = csty.paddingRight ? parseFloat(csty.paddingRight) : 0;
+    const paddingTop = csty.paddingTop ? parseFloat(csty.paddingTop) : 0;
+    const paddingBottom = csty.paddingBottom ? parseFloat(csty.paddingBottom) : 0;
+
+    const margin_padding_W = (marginLeft + marginRight + paddingLeft + paddingRight);
+    const margin_padding_H = (marginTop + marginBottom + paddingTop + paddingBottom);
+
+    return [margin_padding_W, margin_padding_H];
+}
+
+/** hook to retrieve sum or margin(left+right) and padding(left+right) of div element; optionally consider parent's */
+export function useDivMarginPadding(div: React.RefObject<HTMLDivElement>, considerParent: boolean = false) {
+    const [val, setVal] = useState<number[]>([0, 0]);
+    useEffect(() => {
+        if (div.current) {
+            let res = [0, 0];
+
+            const q = getComputedStyleMarginPadding(div.current);
+            res[0] += q[0];
+            res[1] += q[1];
+
+            if (considerParent) {
+                let p = div.current.parentElement;
+                while (p) {
+                    const qp = getComputedStyleMarginPadding(p);                    
+
+                    res[0] += qp[0];
+                    res[1] += qp[1];
+
+                    p = p.parentElement;
+                }
+            }
+
+            setVal(res);
+        }
+    }, [div]);
+
+    return val;
+}
+
 export interface GraphicsSize {
     width: number;
     height: number;
@@ -65,18 +114,18 @@ export function getElementSize(div: HTMLElement) {
     } as GraphicsSize;
 }
 
-export function useElementSize(elRef: React.RefObject<HTMLElement>) {    
+export function useElementSize(elRef: React.RefObject<HTMLElement>) {
     const [elSize, setElSize] = useState(elRef.current ? getElementSize(elRef.current) : { width: 0, height: 0 } as GraphicsSize);
 
     const handleResize = () => {
         if (elRef.current) {
-            const size = getElementSize(elRef.current);            
+            const size = getElementSize(elRef.current);
             setElSize(size);
         }
     };
 
-    useEffect(() => {    
-        if (elRef.current) {            
+    useEffect(() => {
+        if (elRef.current) {
             handleResize();
             window.addEventListener("resize", handleResize);
             return () => {

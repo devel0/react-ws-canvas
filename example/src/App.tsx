@@ -79,7 +79,7 @@ const App: React.FC = () => {
         Sample1(exampleInit, debug, dbgDiv, winSize.width, winSize.height * .8, api, columnClickBehavior) :
         Sample3(exampleInit, debug, dbgDiv, winSize.width, winSize.height * .8, api, columnClickBehavior)}
     </div>
-
+{/* 
     <div style={{ background: "lightgreen", margin: "1em" }}>
       <h3>TEST DIV AFTER CONTROL</h3>
       <p>sample text 1</p>
@@ -91,7 +91,7 @@ const App: React.FC = () => {
       <p>sample text 1</p>
       <p>sample text 2</p>
       <p>sample text 3</p>
-    </div>
+    </div> */}
   </div>
 }
 

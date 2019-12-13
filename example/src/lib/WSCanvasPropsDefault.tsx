@@ -12,7 +12,8 @@ export const WSCanvasPropsDefault = () => {
     return {
         api: new WSCanvasApi(),
 
-        width: window.innerWidth,
+        fullwidth: false,
+        width: window.innerWidth,        
         height: window.innerHeight,
         dataSource: null,
         rowsCount: 1000,
