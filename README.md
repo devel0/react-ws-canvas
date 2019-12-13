@@ -60,7 +60,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - [column header][15] can be customized
 
-- canvas size can be specified through width, height ( [fullwidth][https://github.com/devel0/react-ws-canvas/blob/cdd013cda94264770b3e62840148e716ac4e76c5/example/src/Sample3.tsx#L138] option available )
+- canvas size can be specified through width, height ( [fullwidth][26] option available )
 
 - column width can be changed intractively using mouse
 
@@ -115,6 +115,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [23]: https://github.com/devel0/react-ws-canvas/blob/e756188d46ffe9fc96bc68d66de65aa6af42b146/example/src/Sample3.tsx#L120
 [24]: https://github.com/devel0/react-ws-canvas/blob/0507546976788845a4617fe77312503481f95209/example/src/Sample3.tsx#L158-L198
 [25]: https://github.com/devel0/react-ws-canvas/blob/4029b9f278824215ca2ffdf65cabe6e2ccf32c4c/example/src/lib/WSCanvasProps.tsx#L89
+[26]: https://github.com/devel0/react-ws-canvas/blob/cdd013cda94264770b3e62840148e716ac4e76c5/example/src/Sample3.tsx#L138
 
 ## quickstart
 
