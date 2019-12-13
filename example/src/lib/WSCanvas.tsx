@@ -825,8 +825,27 @@ export function WSCanvas(props: WSCanvasProps) {
                 ctx.fillText(line, posX, posY);
             }
         }
-        else
-            ctx.fillText(str, posX, posY);
+        else {
+            const cellType = getCellType ? _cellType : "text";
+            if (cellType === "boolean") {
+                const bx = x + cWidth / 2;
+                const by = y + RH / 2;
+                const bw = 10;
+                const bh = 10;
+                ctx.fillStyle = "black";
+                if (cellData as boolean)
+                    ctx.fillRect(bx - bw / 2, by - bh / 2, bw, bh);
+                else {
+                    ctx.beginPath();
+                    ctx.strokeStyle = "black";
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(bx - bw / 2, by - bh / 2, bw, bh);
+                    ctx.stroke();
+                }
+            }
+            else
+                ctx.fillText(str, posX, posY);
+        }
 
         if (showFocusedCellOutline && state.focusedCell.row === cell.row && state.focusedCell.col === cell.col) {
             ctx.beginPath();
@@ -1561,7 +1580,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 if (state.focusedFilterColIdx === -1 && state.customEditCell !== null) {
                     const viewCell = realCellToView(vm, state.customEditCell);
                     const ccoord = viewCellToCanvasCoord(state, viewCell);
-                    if (ccoord) {                        
+                    if (ccoord) {
                         let defaultEdit = true;
 
                         const cellWidth = overridenColWidth(state, state.customEditCell.col) - textMargin - 2;
@@ -1596,7 +1615,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                 <input
                                     autoFocus
                                     key="edit"
-                                    style={ceditStyle}                                    
+                                    style={ceditStyle}
                                     value={state.customEditValue || ""}
                                     onKeyDown={(e) => {
                                         switch (e.key) {
