@@ -846,7 +846,7 @@ export function WSCanvas(props: WSCanvasProps) {
     /** side effect on state ; NO side effect on vm */
     const confirmCustomEdit = (state: WSCanvasState, vm: ViewMap | null) => {
         if (state.customEditCell !== null) {
-            //singleSetCellData(state.customEditCell, /* viewCellToReal(vm, state.customEditCell),*/ state.customEditValue);
+            singleSetCellData(state.customEditCell, /* viewCellToReal(vm, state.customEditCell),*/ state.customEditValue);
             closeCustomEdit(state);
         }
     }
@@ -1604,7 +1604,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                                 {
                                                     const state = stateNfo.dup();
                                                     confirmCustomEdit(state, vm);
-                                                    state.focusedCell = state.focusedCell.nextRow();
+                                                    state.focusedCell = viewCellToReal(vm, realCellToView(vm, state.focusedCell).nextRow());
                                                     rectifyScrollOffset(state, vm);
                                                     setStateNfo(state);
                                                     if (api.onStateChanged) api.onStateChanged(state);
