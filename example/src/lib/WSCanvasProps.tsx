@@ -74,7 +74,8 @@ export interface WSCanvasProps {
     /** set cell dataset state */
     commitCellDataset: (dataset: any) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor */
-    getCellCustomEdit?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => JSX.Element | undefined,
+    getCellCustomEdit?: (coord: WSCanvasCellCoord, props: WSCanvasProps, 
+        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element | undefined,
     /** header of given col */
     getColumnHeader?: (col: number) => string;
     /** column sort method */

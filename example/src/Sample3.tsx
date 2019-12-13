@@ -155,16 +155,17 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
       setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}
-      getCellCustomEdit={(cell, props) => {
+      getCellCustomEdit={(cell, props, containerStyle, cellWidth, cellHeight) => {
         const fieldname = columns[cell.col].field;
 
         if (fieldname === "cboxcol") {
 
+          if (containerStyle) containerStyle.background = "lightyellow";
           const origVal = rows[cell.row].cboxcol;
 
           return <div>
             <select
-              autoFocus              
+              autoFocus
               defaultValue={rows[cell.row].cboxcol}
               onKeyDown={(e) => {
                 switch (e.key) {

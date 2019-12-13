@@ -1564,6 +1564,9 @@ export function WSCanvas(props: WSCanvasProps) {
                     if (ccoord) {                        
                         let defaultEdit = true;
 
+                        const cellWidth = overridenColWidth(state, state.customEditCell.col) - textMargin - 2;
+                        const cellHeight = getRowHeight(state.customEditCell.row) - textMargin;
+
                         const ceditStyle = {
                             font: font,
                             //background: "yellow",
@@ -1572,12 +1575,12 @@ export function WSCanvas(props: WSCanvasProps) {
                             overflow: "hidden",
                             left: canvasRef.current.offsetLeft + ccoord.x + textMargin + 1,
                             top: canvasRef.current.offsetTop + ccoord.y + textMargin,
-                            // width: overridenColWidth(state, state.customEditCell.col) - textMargin - 2,
-                            // height: getRowHeight(state.customEditCell.row) - textMargin
+                            width: defaultEdit ? cellWidth : undefined,
+                            height: defaultEdit ? cellHeight : undefined
                         } as CSSProperties;
 
                         if (getCellCustomEdit) {
-                            const q = getCellCustomEdit(state.customEditCell, props);
+                            const q = getCellCustomEdit(state.customEditCell, props, ceditStyle, cellWidth, cellHeight);
                             if (q) {
                                 defaultEdit = false;
                                 setChildren([<div
@@ -1593,7 +1596,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                 <input
                                     autoFocus
                                     key="edit"
-                                    style={ceditStyle}
+                                    style={ceditStyle}                                    
                                     value={state.customEditValue || ""}
                                     onKeyDown={(e) => {
                                         switch (e.key) {
