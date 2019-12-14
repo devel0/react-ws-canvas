@@ -1,6 +1,6 @@
-import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize } from "./lib";
 
-import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { SampleProps } from "./Frame";
 
 enum MyEnum {
@@ -22,8 +22,7 @@ interface MyData {
 
 export function Sample3(props: SampleProps) {  
   const {
-    api, columnClickBehavior, dbgDiv, debug, height, width
-  } = props;
+    api, columnClickBehavior, dbgDiv, debug, height  } = props;
 
   const [rows, setRows] = useState<MyData[]>([]);
 
@@ -121,7 +120,6 @@ export function Sample3(props: SampleProps) {
   };
 
   const divRef = useRef<HTMLDivElement>(null);
-  const divSize = useElementSize(divRef);
 
   return <div ref={divRef} style={{ margin: "1em", background: "yellow" }}>
     <button onClick={() => {
@@ -172,7 +170,7 @@ export function Sample3(props: SampleProps) {
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
       setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}
-      getCellCustomEdit={(cell, props, containerStyle, cellWidth, cellHeight) => {
+      getCellCustomEdit={(cell, props, containerStyle) => {
         const fieldname = columns[cell.col].field;
 
         if (fieldname === "cboxcol") {
@@ -216,9 +214,9 @@ export function Sample3(props: SampleProps) {
       }}
       getColumnLessThanOp={(col) => columns[col].lessThan}
 
-      getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
-      getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }}
-      getCellType={(cell, data) => columns[cell.col].type}
+      getCellTextAlign={(cell) => (cell.col === 0) ? "center" : undefined}
+      getCellTextWrap={(cell) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }}
+      getCellType={(cell) => columns[cell.col].type}
       getColumnHeader={(col) => columns[col].header}
 
       rowHoverColor={"rgba(248,248,248,1)"}

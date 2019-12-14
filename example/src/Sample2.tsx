@@ -1,6 +1,7 @@
-import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasColumnToSortInfo } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnToSortInfo } from "./lib";
 
 import React, { useState, useEffect } from "react";
+import { SampleProps } from "./Frame";
 
 interface MyData {
   col1: string;
@@ -11,8 +12,10 @@ interface MyData {
   col6: Date;
 }
 
-export function Sample2(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
-  width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
+export function Sample2(props: SampleProps) {  
+  const {
+    api, columnClickBehavior, dbgDiv, debug, height, width
+  } = props;
   const [rows, setRows] = useState<MyData[]>([]);
 
   const ROWS = 5000;
@@ -100,21 +103,21 @@ export function Sample2(debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
     commitCellDataset={(q) => setRows(q)}
     setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}
     columnInitialSort={WSCanvasColumnToSortInfo(columns)}
-    getCellBackgroundColor={(cell, props) => {
+    getCellBackgroundColor={(cell) => {
       if (cell.row === 2) return "navy";
       if (cell.col === 1) return "lightyellow";
     }}
     getCellFont={(cell, props) => {
       if (cell.col === 1) return "bold " + props.font;
     }}
-    getCellTextColor={(cell, props) => {
+    getCellTextColor={(cell) => {
       if (cell.row === 2) return "white";
     }}
-    getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
+    getCellTextAlign={(cell) => (cell.col === 0) ? "center" : undefined}
     getColumnHeader={(col) => columns[col].header}
     getColumnLessThanOp={(col) => columns[col].lessThan}
-    getCellType={(cell, data) => columns[cell.col].type}
-    colWidth={(col) => 120}
+    getCellType={(cell) => columns[cell.col].type}
+    colWidth={() => 120}
     rowHeight={() => 30}
     showFilter={true}
     showColNumber={true} showRowNumber={true}
