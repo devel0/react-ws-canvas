@@ -1,9 +1,12 @@
-import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas } from "./lib";
-
 import React, { useState, useEffect } from "react";
+import { WSCanvas } from "./lib";
+import { SampleProps } from "./Frame";
 
-export function Sample1(exampleInit: number, debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
-  width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
+export function Sample1(props: SampleProps) {  
+  const {
+    api, columnClickBehavior, dbgDiv, debug, height, width
+  } = props;
+
   const [rows, setRows] = useState<any[][]>([]);
 
   const ROWS = 50000;
@@ -43,8 +46,7 @@ export function Sample1(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
     }}
     rowsCount={rows.length} colsCount={COLS}
     showRowNumber={true} showColNumber={true} showFilter={true}
-    frozenRowsCount={1} frozenColsCount={1}
-    // getCellCustomEdit={(coord, props) => <button key="btb">{props.getCellData(coord)}</button>}
+    frozenRowsCount={1} frozenColsCount={1}    
     debug={debug} dbgDiv={dbgDiv}
   />
 }
