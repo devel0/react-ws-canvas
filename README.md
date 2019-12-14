@@ -11,6 +11,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 - [features](#features)
 - [quickstart](#quickstart)
 - [tips](#tips)
+- [examples list](#examples-list)
 - [how to contribute ( quickstart )](#how-to-contribute--quickstart-)
 - [local deploy](#local-deploy)
 - [how this project was built](#how-this-project-was-built)
@@ -196,6 +197,15 @@ yarn start
 [1003]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128
 [1004]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L8
 [1005]: https://github.com/devel0/react-ws-canvas/blob/71250c44e7dae6dab2b6979ec8747030b7c59148/example/src/Sample3.tsx#L129-L134
+
+## examples list
+
+| example | description |
+|---|---|
+| [quickstart](example/src/App.quickstart.tsx) | 500000 x 20 grid with minimal props |
+| [Sample1](example/src/Sample1.tsx) | 50000 x 200 grid with frozen row/col, filter, custom column width |
+| [Sample2](example/src/Sample2.tsx) | 5000 x 6 grid db-record-like column mapping, initial sort, custom sort, api onMouseDown |
+| [Sample3](example/src/Sample3.tsx) | 5000 x 7 grid db-record-like, data interact del/change row, custom cell editor, rowHover |
 
 ## how to contribute ( quickstart )
 
