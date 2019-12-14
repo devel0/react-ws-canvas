@@ -6,7 +6,7 @@ import { Sample3 } from './Sample3';
 import Frame from './Frame';
 
 ReactDOM.render(
-    <Frame sample={(props) => Sample3(props)} />,
+    <Frame/>,
     document.getElementById('root'));
 
 serviceWorker.unregister();

@@ -1,5 +1,9 @@
-import React, { useRef, useState } from 'react';
-import { WSCanvasApi, WSCanvasCellCoord, useWindowSize, useElementSize, WSCanvasColumnClickBehavior } from './lib';
+import React, { useRef, useState, useEffect } from 'react';
+import { WSCanvasApi, WSCanvasCellCoord, useWindowSize, WSCanvasColumnClickBehavior } from './lib';
+import AppQuickStart from './App.quickstart';
+import { Sample1 } from './Sample1';
+import { Sample2 } from './Sample2';
+import { Sample3 } from './Sample3';
 
 export interface SampleProps {
   debug: boolean,
@@ -10,40 +14,59 @@ export interface SampleProps {
   columnClickBehavior: WSCanvasColumnClickBehavior
 }
 
-interface FrameProps {
-  sample: (props: SampleProps) => JSX.Element;
-}
+const DEFAULT_EXAMPLE = 3;
 
-interface FrameParams {
-  id?: string;
-}
-
-export default function Frame(props: FrameProps) {
+export default function Frame() {
   const winSize = useWindowSize();
   const userDivRef = useRef<HTMLDivElement>(null);
-  const userSize = useElementSize(userDivRef);
   const [debug, setDebug] = useState(false);
   const api = new WSCanvasApi();
   const [columnClickBehavior, setColumnClickBehavior] = useState(WSCanvasColumnClickBehavior.ToggleSort);
   const dbgDiv = useRef<HTMLDivElement>(null);
+  const [example, setExample] = useState(DEFAULT_EXAMPLE);
 
   api.onMouseDown = (e, c) => {
-    //  console.log("CELL CLICKED " + c);
+    console.log("CELL CLICKED " + c);
   };
 
   api.onContextMenu = (e, c) => {
     if (c) {
-      console.log("context menu on cell:" + c + " cursel:" + api.getSelection().toString());
+      alert("context menu on cell:" + c + " cursel:" + api.getSelection().toString());
       e.preventDefault();
     }
-  }
+  }  
 
-  const [example, setExample] = useState(1);
-  const [exampleInit, setExampleInit] = useState(0);
+  const [ctl, setCtl] = useState<JSX.Element | null>(null);  
+
+  const props = {
+    api: api,
+    columnClickBehavior: columnClickBehavior,
+    dbgDiv: dbgDiv,
+    debug: debug,
+    height: winSize.height,
+    width: winSize.width
+  } as SampleProps;
+
+  useEffect(() => {
+    switch (example) {
+      case 0: setCtl(<AppQuickStart />); break;
+      case 1: setCtl(<Sample1 {...props} />); break;
+      case 2: setCtl(<Sample2  {...props} />); break;
+      case 3: setCtl(<Sample3 {...props} />); break;
+      default: setCtl(<div>invalid example selection</div>); break;
+    }
+  }, [example]);
 
   return <div>
 
     <div ref={userDivRef} style={{ margin: 10 }}>
+      <b>EXAMPLES</b>
+      <button onClick={() => { setExample(0); }}>quickstart</button>
+      <button onClick={() => { setExample(1); }}>EX1</button>
+      <button onClick={() => { setExample(2); }}>EX2</button>
+      <button onClick={() => { setExample(3); }}>EX3</button>
+      <br />
+
       <b>API </b>
 
       <button onClick={() => {
@@ -84,14 +107,7 @@ export default function Frame(props: FrameProps) {
     </div>
 
     <div>
-      {props.sample({
-        api: api,
-        columnClickBehavior: columnClickBehavior,
-        dbgDiv: dbgDiv,
-        debug: debug,
-        height: winSize.height,
-        width: winSize.width
-      })}
+      {ctl}
     </div>
 
     <div style={{ background: "lightgreen", margin: "1em" }}>
