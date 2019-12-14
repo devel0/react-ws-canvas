@@ -1163,7 +1163,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (!state.initialized) return;
 
         if (debug) console.log("PAINT (rows:" + rowsCount + ")");
-        
+
         let stateChanged = false;
         ++state.paintcnt;
 
@@ -1681,6 +1681,18 @@ export function WSCanvas(props: WSCanvasProps) {
         ]);
     }
 
+    const mouseCoordToCanvasCoord = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+        const x = e.clientX;
+        const y = e.clientY;
+
+        if (canvasRef && canvasRef.current) {
+            const brect = canvasRef.current.getBoundingClientRect();
+            return [x - brect.left, y - brect.top];
+        }
+        else
+            return [x, y];
+    }
+
     const handleKeyDown = async (e: React.KeyboardEvent) => {
         if (api.onPreviewKeyDown) api.onPreviewKeyDown(e);
 
@@ -1986,8 +1998,9 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         let cellCoord: WSCanvasCellCoord | null = null;
-        const x = e.pageX - e.currentTarget.offsetLeft;
-        const y = e.pageY - e.currentTarget.offsetTop;
+        const ccr = mouseCoordToCanvasCoord(e);
+        const x = ccr[0];
+        const y = ccr[1];
         const ccoord = new WSCanvasCoord(x, y);
 
         if (api.onPreviewMouseDown) api.onPreviewMouseDown(e, cellCoord);
@@ -2139,8 +2152,9 @@ export function WSCanvas(props: WSCanvasProps) {
         if (api.onPreviewMouseMove) api.onPreviewMouseMove(e);
 
         if (!e.defaultPrevented) {
-            const x = e.pageX - e.currentTarget.offsetLeft;
-            const y = e.pageY - e.currentTarget.offsetTop;
+            const ccr = mouseCoordToCanvasCoord(e);
+            const x = ccr[0];
+            const y = ccr[1];
             const ccoord = new WSCanvasCoord(x, y);
             const RESIZE_HANDLE_TOL = 10;
             let stateUpdated = false;
@@ -2275,8 +2289,9 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-        const x = e.pageX - e.currentTarget.offsetLeft;
-        const y = e.pageY - e.currentTarget.offsetTop;
+        const ccr = mouseCoordToCanvasCoord(e);
+        const x = ccr[0];
+        const y = ccr[1];
         const ccoord = new WSCanvasCoord(x, y);
         const cell = canvasToCellCoord(stateNfo, viewMap, ccoord);
 
@@ -2499,8 +2514,9 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const handleContextMenu = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-        const x = e.pageX - e.currentTarget.offsetLeft;
-        const y = e.pageY - e.currentTarget.offsetTop;
+        const ccr = mouseCoordToCanvasCoord(e);
+        const x = ccr[0];
+        const y = ccr[1];
         const cell = canvasToCellCoord(stateNfo, viewMap, new WSCanvasCoord(x, y));
 
         if (api.onContextMenu) api.onContextMenu(e, cell);
@@ -2614,7 +2630,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }, [debouncedFilter]);
     //#endregion     
 
-    useEffect(() => {        
+    useEffect(() => {
         if (debug) console.log("*** resize");
         if (debug) console.log("paintfrom:6");
         paint(stateNfo, viewMap);
