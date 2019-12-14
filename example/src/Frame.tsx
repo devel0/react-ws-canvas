@@ -1,5 +1,5 @@
 import React, { useRef, useState, FunctionComponent } from 'react';
-import {useLocation} from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
 import { WSCanvasApi, WSCanvasCellCoord, useWindowSize, useElementSize, WSCanvasColumnClickBehavior } from './lib';
 import { Sample1 } from './Sample1';
@@ -19,6 +19,10 @@ interface FrameProps {
   sample: (props: SampleProps) => JSX.Element;
 }
 
+interface FrameParams {
+  id?: string;
+}
+
 export default function Frame(props: FrameProps) {
   const winSize = useWindowSize();
   const userDivRef = useRef<HTMLDivElement>(null);
@@ -28,6 +32,7 @@ export default function Frame(props: FrameProps) {
   const [columnClickBehavior, setColumnClickBehavior] = useState(WSCanvasColumnClickBehavior.ToggleSort);
   const dbgDiv = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  //const params = useParams<FrameParams>();
 
   api.onMouseDown = (e, c) => {
     //  console.log("CELL CLICKED " + c);
@@ -80,7 +85,8 @@ export default function Frame(props: FrameProps) {
         setDebug(!debug);
       }}>toggleDebug</button>
 
-      location:{location.pathname}
+      location:{location.pathname} - 
+      id:{JSON.stringify(location)}
     </div>
 
     <div ref={dbgDiv}>
