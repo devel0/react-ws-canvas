@@ -21,7 +21,7 @@ export function Sample1(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
     }
 
     setRows(_rows);
-  }, [exampleInit]);
+  }, []);
 
   return <WSCanvas
     api={api}

@@ -1,6 +1,7 @@
 import { WSCanvasApi, WSCanvasColumnClickBehavior, WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasScrollbarMode, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize } from "./lib";
 
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { SampleProps } from "./Frame";
 
 enum MyEnum {
   first,
@@ -19,8 +20,11 @@ interface MyData {
   cboxcol: MyEnum;
 }
 
-export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefObject<HTMLDivElement>,
-  width: number, height: number, api: WSCanvasApi, columnClickBehavior: WSCanvasColumnClickBehavior) {
+export function Sample3(props: SampleProps) {  
+  const {
+    api, columnClickBehavior, dbgDiv, debug, height, width
+  } = props;
+
   const [rows, setRows] = useState<MyData[]>([]);
 
   const ROWS = 5000;
@@ -105,7 +109,7 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
     setRows(_rows);
     //}, 100);
 
-  }, [exampleInit]);
+  }, []);
 
   api.onMouseDown = (e, cell) => {
     if (cell) {
@@ -129,7 +133,7 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       const q = rows.slice();
       q[0].col7 = "NEW DESC";
       setRows(q);
-    }}>CHANGE ROW</button>    
+    }}>CHANGE ROW</button>
 
     <WSCanvas
       api={api} debug={debug} dbgDiv={dbgDiv}
@@ -137,17 +141,17 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
       containerStyle={{ margin: "1em" }}
       fullwidth
       // width={divSize.width}
-      height={Math.max(300, height * .9)}      
+      height={Math.max(300, height * .9)}
 
       frozenRowsCount={0} frozenColsCount={0}
       columnClickBehavior={columnClickBehavior}
-      columnInitialSort={WSCanvasColumnToSortInfo(columns)}      
+      columnInitialSort={WSCanvasColumnToSortInfo(columns)}
       colWidth={(col) => columns[col].width || 100} colWidthExpand={true}
       showFilter={true}
       showPartialColumns={true} showPartialRows={true}
-      showColNumber={true} showRowNumber={true}      
+      showColNumber={true} showRowNumber={true}
 
-      rowsCount={rows.length} colsCount={columns.length} 
+      rowsCount={rows.length} colsCount={columns.length}
       dataSource={rows}
       getCellData={(cell) => {
         const fieldname = columns[cell.col].field;
@@ -210,16 +214,16 @@ export function Sample3(exampleInit: number, debug: boolean, dbgDiv: React.RefOb
         }
         return undefined;
       }}
-      getColumnLessThanOp={(col) => columns[col].lessThan}            
+      getColumnLessThanOp={(col) => columns[col].lessThan}
 
-      getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}      
-      getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }}      
-      getCellType={(cell, data) => columns[cell.col].type}      
+      getCellTextAlign={(cell, val) => (cell.col === 0) ? "center" : undefined}
+      getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }}
+      getCellType={(cell, data) => columns[cell.col].type}
       getColumnHeader={(col) => columns[col].header}
 
-      rowHoverColor={"rgba(248,248,248,1)"}                              
+      rowHoverColor={"rgba(248,248,248,1)"}
       rowHeight={() => 35} textMargin={5}
-      selectionMode={WSCanvasSelectMode.Cell}                              
-      />
+      selectionMode={WSCanvasSelectMode.Cell}
+    />
   </div>
 }
