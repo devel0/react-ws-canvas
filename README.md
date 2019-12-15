@@ -4,7 +4,7 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.7.3](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/623443dc47b0c53867d402b767dc0be0529bd22e/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.7.4](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example) )
 
 ---
 
@@ -104,7 +104,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [10]: https://github.com/devel0/react-ws-canvas/blob/7c4270e17742f55e229e1a66e9d16410a9c97b26/example/src/lib/WSCanvasApi.tsx#L9
 [11]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L118-L156
 [12]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L35-L36
-[13]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L44-L45
+[13]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvasProps.tsx#L87
 [14]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L50-L51
 [15]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/Sample2.tsx#L87
 [16]: https://github.com/devel0/react-ws-canvas/blob/5a7b126b35a08350f1fb3409138c2dfee49360f4/example/src/lib/WSCanvasProps.tsx#L23-L24
@@ -115,7 +115,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [21]: https://github.com/devel0/react-ws-canvas/blob/10556d1e377e8258077f4a87cffb21f722c7e4e6/example/src/lib/WSCanvasProps.tsx#L103-L104
 [22]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/lib/WSCanvasPropsDefault.tsx#L13
 [23]: https://github.com/devel0/react-ws-canvas/blob/e756188d46ffe9fc96bc68d66de65aa6af42b146/example/src/Sample3.tsx#L120
-[24]: https://github.com/devel0/react-ws-canvas/blob/0507546976788845a4617fe77312503481f95209/example/src/Sample3.tsx#L158-L198
+[24]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/Sample3.tsx#L240-L279
 [25]: https://github.com/devel0/react-ws-canvas/blob/4029b9f278824215ca2ffdf65cabe6e2ccf32c4c/example/src/lib/WSCanvasProps.tsx#L89
 [26]: https://github.com/devel0/react-ws-canvas/blob/cdd013cda94264770b3e62840148e716ac4e76c5/example/src/Sample3.tsx#L138
 [27]: https://github.com/devel0/react-ws-canvas/blob/7d9b1b9bb9d02854dcf2080a49ddbf60306d0eeb/example/src/lib/WSCanvasHandlers.tsx#L10
@@ -209,14 +209,14 @@ yarn start
 
 - to inhibit column sorting set `columnClickBehavior` to [None][1004]
 
-- transform data on-the-fly using `getCellData` ( [example][1005] )
+- transform render data on-the-fly using `renderTransform` ( [example][1005] ) useful for enum data value mapping to string when displayed )
 
 [1000]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L17
 [1001]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L21
 [1002]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128-L132
 [1003]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128
 [1004]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L8
-[1005]: https://github.com/devel0/react-ws-canvas/blob/71250c44e7dae6dab2b6979ec8747030b7c59148/example/src/Sample3.tsx#L129-L134
+[1005]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/Sample3.tsx#L221-L230
 
 ## examples list
 
