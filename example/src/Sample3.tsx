@@ -23,10 +23,15 @@ interface MyData {
 
 export function Sample3() {
   const [rows, setRows] = useState<MyData[]>([]);
+
   const [gridHandlers, setGridHandlers] = useState<WSCanvasHandlers | undefined>(undefined);
   const [gridApi, setGridApi] = useState<WSCanvasApi | null>(null);
+
   const [gridStateNfo, setGridStateNfo] = useState<WSCanvasStates>({} as WSCanvasStates);
-  const winSize = useWindowSize();
+  const [overCellCoord, setOverCellCoord] = useState<string>("");
+
+  const tooltipDivRef = useRef<HTMLDivElement>(null);
+  const [tooltipTest, setTooltipTest] = useState(false);
 
   const ROWS = 5000;
 
@@ -110,11 +115,6 @@ export function Sample3() {
     setRows(_rows);
   }, []);
 
-  //  let handlers: WSCanvasHandlers | undefined = undefined;
-
-  const [overCellCoord, setOverCellCoord] = useState<string>("");
-  const [tooltipTest, setTooltipTest] = useState(false);
-
   useEffect(() => {
     const handlers = {
       onMouseDown: (states, e, cell) => {
@@ -125,7 +125,7 @@ export function Sample3() {
           }
         }
       },
-      onMouseOverCell: (states, nfo) => {        
+      onMouseOverCell: (states, nfo) => {
         if (tooltipTest) {
           if (gridApi && tooltipDivRef && tooltipDivRef.current) {
             const div = tooltipDivRef.current;
@@ -148,20 +148,16 @@ export function Sample3() {
           }
         }
       },
-      onStateChanged: (states) => {        
+      onStateChanged: (states) => {
         setGridStateNfo(states);
-        
-        //console.log("->" + states.state.filteredSortedRowsCount);
       }
     } as WSCanvasHandlers;
     setGridHandlers(handlers);
   }, [rows, tooltipTest]);
 
-  const tooltipDivRef = useRef<HTMLDivElement>(null);
+  const winSize = useWindowSize();
 
-  const divRef = useRef<HTMLDivElement>(null);
-
-  return <div ref={divRef} style={{ margin: "1em", background: "yellow" }}>
+  return <div style={{ margin: "1em", background: "yellow" }}>
     <button onClick={() => {
       const q = rows.slice(1);
       setRows(q);
@@ -176,6 +172,10 @@ export function Sample3() {
     <button onClick={() => { setTooltipTest(!tooltipTest) }}>
       TOGGLE TOOLTIP TEST API
     </button>
+
+    <span style={{ marginLeft: "1em" }}>
+      gridStateNfo:{(gridStateNfo && gridStateNfo.state && gridStateNfo.state.focusedCell) ? gridStateNfo.state.focusedCell.toString() : ""}
+    </span>
 
     {tooltipTest ?
       <div ref={tooltipDivRef} style={{ position: "absolute", pointerEvents: "none" }}>
@@ -225,7 +225,7 @@ export function Sample3() {
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
       setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}
-      getCellCustomEdit={(cell, props, containerStyle) => {
+      getCellCustomEdit={(states, props, cell, containerStyle) => {
         const fieldname = columns[cell.col].field;
 
         if (fieldname === "cboxcol") {
@@ -241,14 +241,14 @@ export function Sample3() {
                 switch (e.key) {
                   case "Tab":
                   case "Enter":
-                    e.preventDefault();
-                    //api.closeCustomEdit(); // TODO:
+                    e.preventDefault();                    
+                    if (gridApi) gridApi.closeCustomEdit(states);                    
                     break;
                   case "Escape":
                     const q = props.prepareCellDataset();
                     props.setCellData(q, cell, origVal);
                     props.commitCellDataset(q);
-                    // api.closeCustomEdit(); // TODO:
+                    if (gridApi) gridApi.closeCustomEdit(states);
                     break;
                 }
               }}
@@ -259,7 +259,7 @@ export function Sample3() {
                 row.cboxcol = qval;
               }}>
               {mapEnum(MyEnum).map((x) =>
-                <option value={x.value}>{x.name}</option>
+                <option key={x.value} value={x.value}>{x.name}</option>
               )}
             </select>
           </div>

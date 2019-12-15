@@ -263,11 +263,11 @@ export function WSCanvas(props: WSCanvasProps) {
         return res;
     }
 
-    const mkstates = (_state: WSCanvasState, _vm: ViewMap | null, _orh: number[] | null) => {
+    const mkstates = (_state: WSCanvasState, _vm: ViewMap | null, _overridenRowHeight: number[] | null) => {
         return {
             state: _state,
             vm: _vm,
-            overrideRowHeight: _orh
+            overrideRowHeight: _overridenRowHeight
         } as WSCanvasStates;
     }
 
@@ -607,7 +607,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** (NO side effects on state) */
-    const viewCellToCanvasCoord = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, viewCell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {        
+    const viewCellToCanvasCoord = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, viewCell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {
         const colXW = viewColGetXWidth(state, vm, viewCell.col, allowPartialCol);
         if (viewCell.filterRow) return new WSCanvasCoord(colXW[0], colNumberRowHeight + filterTextMargin, colXW[1], getRowHeight(orh, -1));
         let y = 1;
@@ -880,8 +880,8 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** side effect on state */
-    const closeCustomEdit = (state: WSCanvasState) => {
-        if (stateNfo.customEditCell !== null) {
+    const closeCustomEdit = (state: WSCanvasState) => {        
+        if (state.customEditCell !== null) {
             state.customEditCell = null;
             state.editMode = WSCanvasEditMode.none;
         }
@@ -1062,7 +1062,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (scrollTo === true) rectifyScrollOffset(state, vm);
     }
 
-    const evalScrollChanged = (state: WSCanvasState) => {                
+    const evalScrollChanged = (state: WSCanvasState) => {
         if (handlers && handlers.onMouseOverCell) handlers.onMouseOverCell(mkstates(state, viewMap, overridenRowHeight), null);
     }
 
@@ -1617,7 +1617,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         } as CSSProperties;
 
                         if (getCellCustomEdit) {
-                            const q = getCellCustomEdit(state.customEditCell, props, ceditStyle, cellWidth, cellHeight);
+                            const q = getCellCustomEdit(mkstates(state, vm, overridenRowHeight), props, state.customEditCell, ceditStyle, cellWidth, cellHeight);
                             if (q) {
                                 defaultEdit = false;
                                 setChildren([<div
@@ -1945,7 +1945,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             // fist character [direct editing]
                             //
                             if (!keyHandled && (isCellReadonly === undefined || !isCellReadonly(cell)) &&
-                                (getCellCustomEdit === undefined || getCellCustomEdit(cell, props) === undefined)) {
+                                (getCellCustomEdit === undefined || getCellCustomEdit(mkstates(state, viewMap, overridenRowHeight), props, cell) === undefined)) {
                                 if (getCellType) {
                                     const prevData = getCellData(cell);
                                     const type = getCellType(cell, prevData);
@@ -2770,10 +2770,10 @@ export function WSCanvas(props: WSCanvasProps) {
                 const state = states.state;
                 const vm = states.vm;
                 const orh = states.overrideRowHeight;
-                const viewCell = realCellToView(vm, cell);                
+                const viewCell = realCellToView(vm, cell);
                 const leftTopCell = viewCellToCanvasCoord(state, vm, orh, state.viewScrollOffset, props.showPartialColumns);
                 const tmp = viewCellToCanvasCoord(state, vm, orh, viewCell, props.showPartialColumns);
-                if (leftTopCell && tmp) {                    
+                if (leftTopCell && tmp) {
                     return new WSCanvasCoord(
                         tmp.x - leftTopCell.x + (showRowNumber ? rowNumberColWidth : 0),
                         tmp.y - leftTopCell.y + (showColNumber ? colNumberRowHeightFull() : 0),

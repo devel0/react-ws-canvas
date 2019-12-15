@@ -75,7 +75,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - data getter/setter can follow a [worksheet][7] or a [db record type][8]
 
-- [api][10] available for control interactions ( [example][11] )
+- [api][10] and [handlers][27] available for control interactions ( [example][11] )
 
 - each individual cell [custom edit][13] ( F2 ) control can be customized ( [example][24] : through keyboard F2, arrows then enter )
 
@@ -100,7 +100,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [7]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/Sample2.tsx#L98-L100
 [8]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/Sample3.tsx#L128-L130
 [9]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L27-L28
-[10]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasApi.tsx#L7
+[10]: https://github.com/devel0/react-ws-canvas/blob/7c4270e17742f55e229e1a66e9d16410a9c97b26/example/src/lib/WSCanvasApi.tsx#L9
 [11]: https://github.com/devel0/react-ws-canvas/blob/38997638bb5f1f043164fdf73802490cfafa06c3/example/src/App.tsx#L15
 [12]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L35-L36
 [13]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L44-L45
@@ -117,6 +117,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [24]: https://github.com/devel0/react-ws-canvas/blob/0507546976788845a4617fe77312503481f95209/example/src/Sample3.tsx#L158-L198
 [25]: https://github.com/devel0/react-ws-canvas/blob/4029b9f278824215ca2ffdf65cabe6e2ccf32c4c/example/src/lib/WSCanvasProps.tsx#L89
 [26]: https://github.com/devel0/react-ws-canvas/blob/cdd013cda94264770b3e62840148e716ac4e76c5/example/src/Sample3.tsx#L138
+[27]: https://github.com/devel0/react-ws-canvas/blob/7d9b1b9bb9d02854dcf2080a49ddbf60306d0eeb/example/src/lib/WSCanvasHandlers.tsx#L10
 
 ## quickstart
 
