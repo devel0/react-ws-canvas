@@ -11,7 +11,7 @@ export interface WSCanvasHandlers {
     // onApi?: (states: WSCanvasStates, api: WSCanvasApi) => void;
     onStateChanged?: (states: WSCanvasStates) => void;
 
-    onMouseOverCell?: (states: WSCanvasStates, nfo: WSCanvasXYCellCoord) => void;
+    onMouseOverCell?: (states: WSCanvasStates, nfo: WSCanvasXYCellCoord | null) => void;
 
     onPreviewKeyDown?: (states: WSCanvasStates, e: React.KeyboardEvent) => void;
     onKeyDown?: (states: WSCanvasStates, e: React.KeyboardEvent) => void;

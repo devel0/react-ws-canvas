@@ -108,20 +108,12 @@ export function Sample3() {
     }
 
     setRows(_rows);
-
-    //newApi.onMouseOverCell = (xycell) => {
-    /*
-    console.log("ON");
-    //if (prevHdlr) prevHdlr(xycell); // TODO:
-    setOverCellCoord(xycell);
-    */
-    //}
-    //setApi(newApi);  
   }, []);
 
   //  let handlers: WSCanvasHandlers | undefined = undefined;
 
   const [overCellCoord, setOverCellCoord] = useState<string>("");
+  const [tooltipTest, setTooltipTest] = useState(false);
 
   useEffect(() => {
     const handlers = {
@@ -133,35 +125,37 @@ export function Sample3() {
           }
         }
       },
-      onMouseOverCell: (states, nfo) => {
-        if (gridApi && tooltipDivRef && tooltipDivRef.current) {
-          const div = tooltipDivRef.current;
-          if (nfo.cell.row >= 0 && nfo.cell.col >= 0) {
-            const canvasCoord = gridApi.canvasCoord(states);
-            const cellCanvasCoord = gridApi.cellToCanvasCoord(states, nfo.cell);
-            if (canvasCoord && cellCanvasCoord) {
-              setOverCellCoord(nfo.cell.toString() + " canvas:" + cellCanvasCoord.toString());
-              div.style["left"] = (canvasCoord.x + cellCanvasCoord.x + cellCanvasCoord.width) + "px";
-              div.style["top"] = (canvasCoord.y + cellCanvasCoord.y + cellCanvasCoord.height / 2) + "px";
+      onMouseOverCell: (states, nfo) => {        
+        if (tooltipTest) {
+          if (gridApi && tooltipDivRef && tooltipDivRef.current) {
+            const div = tooltipDivRef.current;
+            if (nfo && nfo.cell.row >= 0 && nfo.cell.col >= 0) {
+              const canvasCoord = gridApi.canvasCoord(states);
+              const cellCanvasCoord = gridApi.cellToCanvasCoord(states, nfo.cell);
+              if (canvasCoord && cellCanvasCoord) {
+                setOverCellCoord(nfo.cell.toString() + " canvas:" + cellCanvasCoord.toString());
+                div.style["left"] = (canvasCoord.x + cellCanvasCoord.x + cellCanvasCoord.width) + "px";
+                div.style["top"] = (canvasCoord.y + cellCanvasCoord.y + cellCanvasCoord.height / 2) + "px";
 
-              // div.style["left"] = (nfo.xy[0] + 25) + "px";
-              // div.style["top"] = (nfo.xy[1] + 25) + "px";
+                // div.style["left"] = (nfo.xy[0] + 25) + "px";
+                // div.style["top"] = (nfo.xy[1] + 25) + "px";
 
-              div.style["display"] = "block";
+                div.style["display"] = "block";
+              }
+            } else {
+              div.style["display"] = "none";
             }
-          } else {
-            div.style["display"] = "none";
           }
         }
       },
-      onStateChanged: (states) => {
-        console.log("set state viewmap:" + String(states.vm !== undefined && states.vm !== null));
+      onStateChanged: (states) => {        
         setGridStateNfo(states);
+        
         //console.log("->" + states.state.filteredSortedRowsCount);
       }
     } as WSCanvasHandlers;
     setGridHandlers(handlers);
-  }, [rows]);
+  }, [rows, tooltipTest]);
 
   const tooltipDivRef = useRef<HTMLDivElement>(null);
 
@@ -179,15 +173,20 @@ export function Sample3() {
       setRows(q);
     }}>CHANGE ROW</button>
 
-    <div ref={tooltipDivRef} style={{ position: "absolute", pointerEvents: "none" }}>
-      <svg style={{ position: "fixed" }}>
-        <polygon points="0,0 15,15 15,0"
-          style={{ fill: "yellow", stroke: "darkgray", strokeWidth: 1 }} />
-      </svg>
-      <div style={{ marginLeft: "15px", background: "lightcyan", padding: ".25em", border: "1px solid darkgray" }}>
-        TIP for cell: {overCellCoord}
-      </div>
-    </div>
+    <button onClick={() => { setTooltipTest(!tooltipTest) }}>
+      TOGGLE TOOLTIP TEST API
+    </button>
+
+    {tooltipTest ?
+      <div ref={tooltipDivRef} style={{ position: "absolute", pointerEvents: "none" }}>
+        <svg style={{ position: "fixed" }}>
+          <polygon points="0,0 15,15 15,0"
+            style={{ fill: "yellow", stroke: "darkgray", strokeWidth: 1 }} />
+        </svg>
+        <div style={{ marginLeft: "15px", background: "lightcyan", padding: ".25em", border: "1px solid darkgray" }}>
+          TIP for cell: {overCellCoord}
+        </div>
+      </div> : null}
 
     <WSCanvas
       handlers={gridHandlers}

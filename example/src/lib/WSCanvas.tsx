@@ -435,22 +435,23 @@ export function WSCanvas(props: WSCanvasProps) {
 
     /** [-2,0] not on screen
      * (NO side effects on state) */
-    const colGetXWidth = (state: WSCanvasState, qci: number, allowPartialCol: boolean = false) => {
-        if (qci === -1) return [1, rowNumberColWidth];
+    const viewColGetXWidth = (state: WSCanvasState, vm: ViewMap | null, qvci: number, allowPartialCol: boolean = false) => {
+        if (qvci === -1) return [1, rowNumberColWidth];
 
         let _x = 1 + (showRowNumber ? rowNumberColWidth : 0);
         for (let ci = 0; ci < frozenColsCount; ++ci) {
             const cWidth = overridenColWidth(state, ci) + 1;
-            if (ci === qci) return [_x, cWidth];
+            if (ci === qvci) return [_x, cWidth];
             _x += cWidth;
         }
 
-        let lastColView = frozenColsCount + stateNfo.viewScrollOffset.col + state.viewColsCount;
+        let lastColView = frozenColsCount + state.viewScrollOffset.col + state.viewColsCount;
         if (allowPartialCol && lastColView < colsCount) lastColView++;
 
-        for (let ci = frozenColsCount + stateNfo.viewScrollOffset.col; ci < lastColView; ++ci) {
+        for (let vci = frozenColsCount + state.viewScrollOffset.col; vci < lastColView; ++vci) {
+            const ci = viewColToRealCol(vm, vci);
             const cWidth = overridenColWidth(state, ci) + 1;
-            if (ci === qci) return [_x, cWidth];
+            if (vci === qvci) return [_x, cWidth];
             _x += cWidth;
         }
         return [-2, 0];
@@ -606,9 +607,8 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** (NO side effects on state) */
-    const viewCellToCanvasCoord = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, viewCell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {
-        const cell = viewCellToReal(vm, viewCell);
-        const colXW = colGetXWidth(state, cell.col, allowPartialCol);
+    const viewCellToCanvasCoord = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, viewCell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {        
+        const colXW = viewColGetXWidth(state, vm, viewCell.col, allowPartialCol);
         if (viewCell.filterRow) return new WSCanvasCoord(colXW[0], colNumberRowHeight + filterTextMargin, colXW[1], getRowHeight(orh, -1));
         let y = 1;
         for (let vri = state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri) {
@@ -1062,6 +1062,10 @@ export function WSCanvas(props: WSCanvasProps) {
         if (scrollTo === true) rectifyScrollOffset(state, vm);
     }
 
+    const evalScrollChanged = (state: WSCanvasState) => {                
+        if (handlers && handlers.onMouseOverCell) handlers.onMouseOverCell(mkstates(state, viewMap, overridenRowHeight), null);
+    }
+
     /** side effect on state ; NO side effect on vm */
     const scrollTo = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord) => {
         const viewCell = realCellToView(vm, cell);
@@ -1081,6 +1085,8 @@ export function WSCanvas(props: WSCanvasProps) {
         else if (viewCell.col - frozenColsCount <= state.viewScrollOffset.col) {
             state.viewScrollOffset = state.viewScrollOffset.setCol(Math.max(0, viewCell.col - frozenColsCount));
         }
+
+        evalScrollChanged(state);
     }
 
     const evalClickStart = (state: WSCanvasState, ccoord: WSCanvasCoord) => {
@@ -1105,6 +1111,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const newRowScrollOffset = Math.max(0, Math.trunc((state.filteredSortedRowsCount - state.viewRowsCount) * factor));
                 state.viewScrollOffset = state.viewScrollOffset.setRow(newRowScrollOffset);
             }
+            evalScrollChanged(state);
             return true;
         } else if (onHorizontalScrollBar) {
             const onHorizontalScrollHandle = state.horizontalScrollHandleRect && state.horizontalScrollHandleRect.contains(ccoord);
@@ -1122,6 +1129,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const newColScrollOffset = Math.max(0, Math.trunc((colsCount - state.viewColsCount) * factor));
                 state.viewScrollOffset = state.viewScrollOffset.setCol(newColScrollOffset);
             }
+            evalScrollChanged(state);
             return true;
         }
 
@@ -1140,6 +1148,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const factor = Math.min(1, Math.max(0, factoryStart + (deltay / (H - scrollBarThk - verticalScrollHandleLen(state) - 1))));
                 const newRowScrollOffset = Math.max(0, Math.trunc((state.filteredSortedRowsCount - state.viewRowsCount) * factor));
                 state.viewScrollOffset = state.viewScrollOffset.setRow(newRowScrollOffset);
+                evalScrollChanged(state);
             }
         }
     }
@@ -1157,6 +1166,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 const newColScrollOffset = Math.max(0, Math.trunc((colsCount - state.viewColsCount) * factor));
                 state.viewScrollOffset = state.viewScrollOffset.setCol(newColScrollOffset);
+                evalScrollChanged(state);
             }
         }
     }
@@ -1240,7 +1250,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 //#region GRID LINE BACKGROUND ( to make grid lines as diff result ) and sheet background after last row
                 {
-                    const lastViewdCol = colGetXWidth(state, state.viewScrollOffset.col + state.viewColsCount - 1);
+                    const lastViewdCol = viewColGetXWidth(state, vm, state.viewScrollOffset.col + state.viewColsCount - 1);
                     colsXMax = lastViewdCol[0] + lastViewdCol[1] + (showRowNumber ? 1 : 0);
                     rowsYMax = (showColNumber ? (colNumberRowHeightFull() + 1) : 0) + 1;
                     for (let vri = state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri)
@@ -2213,7 +2223,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             let onHandle = false;
                             if (qCol[0] > -2) {
                                 let tryResizingCol = qCol[0];
-                                let colX = colGetXWidth(stateNfo, tryResizingCol, showPartialColumns);
+                                let colX = viewColGetXWidth(stateNfo, viewMap, tryResizingCol, showPartialColumns);
                                 cwidth = colX[1];
                                 let skip = false; // workaround avoid cursor flicker
 
@@ -2221,7 +2231,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     skip = true;
                                 } else if (x - colX[0] > RESIZE_HANDLE_TOL) {
                                     ++tryResizingCol;
-                                    colX = colGetXWidth(stateNfo, tryResizingCol, showPartialColumns);
+                                    colX = viewColGetXWidth(stateNfo, viewMap, tryResizingCol, showPartialColumns);
                                     cwidth = colX[1];
                                 }
 
@@ -2230,14 +2240,14 @@ export function WSCanvas(props: WSCanvasProps) {
                                     if (Math.abs(x - lastX) <= RESIZE_HANDLE_TOL) {
                                         onHandle = true;
                                         resizingCol = colsCount - 1;
-                                        cwidth = colGetXWidth(stateNfo, resizingCol)[1];
+                                        cwidth = viewColGetXWidth(stateNfo, viewMap, resizingCol)[1];
                                     }
                                 }
 
                                 if (!skip && (x === colX[0] || (colX[0] >= x - RESIZE_HANDLE_TOL && colX[0] <= x + RESIZE_HANDLE_TOL))) {
                                     onHandle = true;
                                     resizingCol = tryResizingCol - 1;
-                                    cwidth = colGetXWidth(stateNfo, resizingCol)[1];
+                                    cwidth = viewColGetXWidth(stateNfo, viewMap, resizingCol)[1];
                                 }
                             }
 
@@ -2390,6 +2400,8 @@ export function WSCanvas(props: WSCanvasProps) {
                     state.viewScrollOffset = state.viewScrollOffset.setRow(Math.max(0, state.viewScrollOffset.row - (showPartialRows ? 2 : 1)));
                 }
             }
+
+            evalScrollChanged(state);
 
             setStateNfo(state);
             if (handlers && handlers.onStateChanged) handlers.onStateChanged(mkstates(state, viewMap, overridenRowHeight));
@@ -2755,9 +2767,18 @@ export function WSCanvas(props: WSCanvasProps) {
             }
             api.clientXYToCanvasCoord = (states, x: number, y: number) => clientXYToCanvasCoord(x, y);
             api.cellToCanvasCoord = (states, cell) => {
+                const state = states.state;
                 const vm = states.vm;
                 const orh = states.overrideRowHeight;
-                return viewCellToCanvasCoord(states.state, vm, orh, realCellToView(states.vm, cell));
+                const viewCell = realCellToView(vm, cell);                
+                const leftTopCell = viewCellToCanvasCoord(state, vm, orh, state.viewScrollOffset, props.showPartialColumns);
+                const tmp = viewCellToCanvasCoord(state, vm, orh, viewCell, props.showPartialColumns);
+                if (leftTopCell && tmp) {                    
+                    return new WSCanvasCoord(
+                        tmp.x - leftTopCell.x + (showRowNumber ? rowNumberColWidth : 0),
+                        tmp.y - leftTopCell.y + (showColNumber ? colNumberRowHeightFull() : 0),
+                        tmp.width, tmp.height);
+                } else return null;
             }
             api.canvasCoordToCellCoord = (states, ccoord) => canvasToCellCoord(states.state, states.vm, states.overrideRowHeight, ccoord);
             api.canvasCoord = (states) => {
@@ -2846,7 +2867,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }}>
 
         <div ref={canvasDivRef}
-            style={containerStyle === undefined ? baseDivContainerStyle : Object.assign(baseDivContainerStyle, containerStyle)}>            
+            style={containerStyle === undefined ? baseDivContainerStyle : Object.assign(baseDivContainerStyle, containerStyle)}>
             <canvas ref={canvasRef}
                 tabIndex={0}
                 style={canvasStyle === undefined ? baseCanvasStyle : Object.assign(baseCanvasStyle, canvasStyle, { margin: 0, padding: 0 })}
