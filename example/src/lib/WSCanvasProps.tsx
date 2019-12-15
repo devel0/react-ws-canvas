@@ -6,6 +6,7 @@ import { WSCanvasApi } from "./WSCanvasApi";
 import { CSSProperties } from "react";
 import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
 import { WSCanvasSelection } from "./WSCanvasSelection";
+import { storeNfo } from "./StoreUtils";
 
 export interface WSCanvasCellDataNfo {
     coord: WSCanvasCellCoord;
@@ -14,7 +15,8 @@ export interface WSCanvasCellDataNfo {
 
 /** see WSCanvasPropsDefault for default values */
 export interface WSCanvasProps {
-    api: WSCanvasApi;
+    /** api store */
+    apiStore?: storeNfo<WSCanvasApi>,
 
     /** width 100% */
     fullwidth: boolean;

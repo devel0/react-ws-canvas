@@ -1,7 +1,9 @@
-import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnToSortInfo } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnToSortInfo, WSCanvasApi } from "./lib";
 
 import React, { useState, useEffect } from "react";
 import { SampleProps } from "./Frame";
+import * as _ from 'lodash';
+import { useStoreNfo } from "./lib/StoreUtils";
 
 interface MyData {
   col1: string;
@@ -12,11 +14,12 @@ interface MyData {
   col6: Date;
 }
 
-export function Sample2(props: SampleProps) {  
+export function Sample2(props: SampleProps) {
   const {
-    api, columnClickBehavior, dbgDiv, debug, height, width
+    apiStoreName, columnClickBehavior, dbgDiv, debug, height, width
   } = props;
   const [rows, setRows] = useState<MyData[]>([]);
+  const apiStore = useStoreNfo<WSCanvasApi>(apiStoreName);
 
   const ROWS = 5000;
 
@@ -81,19 +84,21 @@ export function Sample2(props: SampleProps) {
     }
 
     setRows(_rows);
-  }, []);
 
-  api.onMouseDown = (e, cell) => {
-    if (cell) {
-      if (cell.row >= 0) {
-        const data = rows[cell.row] as MyData;
-        console.log("clicked cell row:" + cell.row + " col1:" + data.col1);
-      }
-    }
-  };
+    apiStore.set((x) => {
+      x.onMouseDown = (e, cell) => {
+        if (cell) {
+          if (cell.row >= 0) {
+            const data = rows[cell.row] as MyData;
+            console.log("clicked cell row:" + cell.row + " col1:" + data.col1);
+          }
+        }
+      };
+    });  
+  }, []);  
 
   return <WSCanvas
-    api={api}
+    apiStore={apiStore}
     width={width} height={height}
     containerStyle={{ margin: "2em" }}
     columnClickBehavior={columnClickBehavior}

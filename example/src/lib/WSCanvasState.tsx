@@ -95,6 +95,7 @@ export class WSCanvasState {
     /** view cell selection */
     viewSelection: WSCanvasSelection;
     columnsSort: WSCanvasColumnSortInfo[];
+    /** false when cursor on canvas out of cells such padding space and scrollbars */
     cursorOverCell: boolean;
 
     verticalScrollBarRect: WSCanvasRect | null;

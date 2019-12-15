@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { WSCanvas } from "./lib";
+import { WSCanvas, WSCanvasApi } from "./lib";
 import { SampleProps } from "./Frame";
+import { useStoreNfo } from "./lib/StoreUtils";
 
-export function Sample1(props: SampleProps) {  
+export function Sample1(props: SampleProps) {
   const {
-    api, columnClickBehavior, dbgDiv, debug, height, width
+    apiStoreName, columnClickBehavior, dbgDiv, debug, height, width
   } = props;
+  const apiStore = useStoreNfo<WSCanvasApi>(apiStoreName);
 
   const [rows, setRows] = useState<any[][]>([]);
 
@@ -27,7 +29,7 @@ export function Sample1(props: SampleProps) {
   }, []);
 
   return <WSCanvas
-    api={api}
+    apiStore={apiStore}
     width={width} height={height}
     containerStyle={{ margin: "1em" }}
     columnClickBehavior={columnClickBehavior}
@@ -46,7 +48,7 @@ export function Sample1(props: SampleProps) {
     }}
     rowsCount={rows.length} colsCount={COLS}
     showRowNumber={true} showColNumber={true} showFilter={true}
-    frozenRowsCount={1} frozenColsCount={1}    
+    frozenRowsCount={1} frozenColsCount={1}
     debug={debug} dbgDiv={dbgDiv}
   />
 }

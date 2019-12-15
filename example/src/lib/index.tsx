@@ -16,3 +16,4 @@ export * from './WSCanvasSelectionMode';
 export * from './WSCanvasSelectionRange';
 export * from './WSCanvasSortDirection';
 export * from './WSCanvasState';
+export * from './WSCanvasXYCellCoord';
