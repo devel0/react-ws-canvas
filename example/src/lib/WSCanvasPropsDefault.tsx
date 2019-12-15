@@ -39,7 +39,8 @@ export const WSCanvasPropsDefault = () => {
         showPartialRows: true,
         preventWheelOnBounds: true,
 
-        getCellData: (cell) => null,                
+        getCellData: (cell) => null,        
+        renderTransform: undefined,
         prepareCellDataset: () => null,
         setCellData: (dataset: any, cell: WSCanvasCellCoord, value: any) => {},
         commitCellDataset: (dataset: any) => {},        

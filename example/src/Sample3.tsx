@@ -1,4 +1,4 @@
-import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize, WSCanvasXYCellCoord, WSCanvasApi, useWindowSize, WSCanvasStates, WSCanvasHandlers } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize, WSCanvasXYCellCoord, WSCanvasApi, useWindowSize, WSCanvasStates, WSCanvasHandlers, IEnumValue } from "./lib";
 
 import React, { useState, useEffect, useRef } from "react";
 
@@ -206,34 +206,45 @@ export function Sample3() {
 
       rowsCount={rows.length} colsCount={columns.length}
       dataSource={rows}
+      isCellReadonly={(cell) => {
+        const fieldname = columns[cell.col].field;
+        return fieldname === "col1";
+      }}
       getCellData={(cell) => {
         const fieldname = columns[cell.col].field;
         const row = rows[cell.row];
         if (row) {
           const val = (row as any)[columns[cell.col].field];
-          switch (fieldname) {
-            case "col1": return "( " + val + " )";
-            case "cboxcol": {
-              const q = mapEnum(MyEnum).find((x) => x.value === val);
-              if (q) return q.name;
-            }
-          }
-
           return val;
         }
       }}
+      renderTransform={(cell, data) => {
+        const fieldname = columns[cell.col].field;
+        switch (fieldname) {
+          case "col1": return "( " + data + " )";
+          case "cboxcol":
+            const q = mapEnum(MyEnum).find((x) => x.value === data);
+            if (q) return q.name;
+        }
+        return data;
+      }}
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
-      setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}
+      setCellData={(q, cell, value) => {
+        const fieldname = columns[cell.col].field;
+        const row = rows[cell.row];
+        if (row) {
+          (row as any)[columns[cell.col].field] = value;          
+        }
+      }}
       getCellCustomEdit={(states, props, cell, containerStyle) => {
         const fieldname = columns[cell.col].field;
 
         if (fieldname === "cboxcol") {
 
-          if (containerStyle) containerStyle.background = "lightyellow";
-          const origVal = rows[cell.row].cboxcol;
+          if (containerStyle) containerStyle.background = "lightyellow";          
 
-          return <div>
+          return <div>            
             <select
               autoFocus
               defaultValue={rows[cell.row].cboxcol}
@@ -241,14 +252,11 @@ export function Sample3() {
                 switch (e.key) {
                   case "Tab":
                   case "Enter":
-                    e.preventDefault();                    
-                    if (gridApi) gridApi.closeCustomEdit(states);                    
+                    e.preventDefault();
+                    if (gridApi) gridApi.closeCustomEdit(states, true);
                     break;
                   case "Escape":
-                    const q = props.prepareCellDataset();
-                    props.setCellData(q, cell, origVal);
-                    props.commitCellDataset(q);
-                    if (gridApi) gridApi.closeCustomEdit(states);
+                    if (gridApi) gridApi.closeCustomEdit(states, false);
                     break;
                 }
               }}
@@ -257,9 +265,11 @@ export function Sample3() {
                 const qval: MyEnum = val;
                 const row = rows[cell.row];
                 row.cboxcol = qval;
-              }}>
+                if (gridApi) gridApi.setCustomEditValue(states, qval);
+              }}
+            >
               {mapEnum(MyEnum).map((x) =>
-                <option key={x.value} value={x.value}>{x.name}</option>
+                <option key={"k:" + x.value} value={x.value}>d{x.name}</option>
               )}
             </select>
           </div>

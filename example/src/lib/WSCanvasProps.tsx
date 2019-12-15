@@ -16,16 +16,16 @@ export interface WSCanvasCellDataNfo {
 }
 
 /** see WSCanvasPropsDefault for default values */
-export interface WSCanvasProps {            
+export interface WSCanvasProps {
     /** handlers */
-    handlers?: WSCanvasHandlers,    
+    handlers?: WSCanvasHandlers,
     /** receive api */
     onApi?: (states: WSCanvasStates, api: WSCanvasApi) => void,
 
     /** width 100% */
     fullwidth: boolean;
     /** width of canvas */
-    width: number;    
+    width: number;
     /** height of canvas */
     height: number;
     /** datasource to sync refresh */
@@ -75,6 +75,8 @@ export interface WSCanvasProps {
 
     /** retrieve data from a cell */
     getCellData: (coord: WSCanvasCellCoord) => any;
+    /** allow to transform data before being displayed (useful for enum types); if defined must return input data as is or transformed */
+    renderTransform?: (cell: WSCanvasCellCoord, data: any) => any;
     /** retrieve cells dataset copy */
     prepareCellDataset: () => any;
     /** apply change to dataset */
@@ -82,7 +84,7 @@ export interface WSCanvasProps {
     /** set cell dataset state */
     commitCellDataset: (dataset: any) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor */
-    getCellCustomEdit?: (states: WSCanvasStates, props: WSCanvasProps, coord: WSCanvasCellCoord,
+    getCellCustomEdit?: (states: WSCanvasStates, props: WSCanvasProps, cell: WSCanvasCellCoord,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element | undefined,
     /** header of given col */
     getColumnHeader?: (col: number) => string;

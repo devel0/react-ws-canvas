@@ -17,9 +17,9 @@ export class WSCanvasApi {
     canvasCoordToCellCoord: (states: WSCanvasStates, ccoord: WSCanvasCoord) => WSCanvasCellCoord | null;    
     focusCell: (states: WSCanvasStates, coord: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearSelection?: boolean) => void;
     scrollTo: (states: WSCanvasStates, coord: WSCanvasCellCoord) => void;
-    setSorting: (states: WSCanvasStates, sorting: WSCanvasColumnSortInfo[]) => void;
-    confirmCustomEdit: (states: WSCanvasStates) => void;
-    closeCustomEdit: (states: WSCanvasStates) => void;
+    setSorting: (states: WSCanvasStates, sorting: WSCanvasColumnSortInfo[]) => void;    
+    closeCustomEdit: (states: WSCanvasStates, confirm: boolean) => void;
+    setCustomEditValue: (states: WSCanvasStates, val: any) => void;
     goToNextCell: (states: WSCanvasStates) => void;
     triggerKey: (states: WSCanvasStates, e:React.KeyboardEvent) => void;
 
@@ -36,9 +36,9 @@ export class WSCanvasApi {
         this.canvasCoordToCellCoord = () => null;
         this.focusCell = () => { };
         this.scrollTo = () => { };
-        this.setSorting = () => { };
-        this.confirmCustomEdit = () => {};
+        this.setSorting = () => { };        
         this.closeCustomEdit = () => {};
+        this.setCustomEditValue = () => {};
         this.goToNextCell = () => {};
         this.triggerKey = () => {};
                 

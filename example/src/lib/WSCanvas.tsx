@@ -17,7 +17,7 @@ import moment from "moment";
 import 'moment/min/locales';
 import * as _ from 'lodash';
 import { WSCanvasFilter } from "./WSCanvasFilter";
-import ReactDOM from "react-dom";
+import ReactDOM, { render } from "react-dom";
 import { WSCanvasSelectMode } from "./WSCanvasSelectionMode";
 import { WSCanvasApi } from "./WSCanvasApi";
 import { WSCanvasStates } from "./WSCanvasStates";
@@ -67,8 +67,9 @@ export function WSCanvas(props: WSCanvasProps) {
         preventWheelOnBounds,
 
         getCellData,
+        renderTransform,
         prepareCellDataset,
-        setCellData: setCellData,
+        setCellData,
         commitCellDataset,
         getCellCustomEdit,
         getColumnHeader,
@@ -473,7 +474,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             const colW = overridenColWidth(state, ci);
                             if (colW > 0) {
                                 if (getCellTextWrap(cell, props)) {
-                                    const data = getCellData(cell);
+                                    const data = renderTransform ? renderTransform(cell, getCellData(cell)) : getCellData(cell);
                                     let cellFont = font;
                                     if (getCellFont !== undefined) {
                                         const q = getCellFont(cell, props);
@@ -730,7 +731,7 @@ export function WSCanvas(props: WSCanvasProps) {
         let str = "";
         const _cellType = getCellType ? getCellType(cell, cellData) : undefined;
         if (_cellType === undefined)
-            str = String(cellData);
+            str = renderTransform ? String(renderTransform(cell, cellData)) : String(cellData)
         else {
             const cellType = getCellType ? _cellType : "text";
             switch (cellType) {
@@ -769,7 +770,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     break;
                 case "text":
                     // console.log("draw cell: " + viewCell.toString() + " y:" + y + " txt:" + cellData);
-                    str = cellData;
+                    str = renderTransform ? renderTransform(cell, cellData) : cellData;
                     break;
             }
         }
@@ -871,18 +872,50 @@ export function WSCanvas(props: WSCanvasProps) {
         commitCellDataset(q);
     }
 
-    /** side effect on state */
-    const confirmCustomEdit = (state: WSCanvasState) => {
-        if (state.customEditCell !== null) {
-            singleSetCellData(state.customEditCell, state.customEditValue);
-            closeCustomEdit(state);
+    const openCellCustomEdit = (state: WSCanvasState, orh: number[] | null) => {
+        if (canvasRef.current) {
+            const viewCell = realCellToView(viewMap, state.focusedCell);
+            const xy = viewCellToCanvasCoord(state, viewMap, orh, viewCell);
+            const cell = state.focusedCell;
+            if (isCellReadonly && isCellReadonly(cell)) return;
+
+            if (xy) {
+                state.customEditCell = cell;
+                let cellVal = getCellData(cell);
+                if (getCellType) {
+                    const cellType = getCellType(cell, cellVal);
+                    switch (cellType) {
+                        case "date":
+                            cellVal = formatCellDataAsDate(cellVal);
+                            break;
+
+                        case "time":
+                            cellVal = formatCellDataAsTime(cellVal);
+                            break;
+
+                        case "datetime":
+                            cellVal = formatCellDataAsDateTime(cellVal);
+                            break;
+                    }
+                }
+                state.customEditOrigValue = cellVal;
+                state.customEditValue = cellVal;
+                state.editMode = WSCanvasEditMode.F2;
+            }
         }
     }
 
     /** side effect on state */
-    const closeCustomEdit = (state: WSCanvasState) => {        
+    const closeCustomEdit = (state: WSCanvasState, confirm: boolean) => {        
         if (state.customEditCell !== null) {
+            if (confirm)
+                singleSetCellData(state.customEditCell, state.customEditValue);
+            else
+                singleSetCellData(state.customEditCell, state.customEditOrigValue);
+
             state.customEditCell = null;
+            state.customEditValue = null;
+            state.customEditOrigValue = null;
             state.editMode = WSCanvasEditMode.none;
         }
         if (canvasRef.current) {
@@ -997,42 +1030,10 @@ export function WSCanvas(props: WSCanvasProps) {
                 state.viewSelection.add(viewCell);
     }
 
-    const openCellCustomEdit = (state: WSCanvasState, orh: number[] | null) => {
-        if (canvasRef.current) {
-            const viewCell = realCellToView(viewMap, state.focusedCell);
-            const xy = viewCellToCanvasCoord(state, viewMap, orh, viewCell);
-            const cell = state.focusedCell;
-            if (isCellReadonly && isCellReadonly(cell)) return;
-
-            if (xy) {
-                state.customEditCell = cell;
-                let cellVal = getCellData(cell);
-                if (getCellType) {
-                    const cellType = getCellType(cell, cellVal);
-                    switch (cellType) {
-                        case "date":
-                            cellVal = formatCellDataAsDate(cellVal);
-                            break;
-
-                        case "time":
-                            cellVal = formatCellDataAsTime(cellVal);
-                            break;
-
-                        case "datetime":
-                            cellVal = formatCellDataAsDateTime(cellVal);
-                            break;
-                    }
-                }
-                state.customEditValue = cellVal;
-                state.editMode = WSCanvasEditMode.F2;
-            }
-        }
-    }
-
     const postEditFormat = (state: WSCanvasState) => {
         if (getCellType) {
             const cellData = getCellData(state.focusedCell);
-            const cellType = getCellType(state.focusedCell, cellData);
+            const cellType = getCellType(state.focusedCell, cellData);            
 
             switch (cellType) {
                 case "date":
@@ -1041,7 +1042,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 case "time":
                     singleSetCellData(state.focusedCell, moment(cellData, timeCellMomentFormat));
                     break;
-                case "datetime":
+                case "datetime":                                        
                     singleSetCellData(state.focusedCell, moment(cellData, timeCellMomentFormat));
                     break;
             }
@@ -1056,7 +1057,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (dontApplySelect === undefined || dontApplySelect === false) setSelectionByEndingCell(state, viewCell, endingCell, clearPreviousSel);
 
         state.focusedCell = cell;
-        confirmCustomEdit(state);
+        closeCustomEdit(state, true);        
         state.editMode = WSCanvasEditMode.none;
 
         if (scrollTo === true) rectifyScrollOffset(state, vm);
@@ -1617,11 +1618,12 @@ export function WSCanvas(props: WSCanvasProps) {
                         } as CSSProperties;
 
                         if (getCellCustomEdit) {
-                            const q = getCellCustomEdit(mkstates(state, vm, overridenRowHeight), props, state.customEditCell, ceditStyle, cellWidth, cellHeight);
+                            const q = getCellCustomEdit(mkstates(state, vm, overridenRowHeight), props, state.customEditCell,
+                                ceditStyle, cellWidth, cellHeight);
                             if (q) {
                                 defaultEdit = false;
                                 setChildren([<div
-                                    key="edit"
+                                    key={"edit:" + state.customEditCell.toString()}
                                     style={ceditStyle}>
                                     {q}
                                 </div>]);
@@ -1640,7 +1642,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                             case "Enter":
                                                 {
                                                     const state = stateNfo.dup();
-                                                    confirmCustomEdit(state);
+                                                    closeCustomEdit(state, true);
                                                     state.focusedCell = viewCellToReal(vm, realCellToView(vm, state.focusedCell).nextRow());
                                                     rectifyScrollOffset(state, vm);
                                                     setStateNfo(state);
@@ -1651,7 +1653,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                             case "Escape":
                                                 {
                                                     const state = stateNfo.dup();
-                                                    closeCustomEdit(state);
+                                                    closeCustomEdit(state, false);
                                                     setStateNfo(state);
                                                     if (handlers && handlers.onStateChanged) handlers.onStateChanged(mkstates(state, vm, orh));
                                                 }
@@ -1947,7 +1949,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             if (!keyHandled && (isCellReadonly === undefined || !isCellReadonly(cell)) &&
                                 (getCellCustomEdit === undefined || getCellCustomEdit(mkstates(state, viewMap, overridenRowHeight), props, cell) === undefined)) {
                                 if (getCellType) {
-                                    const prevData = getCellData(cell);
+                                    const prevData = renderTransform ? renderTransform(cell, getCellData(cell)) : getCellData(cell);
                                     const type = getCellType(cell, prevData);
                                     switch (type) {
                                         case "number":
@@ -1972,7 +1974,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         case WSCanvasEditMode.direct:
                             switch (e.key) {
                                 case "Backspace":
-                                    const str = String(getCellData(cell));
+                                    const str = renderTransform ? renderTransform(cell, String(getCellData(cell))) : String(getCellData(cell));
                                     if (str.length > 0) singleSetCellData(cell, str.substring(0, str.length - 1));
                                     keyHandled = true;
                                     break;
@@ -1983,7 +1985,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                             if (!keyHandled && (isCellReadonly === undefined || !isCellReadonly(cell))) {
                                 keyHandled = true;
-                                const prevData = getCellData(cell);
+                                const prevData = renderTransform ? renderTransform(cell, getCellData(cell)) : getCellData(cell);
                                 if (getCellType) {
                                     const type = getCellType(cell, prevData);
                                     switch (type) {
@@ -2737,12 +2739,14 @@ export function WSCanvas(props: WSCanvasProps) {
                 setStateNfo(state);
                 if (handlers && handlers.onStateChanged) handlers.onStateChanged(mkstates(state, viewMap, overridenRowHeight));
             }
-            api.confirmCustomEdit = (states) => {
-                confirmCustomEdit(states.state);
-            }
-            api.closeCustomEdit = (states) => {
+            api.closeCustomEdit = (states, confirm) => {
                 const state = states.state.dup();
-                closeCustomEdit(state);
+                closeCustomEdit(state, confirm);
+                setStateNfo(state);
+            }
+            api.setCustomEditValue = (states, val) => {
+                const state = states.state.dup();
+                state.customEditValue = val;
                 setStateNfo(state);
             }
             api.goToNextCell = (states) => {
@@ -2818,7 +2822,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             onApi(mkstates(stateNfo, viewMap, overridenRowHeight), api);
         }
-    }, []);
+    }, [dataSource]);
     //#endregion
 
     const baseDivContainerStyle = {

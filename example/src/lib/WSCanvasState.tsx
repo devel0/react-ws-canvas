@@ -33,6 +33,7 @@ export class WSCanvasState {
         this.editMode = WSCanvasEditMode.none;
 
         this.customEditCell = null;
+        this.customEditOrigValue = null;
         this.customEditValue = null;
         this.columnWidthOverride = new Map<number, number>();
         this.columnWidthOverrideTrack = "";
@@ -83,6 +84,7 @@ export class WSCanvasState {
     editMode: WSCanvasEditMode;
 
     customEditCell: WSCanvasCellCoord | null;
+    customEditOrigValue: any;
     customEditValue: any;
     columnWidthOverride: Map<number, number>;
     /** json serialization of columnWidthOverride to work with debounce */
