@@ -4,14 +4,13 @@ import { WSCanvasSelectMode } from "./WSCanvasSelectionMode";
 import { WSCanvasApi } from "./WSCanvasApi";
 import { WSCanvasColumnClickBehavior } from "./WSCanvasColumn";
 import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
-import { storeNfo } from "./StoreUtils";
 
 const DEFAULT_ROW_HEIGHT = 30;
 const DEFAULT_COL_WIDTH = 120;
 
 export const WSCanvasPropsDefault = () => {
     return {
-        apiStore: undefined,
+        api: undefined,
 
         fullwidth: false,
         width: window.innerWidth,        

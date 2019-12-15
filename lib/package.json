@@ -23,7 +23,6 @@
     "moment": "^2.24.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
-    "react-hookstore": "^1.4.2",
     "react-scripts": "3.2.0",
     "rollup-plugin-internal": "^1.0.4",
     "typescript": "3.6.4"

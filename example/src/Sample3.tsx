@@ -1,10 +1,8 @@
-import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize, WSCanvasXYCellCoord, WSCanvasApi } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize, WSCanvasXYCellCoord, WSCanvasApi, useWindowSize } from "./lib";
 
 import React, { useState, useEffect, useRef } from "react";
-import { SampleProps } from "./Frame";
 
 import * as _ from 'lodash';
-import { useStoreNfo } from "./lib/StoreUtils";
 
 enum MyEnum {
   first,
@@ -23,12 +21,10 @@ interface MyData {
   cboxcol: MyEnum;
 }
 
-export function Sample3(props: SampleProps) {
-  const {
-    apiStoreName, columnClickBehavior, dbgDiv, debug, height, width
-  } = props;
+export function Sample3() {
   const [rows, setRows] = useState<MyData[]>([]);
-  const apiStore = useStoreNfo<WSCanvasApi>(apiStoreName);
+  const [api, setApi] = useState<WSCanvasApi>(new WSCanvasApi());
+  const winSize = useWindowSize();
 
   const ROWS = 5000;
 
@@ -110,55 +106,52 @@ export function Sample3(props: SampleProps) {
     }
 
     setRows(_rows);
-    //}, 100);
 
-    apiStore.set((x) => {
-
-      x.onMouseDown = (e, cell) => {
-        if (cell) {
-          if (cell.row >= 0) {
-            const data = rows[cell.row] as MyData;
-            if (data) console.log("clicked cell row:" + cell.row + " col1data:" + data.col1);
-          }
+    const newApi = new WSCanvasApi();
+    newApi.onMouseDown = (e, cell) => {
+      if (cell) {
+        if (cell.row >= 0) {
+          const data = rows[cell.row] as MyData;
+          if (data) console.log("clicked cell row:" + cell.row + " col1data:" + data.col1);
         }
       }
-  
-      x.onMouseOverCell = (xycell) => {
-        console.log("ON");
-        //if (prevHdlr) prevHdlr(xycell); // TODO:
-        setOverCellCoord(xycell);
-        if (tooltipDivRef && tooltipDivRef.current) {
-          const div = tooltipDivRef.current;
-          if (xycell) {
-            //const childDiv = React.createContext("div");
-            if (xycell.cell.row >= 0 && xycell.cell.col >= 0) {
-              console.log("query cell:" + xycell.cell.toString() + " fscr:" + (x.currentState ? x.currentState.filteredSortedRowsCount : 0));
-              const cellCoordNfo = x.cellToCanvasCoord(xycell.cell);
-              if (cellCoordNfo) {
-                console.log("coord:" + cellCoordNfo.toString());
-                //div.style["left"] = (cellCoordNfo.x + cellCoordNfo!.width) + "px";
-                //div.style["top"] = xycell.xy[1] + "px";
-                div.style["display"] = "block";
-              }
-            } else {
-              div.style["display"] = "none";
+    }
+
+    newApi.onMouseOverCell = (xycell) => {
+      console.log("ON");
+      //if (prevHdlr) prevHdlr(xycell); // TODO:
+      setOverCellCoord(xycell);
+      if (tooltipDivRef && tooltipDivRef.current) {
+        const div = tooltipDivRef.current;
+        if (xycell) {
+          //const childDiv = React.createContext("div");
+          if (xycell.cell.row >= 0 && xycell.cell.col >= 0) {
+            console.log("query cell:" + xycell.cell.toString() + " fscr:" + (api.currentState ? api.currentState.filteredSortedRowsCount : 0));
+            const cellCoordNfo = api.cellToCanvasCoord(xycell.cell);
+            if (cellCoordNfo) {
+              console.log("coord:" + cellCoordNfo.toString());
+              //div.style["left"] = (cellCoordNfo.x + cellCoordNfo!.width) + "px";
+              //div.style["top"] = xycell.xy[1] + "px";
+              div.style["display"] = "block";
             }
           } else {
             div.style["display"] = "none";
-            //div.classList.remove(""
-            //if (div.hasChildNodes()) div.removeChild(div.childNodes[0]);
           }
+        } else {
+          div.style["display"] = "none";
+          //div.classList.remove(""
+          //if (div.hasChildNodes()) div.removeChild(div.childNodes[0]);
         }
       }
-    });  
-
+    }
+    setApi(newApi);
   }, []);
 
   const [overCellCoord, setOverCellCoord] = useState<WSCanvasXYCellCoord | null>(null);
 
   const tooltipDivRef = useRef<HTMLDivElement>(null);
-  
-  
+
+
   const divRef = useRef<HTMLDivElement>(null);
 
   return <div ref={divRef} style={{ margin: "1em", background: "yellow" }}>
@@ -178,16 +171,14 @@ export function Sample3(props: SampleProps) {
     </div>
 
     <WSCanvas
-      apiStore={apiStore}
-      debug={debug} dbgDiv={dbgDiv}
+      api={api}
 
       containerStyle={{ margin: "1em" }}
-      fullwidth
-      // width={divSize.width}
-      height={Math.max(300, height * .9)}
+      fullwidth      
+      height={Math.max(300, winSize.height * .8)}
 
       frozenRowsCount={0} frozenColsCount={0}
-      columnClickBehavior={columnClickBehavior}
+      // columnClickBehavior={columnClickBehavior}
       columnInitialSort={WSCanvasColumnToSortInfo(columns)}
       colWidth={(col) => columns[col].width || 100} colWidthExpand={true}
       showFilter={true}
@@ -232,13 +223,13 @@ export function Sample3(props: SampleProps) {
                   case "Tab":
                   case "Enter":
                     e.preventDefault();
-                    apiStore.state.closeCustomEdit();
+                    api.closeCustomEdit();
                     break;
                   case "Escape":
                     const q = props.prepareCellDataset();
                     props.setCellData(q, cell, origVal);
                     props.commitCellDataset(q);
-                    apiStore.state.closeCustomEdit();
+                    api.closeCustomEdit();
                     break;
                 }
               }}

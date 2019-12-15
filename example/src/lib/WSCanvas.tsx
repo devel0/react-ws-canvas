@@ -36,7 +36,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const winSize = useWindowSize();
 
     const {
-        apiStore,
+        api,
 
         fullwidth,
         width,
@@ -384,7 +384,7 @@ export function WSCanvas(props: WSCanvasProps) {
             setViewMap(vm);
 
             setStateNfo(state);
-            if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+            if (api && api.onStateChanged) api.onStateChanged(state);
         }
     }
 
@@ -502,7 +502,7 @@ export function WSCanvas(props: WSCanvasProps) {
         state.viewRowsCount = qViewRowsCount;
         state.viewColsCount = qViewColsCount;
         setStateNfo(state);
-        if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+        if (api && api.onStateChanged) api.onStateChanged(state);
     }
 
     /** no side effect on vm */
@@ -600,14 +600,14 @@ export function WSCanvas(props: WSCanvasProps) {
     /** (NO side effects on state) */
     const viewCellToCanvasCoord = (state: WSCanvasState, viewCell: WSCanvasCellCoord, allowPartialCol: boolean = false) => {
         const cell = viewCellToReal(viewMap, viewCell);
-        const colXW = colGetXWidth(state, cell.col, allowPartialCol);        
-        if (viewCell.filterRow) return new WSCanvasCoord(colXW[0], colNumberRowHeight + filterTextMargin, colXW[1]);        
+        const colXW = colGetXWidth(state, cell.col, allowPartialCol);
+        if (viewCell.filterRow) return new WSCanvasCoord(colXW[0], colNumberRowHeight + filterTextMargin, colXW[1]);
         let y = 1;
-        for (let vri = state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri) {        
+        for (let vri = state.viewScrollOffset.row; vri < state.viewScrollOffset.row + state.viewRowsCount; ++vri) {
             if (vri >= state.filteredSortedRowsCount) break;
 
             const ri = viewRowToRealRow(viewMap, vri);
-            const rh = getRowHeight(ri);            
+            const rh = getRowHeight(ri);
 
             if (vri === viewCell.row) {
                 let resy = y + (showColNumber ? colNumberRowHeightFull() : 0);
@@ -1214,7 +1214,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 //paint(state, vm);
                 stateChanged = true;
                 setStateNfo(state);
-                if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                if (api && api.onStateChanged) api.onStateChanged(state);
                 paint(state, vm);
                 return;
             }
@@ -1468,14 +1468,14 @@ export function WSCanvas(props: WSCanvasProps) {
                                     }
                                     state.filtersTrack = JSON.stringify(state.filters);
                                     setStateNfo(state);
-                                    if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                                    if (api && api.onStateChanged) api.onStateChanged(state);
                                 }}
                                 onFocus={(e) => {
                                     if (stateNfo.focusedCell.row !== -1 || stateNfo.focusedCell.col !== -1) {
                                         const state = stateNfo.dup();
                                         state.focusedCell = new WSCanvasCellCoord(-1, -1);
                                         setStateNfo(state);
-                                        if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                                        if (api && api.onStateChanged) api.onStateChanged(state);
                                     }
                                     e.target.setSelectionRange(0, e.target.value.length);
                                 }}
@@ -1497,7 +1497,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                                     canvasRef.current.focus();
                                                 }
                                                 setStateNfo(state);
-                                                if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                                                if (api && api.onStateChanged) api.onStateChanged(state);
                                             }
                                             break;
                                     }
@@ -1626,7 +1626,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                                     state.focusedCell = viewCellToReal(vm, realCellToView(vm, state.focusedCell).nextRow());
                                                     rectifyScrollOffset(state, vm);
                                                     setStateNfo(state);
-                                                    if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                                                    if (api && api.onStateChanged) api.onStateChanged(state);
                                                 }
                                                 break;
 
@@ -1635,7 +1635,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                                     const state = stateNfo.dup();
                                                     closeCustomEdit(state);
                                                     setStateNfo(state);
-                                                    if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                                                    if (api && api.onStateChanged) api.onStateChanged(state);
                                                 }
                                                 break;
 
@@ -1645,7 +1645,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                         const state = stateNfo.dup();
                                         state.customEditValue = e.target.value;
                                         setStateNfo(state);
-                                        if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                                        if (api && api.onStateChanged) api.onStateChanged(state);
                                     }} />
                             ]);
                     }
@@ -1706,7 +1706,7 @@ export function WSCanvas(props: WSCanvasProps) {
         clientXYToCanvasCoord(e.clientX, e.clientY);
 
     const handleKeyDown = async (e: React.KeyboardEvent) => {
-        if (apiStore && apiStore.state.onPreviewKeyDown) apiStore.state.onPreviewKeyDown(e);
+        if (api && api.onPreviewKeyDown) api.onPreviewKeyDown(e);
 
         if (!e.defaultPrevented) {
             const ctrl_key = e.getModifierState("Control");
@@ -1823,7 +1823,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             entireGridSel(state);
                             e.preventDefault();
                             setStateNfo(state);
-                            if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                            if (api && api.onStateChanged) api.onStateChanged(state);
                             return;
                         }
                         break;
@@ -2000,11 +2000,11 @@ export function WSCanvas(props: WSCanvasProps) {
                 if (applyState) {
                     rectifyScrollOffset(state, viewMap);
                     setStateNfo(state);
-                    if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                    if (api && api.onStateChanged) api.onStateChanged(state);
                 }
             }
 
-            if (apiStore && apiStore.state.onKeyDown) apiStore.state.onKeyDown(e);
+            if (api && api.onKeyDown) api.onKeyDown(e);
         }
     };
 
@@ -2016,7 +2016,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const y = ccr.y;
             const ccoord = new WSCanvasCoord(x, y);
 
-            if (apiStore && apiStore.state.onPreviewMouseDown) apiStore.state.onPreviewMouseDown(e, cellCoord);
+            if (api && api.onPreviewMouseDown) api.onPreviewMouseDown(e, cellCoord);
 
             if (!e.defaultPrevented) {
 
@@ -2142,30 +2142,30 @@ export function WSCanvas(props: WSCanvasProps) {
                     }
 
                     setStateNfo(state);
-                    if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                    if (api && api.onStateChanged) api.onStateChanged(state);
                 }
 
-                if (apiStore && apiStore.state.onMouseDown) apiStore.state.onMouseDown(e, cellCoord);
+                if (api && api.onMouseDown) api.onMouseDown(e, cellCoord);
             }
         }
     }
 
     const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-        if (apiStore && apiStore.state.onPreviewMouseUp) apiStore.state.onPreviewMouseUp(e);
+        if (api && api.onPreviewMouseUp) api.onPreviewMouseUp(e);
 
         if (!e.defaultPrevented) {
             const state = stateNfo.dup();
             cleanupScrollClick(state);
             state.resizingCol = -2;
             setStateNfo(state);
-            if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+            if (api && api.onStateChanged) api.onStateChanged(state);
 
-            if (apiStore && apiStore.state.onMouseUp) apiStore.state.onMouseUp(e);
+            if (api && api.onMouseUp) api.onMouseUp(e);
         }
     }
 
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-        if (apiStore && apiStore.state.onPreviewMouseMove) apiStore.state.onPreviewMouseMove(e);
+        if (api && api.onPreviewMouseMove) api.onPreviewMouseMove(e);
 
         if (!e.defaultPrevented) {
             const ccr = mouseCoordToCanvasCoord(e);
@@ -2184,11 +2184,11 @@ export function WSCanvas(props: WSCanvasProps) {
                     state.cursorOverCell = isOverCell;
                 }
 
-                if (apiStore && apiStore.state.onMouseOverCell) {
+                if (api && api.onMouseOverCell) {
                     const q = canvasToCellCoord(stateNfo, viewMap, ccr, showPartialColumns);
                     const xy = [e.clientX, e.clientY];
                     if (q != null) {
-                        apiStore.state.onMouseOverCell({ xy: xy, cell: q });
+                        api.onMouseOverCell({ xy: xy, cell: q });
                     }
                 }
 
@@ -2308,10 +2308,10 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 if (stateUpdated) {
                     setStateNfo(state!);
-                    if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state!);
+                    if (api && api.onStateChanged) api.onStateChanged(state!);
                 }
 
-                if (apiStore && apiStore.state.onMouseMove) apiStore.state.onMouseMove(e);
+                if (api && api.onMouseMove) api.onMouseMove(e);
 
             }
         }
@@ -2325,7 +2325,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const ccoord = new WSCanvasCoord(x, y);
             const cell = canvasToCellCoord(stateNfo, viewMap, ccoord);
 
-            if (apiStore && apiStore.state.onPreviewMouseDoubleClick) apiStore.state.onPreviewMouseDoubleClick(e, cell);            
+            if (api && api.onPreviewMouseDoubleClick) api.onPreviewMouseDoubleClick(e, cell);
 
             if (!e.defaultPrevented) {
                 if (cell) {
@@ -2338,24 +2338,24 @@ export function WSCanvas(props: WSCanvasProps) {
                             const state = stateNfo.dup();
                             paint(state, viewMap);
                             setStateNfo(state);
-                            if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                            if (api && api.onStateChanged) api.onStateChanged(state);
                             return;
                         }
 
                         const state = stateNfo.dup();
                         openCellCustomEdit(state);
                         setStateNfo(state);
-                        if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                        if (api && api.onStateChanged) api.onStateChanged(state);
                     }
 
-                    if (apiStore && apiStore.state.onMouseDown) apiStore.state.onMouseDown(e, cell);
+                    if (api && api.onMouseDown) api.onMouseDown(e, cell);
                 }
             }
         }
     }
 
     const handleWheel = (e: WheelEvent) => {
-        if (apiStore && apiStore.state.onPreviewMouseWheel) apiStore.state.onPreviewMouseWheel(e);
+        if (api && api.onPreviewMouseWheel) api.onPreviewMouseWheel(e);
 
         if (!e.defaultPrevented && stateNfo.cursorOverCell) {
             const shift_key = e.getModifierState("Shift");
@@ -2385,13 +2385,13 @@ export function WSCanvas(props: WSCanvasProps) {
             }
 
             setStateNfo(state);
-            if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+            if (api && api.onStateChanged) api.onStateChanged(state);
 
             if (prevent) {
                 e.preventDefault();
             }
 
-            if (apiStore && apiStore.state.onMouseWheel) apiStore.state.onMouseWheel(e);
+            if (api && api.onMouseWheel) api.onMouseWheel(e);
         }
     }
 
@@ -2429,7 +2429,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
 
         setStateNfo(state);
-        if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+        if (api && api.onStateChanged) api.onStateChanged(state);
     }
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -2523,7 +2523,7 @@ export function WSCanvas(props: WSCanvasProps) {
             if (matches || state.horizontalScrollClickStartCoord !== null || state.verticalScrollClickStartCoord !== null) {
                 e.preventDefault();
                 setStateNfo(state);
-                if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                if (api && api.onStateChanged) api.onStateChanged(state);
             }
         }
     }
@@ -2534,7 +2534,7 @@ export function WSCanvas(props: WSCanvasProps) {
             state.horizontalScrollClickStartCoord = null;
             state.verticalScrollClickStartCoord = null;
             setStateNfo(state);
-            if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+            if (api && api.onStateChanged) api.onStateChanged(state);
         }
     }
 
@@ -2551,7 +2551,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const y = ccr.y;
             const cell = canvasToCellCoord(stateNfo, viewMap, new WSCanvasCoord(x, y));
 
-            if (apiStore && apiStore.state.onContextMenu) apiStore.state.onContextMenu(e, cell);
+            if (api && api.onContextMenu) api.onContextMenu(e, cell);
         }
     }
 
@@ -2577,7 +2577,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 paint(state, viewMap);
                 setViewMap(vm);
                 setStateNfo(state);
-                if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+                if (api && api.onStateChanged) api.onStateChanged(state);
             }
         }
     }, [stateNfo.initialized]);
@@ -2609,7 +2609,7 @@ export function WSCanvas(props: WSCanvasProps) {
         recomputeGeometry2(state, vm);
         setViewMap(vm);
         setStateNfo(state);
-        if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+        if (api && api.onStateChanged) api.onStateChanged(state);
     }, [debouncedColumnWidth]);
     //#endregion 
 
@@ -2626,7 +2626,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         setViewMap(vm);
         setStateNfo(state);
-        if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+        if (api && api.onStateChanged) api.onStateChanged(state);
     }, [rowsCount, dataSource]);
 
     // useEffect(() => {
@@ -2658,7 +2658,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             setViewMap(vm);
             setStateNfo(state);
-            if (apiStore && apiStore.state.onStateChanged) apiStore.state.onStateChanged(state);
+            if (api && api.onStateChanged) api.onStateChanged(state);
         }
     }, [debouncedFilter]);
     //#endregion     
@@ -2701,78 +2701,76 @@ export function WSCanvas(props: WSCanvasProps) {
 
     //#region API    
     useEffect(() => {
-        if (apiStore) {
-            apiStore.set((x) => {
-                x.currentState = stateNfo;
+        if (api) {
+            api.currentState = stateNfo;
 
-                x.clearSelection = () => {
-                    const state = stateNfo.dup();
-                    clearSelection(state);
-                    setStateNfo(state);
-                    if (x.onStateChanged) x.onStateChanged(state);
-                };
+            api.clearSelection = () => {
+                const state = stateNfo.dup();
+                clearSelection(state);
+                setStateNfo(state);
+                if (api.onStateChanged) api.onStateChanged(state);
+            };
 
-                x.getSelection = () => stateNfo.viewSelection;
-                x.setSelection = (selection: WSCanvasSelection) => {
-                    const state = stateNfo.dup();
-                    state.viewSelection = selection;
-                    setStateNfo(state);
-                    if (x.onStateChanged) x.onStateChanged(state);
-                }
-                x.confirmCustomEdit = () => {
-                    confirmCustomEdit(stateNfo, viewMap);
-                }
-                x.closeCustomEdit = () => {
-                    const state = stateNfo.dup();
-                    closeCustomEdit(state);
-                    setStateNfo(state);
-                }
-                x.goToNextCell = () => {
-                    const state = stateNfo.dup();
-                    const focusedViewCell = new WSCanvasCellCoord(
-                        realRowToViewRow(viewMap, stateNfo.focusedCell.row),
-                        realColToViewCol(viewMap, stateNfo.focusedCell.col),
-                        stateNfo.focusedCell.filterRow);
-                    if (focusedViewCell.col < colsCount - 1)
-                        state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol());
-                    else if (focusedViewCell.row < rowsCount - 1)
-                        state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextRow().setCol(0));
-                    setStateNfo(state);
-                    paint(state, viewMap);
-                    if (x.onStateChanged) x.onStateChanged(state);
-                }
-                x.triggerKey = (e: React.KeyboardEvent) => {
-                    handleKeyDown(e);
-                }
+            api.getSelection = () => stateNfo.viewSelection;
+            api.setSelection = (selection: WSCanvasSelection) => {
+                const state = stateNfo.dup();
+                state.viewSelection = selection;
+                setStateNfo(state);
+                if (api.onStateChanged) api.onStateChanged(state);
+            }
+            api.confirmCustomEdit = () => {
+                confirmCustomEdit(stateNfo, viewMap);
+            }
+            api.closeCustomEdit = () => {
+                const state = stateNfo.dup();
+                closeCustomEdit(state);
+                setStateNfo(state);
+            }
+            api.goToNextCell = () => {
+                const state = stateNfo.dup();
+                const focusedViewCell = new WSCanvasCellCoord(
+                    realRowToViewRow(viewMap, stateNfo.focusedCell.row),
+                    realColToViewCol(viewMap, stateNfo.focusedCell.col),
+                    stateNfo.focusedCell.filterRow);
+                if (focusedViewCell.col < colsCount - 1)
+                    state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol());
+                else if (focusedViewCell.row < rowsCount - 1)
+                    state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextRow().setCol(0));
+                setStateNfo(state);
+                paint(state, viewMap);
+                if (api.onStateChanged) api.onStateChanged(state);
+            }
+            api.triggerKey = (e: React.KeyboardEvent) => {
+                handleKeyDown(e);
+            }
 
-                x.clientXYToCanvasCoord = (x: number, y: number) => clientXYToCanvasCoord(x, y);
-                x.cellToCanvasCoord = (cell) => {
-                    console.log("FSRC:" + stateNfo.filteredSortedRowsCount);
-                    return viewCellToCanvasCoord(stateNfo, realCellToView(viewMap, cell));
-                }
-                x.canvasCoordToCellCoord = (ccoord) => canvasToCellCoord(stateNfo, viewMap, ccoord);
-                x.focusCell = (cell, scrollTo, endingCell, clearSelection) => {
-                    const state = stateNfo.dup();
-                    focusCell(state, viewMap, cell, scrollTo, endingCell, clearSelection);
-                    setStateNfo(state);
-                    if (x.onStateChanged) x.onStateChanged(state);
-                }
-                //
+            api.clientXYToCanvasCoord = (x: number, y: number) => clientXYToCanvasCoord(x, y);
+            api.cellToCanvasCoord = (cell) => {
+                console.log("FSRC:" + stateNfo.filteredSortedRowsCount);
+                return viewCellToCanvasCoord(stateNfo, realCellToView(viewMap, cell));
+            }
+            api.canvasCoordToCellCoord = (ccoord) => canvasToCellCoord(stateNfo, viewMap, ccoord);
+            api.focusCell = (cell, scrollTo, endingCell, clearSelection) => {
+                const state = stateNfo.dup();
+                focusCell(state, viewMap, cell, scrollTo, endingCell, clearSelection);
+                setStateNfo(state);
+                if (api.onStateChanged) api.onStateChanged(state);
+            }
+            //
 
-                x.scrollTo = (coord) => {
-                    const state = stateNfo.dup();
-                    scrollTo(state, viewMap, coord);
-                    setStateNfo(state);
-                    if (x.onStateChanged) x.onStateChanged(state);
-                }
-                x.setSorting = (newSorting) => {
-                    const state = stateNfo.dup();
-                    state.columnsSort = newSorting;
-                    setStateNfo(state);
-                    if (x.onStateChanged) x.onStateChanged(state);
-                }
-                x.paint = () => paint(stateNfo, viewMap);
-            });
+            api.scrollTo = (coord) => {
+                const state = stateNfo.dup();
+                scrollTo(state, viewMap, coord);
+                setStateNfo(state);
+                if (api.onStateChanged) api.onStateChanged(state);
+            }
+            api.setSorting = (newSorting) => {
+                const state = stateNfo.dup();
+                state.columnsSort = newSorting;
+                setStateNfo(state);
+                if (api.onStateChanged) api.onStateChanged(state);
+            }
+            api.paint = () => paint(stateNfo, viewMap);
         }
     }, [stateNfo, viewMap]);
     //#endregion
