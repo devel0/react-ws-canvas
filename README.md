@@ -10,6 +10,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - [features](#features)
 - [quickstart](#quickstart)
+- [states, handlers and api usage](#states-handlers-and-api-usage)
 - [tips](#tips)
 - [examples list](#examples-list)
 - [how to contribute ( quickstart )](#how-to-contribute--quickstart-)
@@ -101,7 +102,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [8]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/Sample3.tsx#L128-L130
 [9]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L27-L28
 [10]: https://github.com/devel0/react-ws-canvas/blob/7c4270e17742f55e229e1a66e9d16410a9c97b26/example/src/lib/WSCanvasApi.tsx#L9
-[11]: https://github.com/devel0/react-ws-canvas/blob/38997638bb5f1f043164fdf73802490cfafa06c3/example/src/App.tsx#L15
+[11]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L118-L156
 [12]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L35-L36
 [13]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L44-L45
 [14]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L50-L51
@@ -179,6 +180,24 @@ export default AppQuickStart;
 ```sh
 yarn start
 ```
+
+## states, handlers and api usage
+
+- [declare][500] your grid handlers and api state variables
+
+- handlers
+  - [attach handlers][501]
+  - [define handlers][503]
+- api
+  - [onApi][502] set your api state variable
+  - [invoke api][503] passing states info that comes as argument from handlers. If call an api outside grid handlers can use your own [states copy][505]
+
+[500]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L27-L28
+[501]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L192
+[502]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L193
+[503]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L118-L156
+[504]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L133
+[505]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L152
 
 ## tips
 
