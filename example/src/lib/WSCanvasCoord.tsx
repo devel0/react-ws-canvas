@@ -27,5 +27,5 @@ export class WSCanvasCoord {
 
     key = () => this.toString();
 
-    toString() { return "(" + this._x + ", " + this._y + ")"; }
+    toString() { return "(x:" + this._x + ", y:" + this._y + " w:" + this._width + ", h:" + this._height + ")"; }
 }

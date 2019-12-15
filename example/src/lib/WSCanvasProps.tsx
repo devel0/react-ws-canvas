@@ -5,6 +5,10 @@ import { WSCanvasColumnType, WSCanvasColumnClickBehavior } from "./WSCanvasColum
 import { WSCanvasApi } from "./WSCanvasApi";
 import { CSSProperties } from "react";
 import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
+import { WSCanvasState } from "./WSCanvasState";
+import { ViewMap } from "./WSCanvas";
+import { WSCanvasStates } from "./WSCanvasStates";
+import { WSCanvasHandlers } from "./WSCanvasHandlers";
 
 export interface WSCanvasCellDataNfo {
     coord: WSCanvasCellCoord;
@@ -12,9 +16,11 @@ export interface WSCanvasCellDataNfo {
 }
 
 /** see WSCanvasPropsDefault for default values */
-export interface WSCanvasProps {
-    /** api */
-    api?: WSCanvasApi,
+export interface WSCanvasProps {            
+    /** handlers */
+    handlers?: WSCanvasHandlers,    
+    /** receive api */
+    onApi?: (states: WSCanvasStates, api: WSCanvasApi) => void,
 
     /** width 100% */
     fullwidth: boolean;

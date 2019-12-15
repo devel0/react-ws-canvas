@@ -1,4 +1,4 @@
-import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize, WSCanvasXYCellCoord, WSCanvasApi, useWindowSize } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize, WSCanvasXYCellCoord, WSCanvasApi, useWindowSize, WSCanvasStates, WSCanvasHandlers } from "./lib";
 
 import React, { useState, useEffect, useRef } from "react";
 
@@ -23,7 +23,9 @@ interface MyData {
 
 export function Sample3() {
   const [rows, setRows] = useState<MyData[]>([]);
-  const [api, setApi] = useState<WSCanvasApi>(new WSCanvasApi());
+  const [gridHandlers, setGridHandlers] = useState<WSCanvasHandlers | undefined>(undefined);
+  const [gridApi, setGridApi] = useState<WSCanvasApi | null>(null);
+  const [gridStateNfo, setGridStateNfo] = useState<WSCanvasStates>({} as WSCanvasStates);
   const winSize = useWindowSize();
 
   const ROWS = 5000;
@@ -107,50 +109,61 @@ export function Sample3() {
 
     setRows(_rows);
 
-    const newApi = new WSCanvasApi();
-    newApi.onMouseDown = (e, cell) => {
-      if (cell) {
-        if (cell.row >= 0) {
-          const data = rows[cell.row] as MyData;
-          if (data) console.log("clicked cell row:" + cell.row + " col1data:" + data.col1);
-        }
-      }
-    }
+    //newApi.onMouseOverCell = (xycell) => {
+    /*
+    console.log("ON");
+    //if (prevHdlr) prevHdlr(xycell); // TODO:
+    setOverCellCoord(xycell);
+    */
+    //}
+    //setApi(newApi);  
+  }, []);
 
-    newApi.onMouseOverCell = (xycell) => {
-      console.log("ON");
-      //if (prevHdlr) prevHdlr(xycell); // TODO:
-      setOverCellCoord(xycell);
-      if (tooltipDivRef && tooltipDivRef.current) {
-        const div = tooltipDivRef.current;
-        if (xycell) {
-          //const childDiv = React.createContext("div");
-          if (xycell.cell.row >= 0 && xycell.cell.col >= 0) {
-            console.log("query cell:" + xycell.cell.toString() + " fscr:" + (api.currentState ? api.currentState.filteredSortedRowsCount : 0));
-            const cellCoordNfo = api.cellToCanvasCoord(xycell.cell);
-            if (cellCoordNfo) {
-              console.log("coord:" + cellCoordNfo.toString());
-              //div.style["left"] = (cellCoordNfo.x + cellCoordNfo!.width) + "px";
-              //div.style["top"] = xycell.xy[1] + "px";
+  //  let handlers: WSCanvasHandlers | undefined = undefined;
+
+  const [overCellCoord, setOverCellCoord] = useState<string>("");
+
+  useEffect(() => {
+    const handlers = {
+      onMouseDown: (states, e, cell) => {
+        if (cell) {
+          if (cell.row >= 0) {
+            const data = rows[cell.row] as MyData;
+            if (data) console.log("clicked cell row:" + cell.row + " col1data:" + data.col1);
+          }
+        }
+      },
+      onMouseOverCell: (states, nfo) => {
+        if (gridApi && tooltipDivRef && tooltipDivRef.current) {
+          const div = tooltipDivRef.current;
+          if (nfo.cell.row >= 0 && nfo.cell.col >= 0) {
+            const canvasCoord = gridApi.canvasCoord(states);
+            const cellCanvasCoord = gridApi.cellToCanvasCoord(states, nfo.cell);
+            if (canvasCoord && cellCanvasCoord) {
+              setOverCellCoord(nfo.cell.toString() + " canvas:" + cellCanvasCoord.toString());
+              div.style["left"] = (canvasCoord.x + cellCanvasCoord.x + cellCanvasCoord.width) + "px";
+              div.style["top"] = (canvasCoord.y + cellCanvasCoord.y + cellCanvasCoord.height / 2) + "px";
+
+              // div.style["left"] = (nfo.xy[0] + 25) + "px";
+              // div.style["top"] = (nfo.xy[1] + 25) + "px";
+
               div.style["display"] = "block";
             }
           } else {
             div.style["display"] = "none";
           }
-        } else {
-          div.style["display"] = "none";
-          //div.classList.remove(""
-          //if (div.hasChildNodes()) div.removeChild(div.childNodes[0]);
         }
+      },
+      onStateChanged: (states) => {
+        console.log("set state viewmap:" + String(states.vm !== undefined && states.vm !== null));
+        setGridStateNfo(states);
+        //console.log("->" + states.state.filteredSortedRowsCount);
       }
-    }
-    setApi(newApi);
-  }, []);
-
-  const [overCellCoord, setOverCellCoord] = useState<WSCanvasXYCellCoord | null>(null);
+    } as WSCanvasHandlers;
+    setGridHandlers(handlers);
+  }, [rows]);
 
   const tooltipDivRef = useRef<HTMLDivElement>(null);
-
 
   const divRef = useRef<HTMLDivElement>(null);
 
@@ -166,15 +179,22 @@ export function Sample3() {
       setRows(q);
     }}>CHANGE ROW</button>
 
-    <div ref={tooltipDivRef} style={{ position: "absolute", background: "lightcyan", padding: ".25em", border: "1px solid darkgray" }}>
-      TIP for cell: {overCellCoord ? overCellCoord.cell.toString() : ""}
+    <div ref={tooltipDivRef} style={{ position: "absolute", pointerEvents: "none" }}>
+      <svg style={{ position: "fixed" }}>
+        <polygon points="0,0 15,15 15,0"
+          style={{ fill: "yellow", stroke: "darkgray", strokeWidth: 1 }} />
+      </svg>
+      <div style={{ marginLeft: "15px", background: "lightcyan", padding: ".25em", border: "1px solid darkgray" }}>
+        TIP for cell: {overCellCoord}
+      </div>
     </div>
 
     <WSCanvas
-      api={api}
+      handlers={gridHandlers}
+      onApi={(states, api) => { setGridApi(api); }}
 
       containerStyle={{ margin: "1em" }}
-      fullwidth      
+      fullwidth
       height={Math.max(300, winSize.height * .8)}
 
       frozenRowsCount={0} frozenColsCount={0}
@@ -223,13 +243,13 @@ export function Sample3() {
                   case "Tab":
                   case "Enter":
                     e.preventDefault();
-                    api.closeCustomEdit();
+                    //api.closeCustomEdit(); // TODO:
                     break;
                   case "Escape":
                     const q = props.prepareCellDataset();
                     props.setCellData(q, cell, origVal);
                     props.commitCellDataset(q);
-                    api.closeCustomEdit();
+                    // api.closeCustomEdit(); // TODO:
                     break;
                 }
               }}

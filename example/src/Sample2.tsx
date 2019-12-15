@@ -81,20 +81,20 @@ export function Sample2() {
 
     setRows(_rows);
 
-    const newApi = new WSCanvasApi();
-    newApi.onMouseDown = (e, cell) => {
-      if (cell) {
-        if (cell.row >= 0) {
-          const data = rows[cell.row] as MyData;
-          if (data) console.log("clicked cell row:" + cell.row + " col1:" + data.col1);
-        }
-      }
-    };
-    setApi(newApi);
+    // const newApi = new WSCanvasApi();
+    // newApi.onMouseDown = (e, cell) => {
+    //   if (cell) {
+    //     if (cell.row >= 0) {
+    //       const data = rows[cell.row] as MyData;
+    //       if (data) console.log("clicked cell row:" + cell.row + " col1:" + data.col1);
+    //     }
+    //   }
+    // };
+    // setApi(newApi);
   }, []);
 
   return <WSCanvas
-    api={api}
+    // api={api}
     fullwidth height={winSize.height * .8}
     containerStyle={{ margin: "2em" }}
     // columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}

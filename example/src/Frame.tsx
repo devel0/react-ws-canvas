@@ -23,7 +23,7 @@ export default function Frame() {
   return <div>
 
     <div style={{ margin: 10 }}>
-      <b>EXAMPLES</b>
+      <b>EXAMPLES </b>
       <button onClick={() => { setExample(0); }}>quickstart</button>
       <button onClick={() => { setExample(1); }}>EX1</button>
       <button onClick={() => { setExample(2); }}>EX2</button>

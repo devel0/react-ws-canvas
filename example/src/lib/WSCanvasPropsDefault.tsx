@@ -9,8 +9,9 @@ const DEFAULT_ROW_HEIGHT = 30;
 const DEFAULT_COL_WIDTH = 120;
 
 export const WSCanvasPropsDefault = () => {
-    return {
-        api: undefined,
+    return {        
+        onApi: undefined,
+        handlers: undefined,
 
         fullwidth: false,
         width: window.innerWidth,        
