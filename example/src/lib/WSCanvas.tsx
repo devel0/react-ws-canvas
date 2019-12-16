@@ -1759,7 +1759,6 @@ export function WSCanvas(props: WSCanvasProps) {
     /** side effect on state */
     const goToNextCell = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null) => {
         if (canvasDivRef.current) {
-            console.log("focusing");
             canvasDivRef.current.blur();
         }
         const focusedViewCell = new WSCanvasCellCoord(
@@ -1775,8 +1774,7 @@ export function WSCanvas(props: WSCanvasProps) {
         state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(newViewCell, newViewCell)]);
         setStateNfo(state);
         paint(state, vm, orh);
-        if (canvasDivRef.current) {
-            console.log("focusing");
+        if (canvasDivRef.current) {            
             canvasDivRef.current.blur();
             canvasDivRef.current.focus();
         }
