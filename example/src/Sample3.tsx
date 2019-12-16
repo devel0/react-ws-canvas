@@ -269,7 +269,7 @@ export function Sample3() {
               }}
             >
               {mapEnum(MyEnum).map((x) =>
-                <option key={"k:" + x.value} value={x.value}>d{x.name}</option>
+                <option key={"k:" + x.value} value={x.value}>{x.name}</option>
               )}
             </select>
           </div>

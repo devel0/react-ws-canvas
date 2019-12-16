@@ -146,6 +146,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const [overridenRowHeight, setOverridenRowHeight] = useState<number[] | null>(null);
     const debouncedFilter = useDebounce(stateNfo.filtersTrack, filterDebounceMs);
     const debouncedColumnWidth = useDebounce(stateNfo.columnWidthOverrideTrack, recomputeRowHeightDebounceFilterMs);
+    const [touchStartTime, setTouchStartTime] = useState<Date>(new Date());
 
     const colNumberRowHeightFull = () => colNumberRowHeight + (showFilter ? rowHeight(-1) : 0);
 
@@ -539,7 +540,7 @@ export function WSCanvas(props: WSCanvasProps) {
     // const canvasToViewCell = (state: WSCanvasState, ccoord: WSCanvasCoord, allowPartialCol: boolean = false) =>
     // new 
 
-    const canvasToCellCoord = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, ccoord: WSCanvasCoord, allowPartialCol: boolean = false) => {
+    const canvasToCellCoord = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, ccoord: WSCanvasCoord, allowPartialCol: boolean) => {
         const px = ccoord.x;
         const py = ccoord.y;
 
@@ -872,14 +873,15 @@ export function WSCanvas(props: WSCanvasProps) {
         commitCellDataset(q);
     }
 
-    const openCellCustomEdit = (state: WSCanvasState, orh: number[] | null) => {
+    const openCellCustomEdit = (state: WSCanvasState, cell: WSCanvasCellCoord, orh: number[] | null) => {        
         if (canvasRef.current) {
-            const viewCell = realCellToView(viewMap, state.focusedCell);
+            const viewCell = realCellToView(viewMap, cell);
+            
             const xy = viewCellToCanvasCoord(state, viewMap, orh, viewCell);
-            const cell = state.focusedCell;
-            if (isCellReadonly && isCellReadonly(cell)) return;
+                        
+            if (isCellReadonly !== undefined && isCellReadonly(cell)) return;            
+            if (xy) {                
 
-            if (xy) {
                 state.customEditCell = cell;
                 let cellVal = getCellData(cell);
                 if (getCellType) {
@@ -906,13 +908,13 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     /** side effect on state */
-    const closeCustomEdit = (state: WSCanvasState, confirm: boolean) => {        
+    const closeCustomEdit = (state: WSCanvasState, confirm: boolean) => {
         if (state.customEditCell !== null) {
             if (confirm)
                 singleSetCellData(state.customEditCell, state.customEditValue);
             else
                 singleSetCellData(state.customEditCell, state.customEditOrigValue);
-
+            
             state.customEditCell = null;
             state.customEditValue = null;
             state.customEditOrigValue = null;
@@ -1033,7 +1035,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const postEditFormat = (state: WSCanvasState) => {
         if (getCellType) {
             const cellData = getCellData(state.focusedCell);
-            const cellType = getCellType(state.focusedCell, cellData);            
+            const cellType = getCellType(state.focusedCell, cellData);
 
             switch (cellType) {
                 case "date":
@@ -1042,7 +1044,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 case "time":
                     singleSetCellData(state.focusedCell, moment(cellData, timeCellMomentFormat));
                     break;
-                case "datetime":                                        
+                case "datetime":
                     singleSetCellData(state.focusedCell, moment(cellData, timeCellMomentFormat));
                     break;
             }
@@ -1057,7 +1059,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (dontApplySelect === undefined || dontApplySelect === false) setSelectionByEndingCell(state, viewCell, endingCell, clearPreviousSel);
 
         state.focusedCell = cell;
-        closeCustomEdit(state, true);        
+        closeCustomEdit(state, true);
         state.editMode = WSCanvasEditMode.none;
 
         if (scrollTo === true) rectifyScrollOffset(state, vm);
@@ -1192,7 +1194,7 @@ export function WSCanvas(props: WSCanvasProps) {
      * PAINT
      *=====================================================================================================
      **/
-    const paint = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null) => {
+    const paint = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null) => {        
         if (!state.initialized) return;
 
         if (debug) console.log("PAINT (rows:" + rowsCount + ")");
@@ -1892,7 +1894,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                 keyHandled = true;
                             }
                             else {
-                                openCellCustomEdit(state, overridenRowHeight);
+                                openCellCustomEdit(state, state.focusedCell, overridenRowHeight);
                             }
                         }
                         break;
@@ -2027,6 +2029,8 @@ export function WSCanvas(props: WSCanvasProps) {
             if (handlers && handlers.onKeyDown) handlers.onKeyDown(mkstates(state, viewMap, overridenRowHeight), e);
         }
     };
+
+    const DOUBLE_CLICK_THRESHOLD = 300;
 
     const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         let cellCoord: WSCanvasCellCoord | null = null;
@@ -2336,38 +2340,44 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
+    const dblClick = (state: WSCanvasState, cell: WSCanvasCellCoord, x: number, y: number) => {
+        if (cell) {
+            if (cell.row >= 0 && cell.col >= 0) {                
+                const data = getCellData(cell);
+                if (getCellType && getCellType(cell, data) === "boolean") {
+                    const boolVal = data as boolean;
+                    singleSetCellData(cell, !boolVal);
+                    paint(state, viewMap, overridenRowHeight);
+                    if (handlers && handlers.onStateChanged) handlers.onStateChanged(mkstates(state, viewMap, overridenRowHeight));
+                    return;
+                }
+
+                focusCell(state, viewMap, cell);
+                openCellCustomEdit(state, cell, overridenRowHeight);
+                if (handlers && handlers.onStateChanged) handlers.onStateChanged(mkstates(state, viewMap, overridenRowHeight));
+            }
+        }
+
+    }
+
     const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         const ccr = mouseCoordToCanvasCoord(e);
+
         if (ccr !== null) {
             const x = ccr.x;
             const y = ccr.y;
+
             const ccoord = new WSCanvasCoord(x, y);
-            const cell = canvasToCellCoord(stateNfo, viewMap, overridenRowHeight, ccoord);
+            const cell = canvasToCellCoord(stateNfo, viewMap, overridenRowHeight, ccoord, showPartialColumns);
 
             if (handlers && handlers.onPreviewMouseDoubleClick) handlers.onPreviewMouseDoubleClick(mkstates(stateNfo, viewMap, overridenRowHeight), e, cell);
 
             if (!e.defaultPrevented) {
                 if (cell) {
-                    if (cell.row >= 0 && cell.col >= 0) {
-
-                        const data = getCellData(cell);
-                        if (getCellType && getCellType(cell, data) === "boolean") {
-                            const boolVal = data as boolean;
-                            singleSetCellData(cell, !boolVal);
-                            const state = stateNfo.dup();
-                            paint(state, viewMap, overridenRowHeight);
-                            setStateNfo(state);
-                            if (handlers && handlers.onStateChanged) handlers.onStateChanged(mkstates(state, viewMap, overridenRowHeight));
-                            return;
-                        }
-
-                        const state = stateNfo.dup();
-                        openCellCustomEdit(state, overridenRowHeight);
-                        setStateNfo(state);
-                        if (handlers && handlers.onStateChanged) handlers.onStateChanged(mkstates(state, viewMap, overridenRowHeight));
-                    }
-
-                    if (handlers && handlers.onMouseDown) handlers.onMouseDown(mkstates(stateNfo, viewMap, overridenRowHeight), e, cell);
+                    const state = stateNfo.dup();
+                    dblClick(state, cell, x, y);
+                    if (handlers && handlers.onMouseDoubleClick) handlers.onMouseDoubleClick(mkstates(state, viewMap, overridenRowHeight), e, cell);
+                    setStateNfo(state);
                 }
             }
         }
@@ -2426,12 +2436,16 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const handleTouchStart = (e: TouchEvent) => {
         if (e.touches.length > 1) return;
+        const touch = e.touches.item(0);
+
+        const nowDate = new Date();
+        const clkDiff = (nowDate.getTime() - touchStartTime.getTime())
+        setTouchStartTime(nowDate);
 
         const state = stateNfo.dup();
 
         state.scrollOffsetStart = new WSCanvasCellCoord(state.viewScrollOffset.row, state.viewScrollOffset.col);
 
-        const touch = e.touches.item(0);
         if (touch && canvasRef.current) {
             const pos = getTouchPos(canvasRef.current, e);
 
@@ -2447,10 +2461,18 @@ export function WSCanvas(props: WSCanvasProps) {
             state.cursorOverCell = isOverCell;
 
             evalClickStart(state, ccoord);
+
+            if (clkDiff < DOUBLE_CLICK_THRESHOLD) {                
+                e.preventDefault();
+                                
+                const cell = canvasToCellCoord(state, viewMap, overridenRowHeight, ccoord, showPartialColumns);
+                
+                if (cell) dblClick(state, cell, x, y);
+            }
         }
 
-        setStateNfo(state);
         if (handlers && handlers.onStateChanged) handlers.onStateChanged(mkstates(state, viewMap, overridenRowHeight));
+        setStateNfo(state);
     }
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -2570,7 +2592,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (ccr !== null) {
             const x = ccr.x;
             const y = ccr.y;
-            const cell = canvasToCellCoord(stateNfo, viewMap, overridenRowHeight, new WSCanvasCoord(x, y));
+            const cell = canvasToCellCoord(stateNfo, viewMap, overridenRowHeight, new WSCanvasCoord(x, y), showPartialColumns);
 
             if (handlers && handlers.onContextMenu) handlers.onContextMenu(mkstates(stateNfo, viewMap, overridenRowHeight), e, cell);
         }
@@ -2784,7 +2806,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         tmp.width, tmp.height);
                 } else return null;
             }
-            api.canvasCoordToCellCoord = (states, ccoord) => canvasToCellCoord(states.state, states.vm, states.overrideRowHeight, ccoord);
+            api.canvasCoordToCellCoord = (states, ccoord) => canvasToCellCoord(states.state, states.vm, states.overrideRowHeight, ccoord, showPartialColumns);
             api.canvasCoord = (states) => {
                 if (canvasRef && canvasRef.current) {
                     const c = canvasRef.current;
