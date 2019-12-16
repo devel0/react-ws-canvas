@@ -81,6 +81,7 @@ export const WSCanvasPropsDefault = () => {
         filterTextMargin: 3,
         filterIgnoreCase: true,
         filterBackground: "yellow",
+        immediateSort: false,        
 
         recomputeRowHeightDebounceFilterMs: 0,
         rowNumberColWidth: 80,
@@ -97,7 +98,7 @@ export const WSCanvasPropsDefault = () => {
         containerStyle: undefined,
         canvasStyle: undefined,
 
-        debug: false,
+        debug: true,
         dbgDiv: undefined,
     } as WSCanvasProps;
 }

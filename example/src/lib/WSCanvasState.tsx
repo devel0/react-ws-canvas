@@ -30,7 +30,7 @@ export class WSCanvasState {
         this.filtersTrack = "";
         this.hoveredViewRow = -2;
 
-        this.editMode = WSCanvasEditMode.none;
+        this.editMode = WSCanvasEditMode.none;        
 
         this.customEditCell = null;
         this.customEditOrigValue = null;
@@ -81,7 +81,7 @@ export class WSCanvasState {
     filtersTrack: string;
     hoveredViewRow: number;
 
-    editMode: WSCanvasEditMode;
+    editMode: WSCanvasEditMode;    
 
     customEditCell: WSCanvasCellCoord | null;
     customEditOrigValue: any;

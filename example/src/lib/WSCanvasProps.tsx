@@ -144,7 +144,7 @@ export interface WSCanvasProps {
     /** default non cell cursor */
     outsideCellCursor: string;
     /** row hover */
-    rowHoverColor: string | undefined;
+    rowHoverColor: string | undefined;    
 
     /** filter apply debounce (ms) */
     filterDebounceMs: number;
@@ -154,6 +154,8 @@ export interface WSCanvasProps {
     filterIgnoreCase: boolean;
     /** filter cell background color */
     filterBackground: string;
+    /** sort during typings */
+    immediateSort: boolean;    
 
     /** ms from last column change to recompute row height */
     recomputeRowHeightDebounceFilterMs: number;
