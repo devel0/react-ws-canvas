@@ -2933,8 +2933,7 @@ export function WSCanvas(props: WSCanvasProps) {
             outer size: {fullwidth ? winSize.width : width} x {height}<br />
             toplevel_container_mp:{toplevel_container_mp} ( size: {toplevel_container_size.width} x {toplevel_container_size.height} )<br />
             canvas_container_mp{canvas_container_mp}<br />
-            canvas size:{cs.width} x {cs.height}<br /> */}
-            paintCnt:{stateNfo.paintcnt}
+            canvas size:{cs.width} x {cs.height}<br /> */}            
 
             <canvas ref={canvasRef}
                 tabIndex={0}
