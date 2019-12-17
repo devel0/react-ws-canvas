@@ -290,7 +290,7 @@ Because I need a library to publish and either a working example to test/debug t
 ## development notes
 
 - **key notes**
-  - [W and H][1508] variables represents [canvas size][1509] and used as starting point for [calculations][1510]
+  - [cs.width and cs.height][1508] variables represents [canvas size][1509] and used as starting point for [calculations][1510]
   - [stateNfo, viewMap, overridenRowHeight][1500] are kept separate because stateNfo must light because frequently updated while viewMap and overridenRowHeight can be heavy struct for large grids
   - [view][1501] mapping have a size less-or-equal than rowsCount depending on [filtering][1502] and the order of view may different depending on sorting
   - some methods work with [real cells][1503] ( the same as user configure through getCellData, setCellData ), some other methods works with [view cells][1504] that is an internal representation convenient to deal on what-you-see-is-what-you-get
@@ -311,6 +311,6 @@ Because I need a library to publish and either a working example to test/debug t
 [1505]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvas.tsx#L183-L187
 [1506]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvas.tsx#L267
 [1507]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvas.tsx#L2039
-[1508]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvas.tsx#L155-L156
-[1509]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvas.tsx#L2885-L2886
-[1510]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvas.tsx#L232
+[1508]: https://github.com/devel0/react-ws-canvas/blob/5c1c29be00c6c3c4e55544df25e8c4087f0631a8/example/src/lib/WSCanvas.tsx#L158-L168
+[1509]: https://github.com/devel0/react-ws-canvas/blob/5c1c29be00c6c3c4e55544df25e8c4087f0631a8/example/src/lib/WSCanvas.tsx#L2945-L2946
+[1510]: https://github.com/devel0/react-ws-canvas/blob/5c1c29be00c6c3c4e55544df25e8c4087f0631a8/example/src/lib/WSCanvas.tsx#L244
