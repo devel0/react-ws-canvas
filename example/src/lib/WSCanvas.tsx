@@ -427,15 +427,6 @@ export function WSCanvas(props: WSCanvasProps) {
 
     //#endregion    
 
-    // useEffect(() => {
-    //     const state = stateNfo.dup();
-    //     if (rowsCount > 0) {
-    //         paint(state, viewMap);
-    //     }
-    //     setStateNfo(state);
-    //     //setViewMap(vm);
-    // }, [rowsCount]);
-
     /** [-2,0] not on screen ; -1:(row col number); [ci,cwidth] is the result */
     const xGetCol = (state: WSCanvasState, x: number, allowPartialCol: boolean = false) => {
         if (showRowNumber && x >= 1 && x <= 1 + rowNumberColWidth) return [-1, rowNumberColWidth];
@@ -1203,15 +1194,6 @@ export function WSCanvas(props: WSCanvasProps) {
         return x >= state.tableCellsBBox.leftTop.x && x <= (allowPartialCol ? cs.width : state.tableCellsBBox.rightBottom.x) &&
             y >= state.tableCellsBBox.leftTop.y && y <= state.tableCellsBBox.rightBottom.y;
     }
-
-    /*
-    if (stateNfo.widthBackup !== W || stateNfo.heightBackup !== H) {
-        const state = stateNfo.dup();
-        recomputeGeometry(state);
-        setStateNfo(state);
-        if (api.onStateChanged) api.onStateChanged(state);
-    }
-*/
 
     /**
      *=====================================================================================================
@@ -2275,7 +2257,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                             let resizingCol = -2;
                             let cwidth = qCol[1];
-                            
+
                             if (qCol[0] > -2) {
                                 let tryResizingCol = qCol[0];
                                 let colX = viewColGetXWidth(stateNfo, viewMap, tryResizingCol, showPartialColumns);
@@ -2292,13 +2274,13 @@ export function WSCanvas(props: WSCanvasProps) {
 
                                 if (qCol[0] === colsCount - 1) {
                                     const lastX = stateNfo.tableCellsBBox.rightBottom.x;
-                                    if (Math.abs(x - lastX) <= RESIZE_HANDLE_TOL) {                                        
+                                    if (Math.abs(x - lastX) <= RESIZE_HANDLE_TOL) {
                                         resizingCol = colsCount - 1;
                                         cwidth = viewColGetXWidth(stateNfo, viewMap, resizingCol)[1];
                                     }
                                 }
 
-                                if (!skip && (x === colX[0] || (colX[0] >= x - RESIZE_HANDLE_TOL && colX[0] <= x + RESIZE_HANDLE_TOL))) {                                    
+                                if (!skip && (x === colX[0] || (colX[0] >= x - RESIZE_HANDLE_TOL && colX[0] <= x + RESIZE_HANDLE_TOL))) {
                                     resizingCol = tryResizingCol - 1;
                                     cwidth = viewColGetXWidth(stateNfo, viewMap, resizingCol)[1];
                                 }
@@ -2740,7 +2722,7 @@ export function WSCanvas(props: WSCanvasProps) {
             filterAndSort(state, vm);
             recomputeGeometry2(state, vm);
 
-            if (stateNfo.focusedFilterColIdx >= 0 && viewMap) {                
+            if (stateNfo.focusedFilterColIdx >= 0 && viewMap) {
                 const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
                 focusCell(state, vm, q, true, false, true, !selectFirstOnFilter);
                 rectifyScrollOffset(state, vm);
@@ -2754,10 +2736,16 @@ export function WSCanvas(props: WSCanvasProps) {
     //#endregion     
 
     useEffect(() => {
-        if (debug) console.log("*** resize");
+        const state = stateNfo.dup();
+        state.winSizeBackup = _.cloneDeep(winSize);
+        setStateNfo(state);
+    }, [winSize.width, winSize.height]);
+
+    useEffect(() => {
+        if (debug) console.log("*** resize width:" + width + " winSize:" + winSize.width);
         if (debug) console.log("paintfrom:6");
         paint(stateNfo, viewMap, overridenRowHeight);
-    }, [winSize, width, height, debugSize, stateNfo.widthBackup, stateNfo.heightBackup]);
+    }, [winSize.width, winSize.height, width, height, debugSize, stateNfo.widthBackup, stateNfo.heightBackup]);
 
     useEffect(() => {
         if (debug) console.log("*** state, vm");
@@ -2911,7 +2899,7 @@ export function WSCanvas(props: WSCanvasProps) {
             <b>paint cnt</b> => {stateNfo.paintcnt} ; <b>W:</b> => {cs.width.toFixed(0)} x <b>H:</b> => {cs.height.toFixed(0)}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
             <b>rows cnt</b> => {rowsCount} ; filtered:{stateNfo.filteredSortedRowsCount} ; focused:{stateNfo.focusedCell.toString()} ; scroll:{stateNfo.viewScrollOffset.toString()} ; isOverCell:{String(stateNfo.cursorOverCell)}<br />
-            <b>custom edit val</b> => {stateNfo.customEditValue}<br />            
+            <b>custom edit val</b> => {stateNfo.customEditValue}<br />
         </div> : null;
     }
     //#endregion
@@ -2942,7 +2930,7 @@ export function WSCanvas(props: WSCanvasProps) {
             outer size: {fullwidth ? winSize.width : width} x {height}<br/>
             toplevel_container_mp:{toplevel_container_mp}<br/>
             canvas_container_mp{canvas_container_mp}<br/>
-            canvas size:{cs.width} x {cs.height}<br/> */}
+            canvas size:{cs.width} x {cs.height}<br/> */}            
 
             <canvas ref={canvasRef}
                 tabIndex={0}

@@ -226,6 +226,7 @@ yarn start
 | [Sample1](example/src/Sample1.tsx) | 50000 x 200 grid with frozen row/col, filter, custom column width |
 | [Sample2](example/src/Sample2.tsx) | 5000 x 6 grid db-record-like column mapping, initial sort, custom sort, api onMouseDown |
 | [Sample3](example/src/Sample3.tsx) | 5000 x 7 grid db-record-like, data interact del/change row, custom cell editor, rowHover |
+| [Sample4](example/src/Sample4.tsx) | add/del rows using api |
 
 ## how to contribute ( quickstart )
 

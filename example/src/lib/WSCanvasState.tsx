@@ -6,6 +6,7 @@ import { WSCanvasCoord } from "./WSCanvasCoord";
 import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
 import * as _ from 'lodash';
 import { WSCanvasFilter } from "./WSCanvasFilter";
+import { GraphicsSize } from "./Utils";
 
 export class WSCanvasState {
     constructor() {
@@ -30,7 +31,7 @@ export class WSCanvasState {
         this.filtersTrack = "";
         this.hoveredViewRow = -2;
 
-        this.editMode = WSCanvasEditMode.none;        
+        this.editMode = WSCanvasEditMode.none;
 
         this.customEditCell = null;
         this.customEditOrigValue = null;
@@ -58,6 +59,7 @@ export class WSCanvasState {
         this.debugNfo = "";
         this.initialized = false;
         this.rowsCountBackup = 0;
+        this.winSizeBackup = { width: 0, height: 0 };
     }
 
     filteredSortedRowsCount: number;
@@ -82,7 +84,7 @@ export class WSCanvasState {
     filtersTrack: string;
     hoveredViewRow: number;
 
-    editMode: WSCanvasEditMode;    
+    editMode: WSCanvasEditMode;
 
     customEditCell: WSCanvasCellCoord | null;
     customEditOrigValue: any;
@@ -114,6 +116,7 @@ export class WSCanvasState {
     debugNfo: string;
     initialized: boolean;
     rowsCountBackup: number;
+    winSizeBackup: GraphicsSize;
 
     dup() {
         const q = _.cloneDeep(this) as WSCanvasState;
