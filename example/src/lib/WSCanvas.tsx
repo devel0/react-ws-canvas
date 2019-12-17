@@ -152,20 +152,21 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const colNumberRowHeightFull = () => colNumberRowHeight + (showFilter ? rowHeight(-1) : 0);
 
-    const toplevel_container_mp = useDivMarginPadding(toplevelContainerDivRef, true);
+    const toplevel_container_size = useElementSize(toplevelContainerDivRef);
+    const toplevel_container_mp = useDivMarginPadding(toplevelContainerDivRef, false);
     const canvas_container_mp = useDivMarginPadding(canvasContainerDivRef, true);
 
     const [cs, setCanvSize] = useState<GraphicsSize>({ width: 0, height: 0 });
 
     useEffect(() => {
         /** canvas width */
-        let CW = fullwidth ? (winSize.width - canvas_container_mp[0]) : (width - toplevel_container_mp[0]);
+        let CW = fullwidth ? (winSize.width - canvas_container_mp[0] - toplevel_container_mp[0]) : (width - toplevel_container_mp[0]);
 
         /** canvas height */
-        let CH = height - debugSize.height - toplevel_container_mp[1] - canvas_container_mp[1];
+        let CH = height - (debug ? debugSize.height : 0) - canvas_container_mp[1];
 
         setCanvSize({ width: CW, height: CH });
-    }, [fullwidth, winSize, width, height, toplevel_container_mp, canvas_container_mp, debugSize.height]);
+    }, [fullwidth, winSize, width, height, toplevel_container_mp, canvas_container_mp, debugSize.height, toplevel_container_size]);
 
     /** no side effect on vm */
     const viewRowToRealRow = (vm: ViewMap | null, viewRow: number) => {
@@ -2917,8 +2918,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     return <div ref={toplevelContainerDivRef}
         style={{
-            width: fullwidth ? winSize.width : width,
-            height: height,
+            width: fullwidth ? winSize.width : width,            
             border: debug ? "1px solid blue" : "",
             overflow: "hidden"
         }}>
@@ -2927,10 +2927,10 @@ export function WSCanvas(props: WSCanvasProps) {
             style={containerStyle === undefined ? baseDivContainerStyle : Object.assign(baseDivContainerStyle, containerStyle)}>
 
             {/* verticalActive:{String(verticalScrollbarActive)}
-            outer size: {fullwidth ? winSize.width : width} x {height}<br/>
-            toplevel_container_mp:{toplevel_container_mp}<br/>
-            canvas_container_mp{canvas_container_mp}<br/>
-            canvas size:{cs.width} x {cs.height}<br/> */}            
+            outer size: {fullwidth ? winSize.width : width} x {height}<br />
+            toplevel_container_mp:{toplevel_container_mp} ( size: {toplevel_container_size.width} x {toplevel_container_size.height} )<br />
+            canvas_container_mp{canvas_container_mp}<br />
+            canvas size:{cs.width} x {cs.height}<br /> */}
 
             <canvas ref={canvasRef}
                 tabIndex={0}
@@ -2943,7 +2943,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 onDoubleClick={handleDoubleClick}
                 onContextMenu={handleContextMenu}
                 width={cs.width}
-                height={cs.height}
+                height={cs.height}                
             />
         </div>
 
