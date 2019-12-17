@@ -9,10 +9,10 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 ---
 
 - [features](#features)
-- [quickstart](#quickstart)
-- [states, handlers and api usage](#states-handlers-and-api-usage)
+- [**quickstart**](#quickstart)
+- [states, handlers and **api** usage](#states-handlers-and-api-usage)
 - [tips](#tips)
-- [examples list](#examples-list)
+- [**examples** list](#examples-list)
 - [how to contribute ( quickstart )](#how-to-contribute--quickstart-)
 - [local deploy](#local-deploy)
 - [how this project was built](#how-this-project-was-built)
