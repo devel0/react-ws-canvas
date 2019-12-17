@@ -57,6 +57,7 @@ export class WSCanvasState {
         this.paintcnt = 0;
         this.debugNfo = "";
         this.initialized = false;
+        this.rowsCountBackup = 0;
     }
 
     filteredSortedRowsCount: number;
@@ -112,6 +113,7 @@ export class WSCanvasState {
     paintcnt: number;
     debugNfo: string;
     initialized: boolean;
+    rowsCountBackup: number;
 
     dup() {
         const q = _.cloneDeep(this) as WSCanvasState;

@@ -17,8 +17,8 @@ export const WSCanvasPropsDefault = () => {
         width: window.innerWidth,        
         height: window.innerHeight,
         dataSource: null,
-        rowsCount: 1000,
-        colsCount: 50,
+        rowsCount: 0,
+        colsCount: 0,
         colWidth: () => DEFAULT_COL_WIDTH,
         colWidthExpand: true,
         rowHeight: () => DEFAULT_ROW_HEIGHT,
@@ -38,6 +38,8 @@ export const WSCanvasPropsDefault = () => {
         showPartialColumns: true,
         showPartialRows: true,
         preventWheelOnBounds: true,
+        newRowsInsertAtViewIndex: undefined,
+        focusInsertedRow: false,
 
         getCellData: (cell) => null,        
         renderTransform: undefined,
@@ -98,7 +100,7 @@ export const WSCanvasPropsDefault = () => {
         containerStyle: undefined,
         canvasStyle: undefined,
 
-        debug: true,
+        debug: false,
         dbgDiv: undefined,
     } as WSCanvasProps;
 }

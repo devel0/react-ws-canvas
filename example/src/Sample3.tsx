@@ -33,7 +33,7 @@ export function Sample3() {
   const tooltipDivRef = useRef<HTMLDivElement>(null);
   const [tooltipTest, setTooltipTest] = useState(false);
 
-  const ROWS = 5000;
+  const ROWS = 1;
 
   const columns = [
     {
@@ -94,22 +94,26 @@ export function Sample3() {
     }
   ] as WSCanvasColumn[];
 
+  const newObj = (ri: number) => {
+    return {
+      col1: "r" + ri,
+      col2: Math.trunc(ri / 4) * 10,
+      col3: ri % 2 === 0,
+      col4: new Date(new Date().getTime() + (ri * 24 * 60 * 60 * 1000)), // +1 day
+      col5: new Date(new Date().getTime() + (ri * 60 * 1000)), // +1 min
+      col6: new Date(new Date().getTime() + (ri * 24 * 60 * 60 * 1000 + ri * 60 * 1000)), // +1 day +1min
+      col7: ri % 2 === 0 ? "short text" : "long text that will be wrapped because too long",
+      cboxcol: (ri % 3) as MyEnum
+    } as MyData;
+  }
+
   useEffect(() => {
     //setTimeout(() => {
     console.log("GENERATE DATA");
 
     const _rows: MyData[] = [];
     for (let ri = 0; ri < ROWS; ++ri) {
-      _rows.push({
-        col1: "r" + ri,
-        col2: Math.trunc(ri / 4) * 10,
-        col3: ri % 2 === 0,
-        col4: new Date(new Date().getTime() + (ri * 24 * 60 * 60 * 1000)), // +1 day
-        col5: new Date(new Date().getTime() + (ri * 60 * 1000)), // +1 min
-        col6: new Date(new Date().getTime() + (ri * 24 * 60 * 60 * 1000 + ri * 60 * 1000)), // +1 day +1min
-        col7: ri % 2 === 0 ? "short text" : "long text that will be wrapped because too long",
-        cboxcol: (ri % 3) as MyEnum
-      });
+      _rows.push(newObj(ri));
     }
 
     setRows(_rows);
@@ -158,6 +162,12 @@ export function Sample3() {
   const winSize = useWindowSize();
 
   return <div style={{ margin: "1em", background: "yellow" }}>
+    <button onClick={() => {
+      const q = rows.slice();
+      q.push(newObj(q.length));
+      setRows(q);
+    }}>ADD ROW</button>
+
     <button onClick={() => {
       const q = rows.slice(1);
       setRows(q);
@@ -234,7 +244,7 @@ export function Sample3() {
         const fieldname = columns[cell.col].field;
         const row = rows[cell.row];
         if (row) {
-          (row as any)[columns[cell.col].field] = value;          
+          (row as any)[columns[cell.col].field] = value;
         }
       }}
       getCellCustomEdit={(states, props, cell, containerStyle) => {
@@ -242,9 +252,9 @@ export function Sample3() {
 
         if (fieldname === "cboxcol") {
 
-          if (containerStyle) containerStyle.background = "lightyellow";          
+          if (containerStyle) containerStyle.background = "lightyellow";
 
-          return <div>            
+          return <div>
             <select
               autoFocus
               defaultValue={rows[cell.row].cboxcol}

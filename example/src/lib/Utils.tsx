@@ -64,7 +64,7 @@ export function useDivMarginPadding(div: React.RefObject<HTMLDivElement>, consid
 
             setVal(res);
         }
-    }, [div]);
+    }, [div, considerParent]);
 
     return val;
 }
