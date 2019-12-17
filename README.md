@@ -4,7 +4,7 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.8.4](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/ce5b975d3c3342002baa05ee4d2f2494553eb830/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.8.7](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/dee24cfc21590793651abf21c6fecc9e32bc826d/example) )
 
 ---
 
@@ -311,6 +311,6 @@ Because I need a library to publish and either a working example to test/debug t
 [1505]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvas.tsx#L183-L187
 [1506]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvas.tsx#L267
 [1507]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvas.tsx#L2039
-[1508]: https://github.com/devel0/react-ws-canvas/blob/5c1c29be00c6c3c4e55544df25e8c4087f0631a8/example/src/lib/WSCanvas.tsx#L158-L168
+[1508]: https://github.com/devel0/react-ws-canvas/blob/dee24cfc21590793651abf21c6fecc9e32bc826d/example/src/lib/WSCanvas.tsx#L159-L169
 [1509]: https://github.com/devel0/react-ws-canvas/blob/5c1c29be00c6c3c4e55544df25e8c4087f0631a8/example/src/lib/WSCanvas.tsx#L2945-L2946
 [1510]: https://github.com/devel0/react-ws-canvas/blob/5c1c29be00c6c3c4e55544df25e8c4087f0631a8/example/src/lib/WSCanvas.tsx#L244
