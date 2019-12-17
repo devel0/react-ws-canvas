@@ -936,7 +936,7 @@ export function WSCanvas(props: WSCanvasProps) {
             state.editMode = WSCanvasEditMode.none;
         }
         if (canvasRef.current) {
-            canvasRef.current.focus();
+            canvasRef.current.focus({ preventScroll: true });
         }
     }
 
@@ -1070,7 +1070,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const focusCell = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord,
         scrollTo?: boolean, endingCell?: boolean, clearPreviousSel?: boolean, dontApplySelect?: boolean) => {
         if (rowsCount === 0) return;
-        if (canvasRef.current) canvasRef.current.focus();
+        if (canvasRef.current) canvasRef.current.focus({ preventScroll: true });
         const viewCell = realCellToView(vm, cell);
         if (dontApplySelect === undefined || dontApplySelect === false) setSelectionByEndingCell(state, viewCell, endingCell, clearPreviousSel);
 
@@ -2933,7 +2933,7 @@ export function WSCanvas(props: WSCanvasProps) {
             outer size: {fullwidth ? winSize.width : width} x {height}<br />
             toplevel_container_mp:{toplevel_container_mp} ( size: {toplevel_container_size.width} x {toplevel_container_size.height} )<br />
             canvas_container_mp{canvas_container_mp}<br />
-            canvas size:{cs.width} x {cs.height}<br /> */}            
+            canvas size:{cs.width} x {cs.height}<br /> */}
 
             <canvas ref={canvasRef}
                 tabIndex={0}
