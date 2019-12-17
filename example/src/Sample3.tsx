@@ -33,7 +33,7 @@ export function Sample3() {
   const tooltipDivRef = useRef<HTMLDivElement>(null);
   const [tooltipTest, setTooltipTest] = useState(false);
 
-  const ROWS = 1;
+  const ROWS = 5000;
 
   const columns = [
     {
@@ -161,7 +161,7 @@ export function Sample3() {
 
   const winSize = useWindowSize();
 
-  return <div style={{ margin: "1em", background: "yellow" }}>
+  return <div style={{ margin: "1em", border: "1px solid gray" }}>
     <button onClick={() => {
       const q = rows.slice();
       q.push(newObj(q.length));
