@@ -1239,7 +1239,6 @@ export function WSCanvas(props: WSCanvasProps) {
                 state.colWidthExpanded = colwavail;
                 state.columnWidthOverrideTrack = JSON.stringify([...state.columnWidthOverride]);
                 recomputeOverridenRowHeight(state);
-                //paint(state, vm);
                 stateChanged = true;
                 setStateNfo(state);
                 if (handlers && handlers.onStateChanged) handlers.onStateChanged(mkstates(state, vm, orh));
@@ -1720,8 +1719,12 @@ export function WSCanvas(props: WSCanvasProps) {
                     ctx.rect(0, 0, cs.width, cs.height);
                     ctx.stroke();
                 }
+
             }
         }
+
+        // workaround for initial draw
+        if (state.paintcnt === 1) paint(state, vm, orh);
 
         return stateChanged;
     };
@@ -2918,7 +2921,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     return <div ref={toplevelContainerDivRef}
         style={{
-            width: fullwidth ? winSize.width : width,            
+            width: fullwidth ? winSize.width : width,
             border: debug ? "1px solid blue" : "",
             overflow: "hidden"
         }}>
@@ -2931,6 +2934,7 @@ export function WSCanvas(props: WSCanvasProps) {
             toplevel_container_mp:{toplevel_container_mp} ( size: {toplevel_container_size.width} x {toplevel_container_size.height} )<br />
             canvas_container_mp{canvas_container_mp}<br />
             canvas size:{cs.width} x {cs.height}<br /> */}
+            paintCnt:{stateNfo.paintcnt}
 
             <canvas ref={canvasRef}
                 tabIndex={0}
@@ -2943,7 +2947,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 onDoubleClick={handleDoubleClick}
                 onContextMenu={handleContextMenu}
                 width={cs.width}
-                height={cs.height}                
+                height={cs.height}
             />
         </div>
 
