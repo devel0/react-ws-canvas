@@ -152,11 +152,6 @@ export function Sample4() {
             toggle col
         </button>
 
-        <br />
-        paitncnt:{gridStates && gridStates.state.paintcnt}<br />
-        colWidthExpanded:{gridStates && gridStates.state.colWidthExpanded}        <br />
-        colWidthExpanded:{gridStates && Array.from(gridStates.state.columnWidthOverride).map((x) => x[1].toFixed(0)).join(",")}        <br />
-
         <WSCanvas
             columns={columns}
             rowsCount={ds.current.length}
@@ -181,7 +176,7 @@ export function Sample4() {
             columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
             focusInsertedRow={true}
 
-            debug={true}
+            debug={false}
             onApi={(states, api) => setGridApi(api)}
             onStateChanged={(states) => setGridState(states)}
             onRowsAppended={(states, rowFrom, rowTo) => {

@@ -2525,8 +2525,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         const startX = state.resizingColStartNfo[0];
                         const startWidth = state.resizingColStartNfo[1];
                         const newWidth = startWidth + (x - startX);
-
-                        // console.log("NEW WIDTH:" + newWidth);
+                        
                         state.columnWidthOverride.set(state.resizingCol, newWidth);
                         state.columnWidthOverrideTrack = JSON.stringify([...state.columnWidthOverride]);
                     }
@@ -2927,7 +2926,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (debug) console.log("*** resize width:" + width + " winSize:" + winSize.width);
         if (debug) console.log("paintfrom:6");
         paint(stateNfo, viewMap, overridenRowHeight);
-        if (debug) console.log(JSON.stringify(stateNfo, null, 1));
+        //if (debug) console.log(JSON.stringify(stateNfo, null, 1));
         if (systemReset > 0) {
             if (systemReset < 3) {
                 const orh: number[] = [];
@@ -2969,7 +2968,7 @@ export function WSCanvas(props: WSCanvasProps) {
             };
         }
         return () => { };
-    }, [canvasRef]);
+    }, [canvasRef, stateNfo]);
 
     //#endregion
 
@@ -3118,9 +3117,7 @@ export function WSCanvas(props: WSCanvasProps) {
             outer size: {fullwidth ? winSize.width : width} x {height}<br />
             toplevel_container_mp:{toplevel_container_mp} ( size: {toplevel_container_size.width} x {toplevel_container_size.height} )<br />
             canvas_container_mp{canvas_container_mp}<br />
-            canvas size:{cs.width} x {cs.height}<br /> */}
-
-            cursorOvercell:{String(stateNfo.cursorOverCell)}
+            canvas size:{cs.width} x {cs.height}<br /> */}            
 
             <canvas ref={canvasRef}
                 tabIndex={0}

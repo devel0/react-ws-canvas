@@ -2,8 +2,6 @@ import { WSCanvasSelection } from "./WSCanvasSelection";
 import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 import { WSCanvasCoord } from "./WSCanvasCoord";
 import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
-import { WSCanvasState } from "./WSCanvasState";
-import { WSCanvasXYCellCoord } from "./WSCanvasXYCellCoord";
 import { WSCanvasStates } from "./WSCanvasStates";
 
 export class WSCanvasApi {
