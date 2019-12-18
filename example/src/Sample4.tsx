@@ -144,10 +144,7 @@ export function Sample4() {
         }}>SAVE</button>
 
         <button onClick={() => {
-            setColVisible(!colVisible); if (gridApi && gridStates) {
-                gridApi.resetView();
-                //gridApi.paint(gridStates, true);
-            }
+            setColVisible(!colVisible); if (gridApi && gridStates) { gridApi.resetView(); }
         }}>
             toggle col
         </button>
