@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { WSCanvas, WSCanvasApi, WSCanvasColumnClickBehavior, useElementSize, useWindowSize } from "./lib";
+import React, { useState, useEffect } from "react";
+import { WSCanvas, useWindowSize } from "./lib";
 
 export function Sample1() {
   const [rows, setRows] = useState<any[][]>([]);

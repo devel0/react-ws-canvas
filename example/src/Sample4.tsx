@@ -42,7 +42,7 @@ export function Sample4() {
             sortOrder: 0,
             sortDirection: WSCanvasSortDirection.Ascending,
             lessThan: (a, b) => a < b,
-            textAlign: () => "center"
+            textAlign: () => "center",            
         },
         {
             type: "text",
@@ -55,7 +55,7 @@ export function Sample4() {
             header: "Last modify",
             field: "modify_timestamp",
             width: 250,
-            readonly: () => true,
+            readonly: true,
             renderTransform: (cell, value) => {
                 const row = ds.current[cell.row];
                 if (row) {
@@ -65,7 +65,7 @@ export function Sample4() {
                     return "";
                 }
                 return undefined;
-            }
+            },            
         }
     ] as WSCanvasColumn[];
 
@@ -148,8 +148,8 @@ export function Sample4() {
                 const row = (q as any[])[cell.row];
                 if (row) { (row as any)[columns[cell.col].field] = value; }
             }}
-            commitCellDataset={(q) => { setDs(new IUpdateEntityNfo<MyData[]>(q, ds.original)); }}
-
+            commitCellDataset={(q) => { setDs(new IUpdateEntityNfo<MyData[]>(q, ds.original)); }}            
+            
             containerStyle={{ marginTop: "1em" }}
             fullwidth
             immediateSort={false}
@@ -157,7 +157,7 @@ export function Sample4() {
             showColNumber={true}
             columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
             focusInsertedRow={true}
-            
+
             onApi={(states, api) => setGridApi(api)}
             onStateChanged={(states) => setGridState(states)}
             onRowsAppended={(states, rowFrom, rowTo) => {
