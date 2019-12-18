@@ -6,7 +6,6 @@ export * from './WSCanvasColumn';
 export * from './WSCanvasCoord';
 export * from './WSCanvasEditMode';
 export * from './WSCanvasFilter';
-export * from './WSCanvasHandlers';
 export * from './WSCanvasProps';
 export * from './WSCanvasPropsDefault';
 export * from './WSCanvasRect';

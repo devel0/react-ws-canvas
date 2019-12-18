@@ -1,4 +1,5 @@
-import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, useElementSize, WSCanvasXYCellCoord, WSCanvasApi, useWindowSize, WSCanvasStates, WSCanvasHandlers, IEnumValue } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, 
+  WSCanvasApi, useWindowSize, WSCanvasStates } from "./lib";
 
 import React, { useState, useEffect, useRef } from "react";
 
@@ -24,7 +25,6 @@ interface MyData {
 export function Sample3() {
   const [rows, setRows] = useState<MyData[]>([]);
 
-  const [gridHandlers, setGridHandlers] = useState<WSCanvasHandlers | undefined>(undefined);
   const [gridApi, setGridApi] = useState<WSCanvasApi | null>(null);
 
   const [gridStateNfo, setGridStateNfo] = useState<WSCanvasStates>({} as WSCanvasStates);
@@ -117,47 +117,7 @@ export function Sample3() {
     }
 
     setRows(_rows);
-  }, []);
-
-  useEffect(() => {
-    const handlers = {
-      onMouseDown: (states, e, cell) => {
-        if (cell) {
-          if (cell.row >= 0) {
-            const data = rows[cell.row] as MyData;
-            if (data) console.log("clicked cell row:" + cell.row + " col1data:" + data.col1);
-          }
-        }
-      },
-      onMouseOverCell: (states, nfo) => {
-        if (tooltipTest) {
-          if (gridApi && tooltipDivRef && tooltipDivRef.current) {
-            const div = tooltipDivRef.current;
-            if (nfo && nfo.cell.row >= 0 && nfo.cell.col >= 0) {
-              const canvasCoord = gridApi.canvasCoord(states);
-              const cellCanvasCoord = gridApi.cellToCanvasCoord(states, nfo.cell);
-              if (canvasCoord && cellCanvasCoord) {
-                setOverCellCoord(nfo.cell.toString() + " canvas:" + cellCanvasCoord.toString());
-                div.style["left"] = (canvasCoord.x + cellCanvasCoord.x + cellCanvasCoord.width) + "px";
-                div.style["top"] = (canvasCoord.y + cellCanvasCoord.y + cellCanvasCoord.height / 2) + "px";
-
-                // div.style["left"] = (nfo.xy[0] + 25) + "px";
-                // div.style["top"] = (nfo.xy[1] + 25) + "px";
-
-                div.style["display"] = "block";
-              }
-            } else {
-              div.style["display"] = "none";
-            }
-          }
-        }
-      },
-      onStateChanged: (states) => {
-        setGridStateNfo(states);
-      }
-    } as WSCanvasHandlers;
-    setGridHandlers(handlers);
-  }, [rows, tooltipTest]);
+  }, []);  
 
   const winSize = useWindowSize();
 
@@ -199,7 +159,6 @@ export function Sample3() {
       </div> : null}
 
     <WSCanvas
-      handlers={gridHandlers}
       onApi={(states, api) => { setGridApi(api); }}
 
       containerStyle={{ margin: "1em" }}
@@ -297,6 +256,41 @@ export function Sample3() {
       rowHoverColor={"rgba(248,248,248,1)"}
       rowHeight={() => 35} textMargin={5}
       selectionMode={WSCanvasSelectMode.Cell}
+
+      onMouseDown={(states, e, cell) => {
+        if (cell) {
+          if (cell.row >= 0) {
+            const data = rows[cell.row] as MyData;
+            if (data) console.log("clicked cell row:" + cell.row + " col1data:" + data.col1);
+          }
+        }
+      }}
+      onMouseOverCell={(states, nfo) => {
+        if (tooltipTest) {
+          if (gridApi && tooltipDivRef && tooltipDivRef.current) {
+            const div = tooltipDivRef.current;
+            if (nfo && nfo.cell.row >= 0 && nfo.cell.col >= 0) {
+              const canvasCoord = gridApi.canvasCoord(states);
+              const cellCanvasCoord = gridApi.cellToCanvasCoord(states, nfo.cell);
+              if (canvasCoord && cellCanvasCoord) {
+                setOverCellCoord(nfo.cell.toString() + " canvas:" + cellCanvasCoord.toString());
+                div.style["left"] = (canvasCoord.x + cellCanvasCoord.x + cellCanvasCoord.width) + "px";
+                div.style["top"] = (canvasCoord.y + cellCanvasCoord.y + cellCanvasCoord.height / 2) + "px";
+
+                // div.style["left"] = (nfo.xy[0] + 25) + "px";
+                // div.style["top"] = (nfo.xy[1] + 25) + "px";
+
+                div.style["display"] = "block";
+              }
+            } else {
+              div.style["display"] = "none";
+            }
+          }
+        }
+      }}
+      onStateChanged={(states) => {
+        setGridStateNfo(states);
+      }}
     />
   </div>
 }

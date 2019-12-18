@@ -5,10 +5,8 @@ import { WSCanvasColumnType, WSCanvasColumnClickBehavior } from "./WSCanvasColum
 import { WSCanvasApi } from "./WSCanvasApi";
 import { CSSProperties } from "react";
 import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
-import { WSCanvasState } from "./WSCanvasState";
-import { ViewMap } from "./WSCanvas";
 import { WSCanvasStates } from "./WSCanvasStates";
-import { WSCanvasHandlers } from "./WSCanvasHandlers";
+import { WSCanvasXYCellCoord } from "./WSCanvasXYCellCoord";
 
 export interface WSCanvasCellDataNfo {
     coord: WSCanvasCellCoord;
@@ -16,12 +14,7 @@ export interface WSCanvasCellDataNfo {
 }
 
 /** see WSCanvasPropsDefault for default values */
-export interface WSCanvasProps {
-    /** handlers */
-    handlers?: WSCanvasHandlers,
-    /** receive api */
-    onApi?: (states: WSCanvasStates, api: WSCanvasApi) => void,
-
+export interface WSCanvasProps {        
     /** width 100% */
     fullwidth: boolean;
     /** width of canvas */
@@ -192,4 +185,34 @@ export interface WSCanvasProps {
     debug: boolean;
     /** div where to place debug */
     dbgDiv: React.RefObject<HTMLDivElement> | undefined;
+
+    /** receive api */
+    onApi?: (states: WSCanvasStates, api: WSCanvasApi) => void,
+    
+    onStateChanged?: (states: WSCanvasStates) => void;
+
+    onMouseOverCell?: (states: WSCanvasStates, nfo: WSCanvasXYCellCoord | null) => void;
+
+    onPreviewKeyDown?: (states: WSCanvasStates, e: React.KeyboardEvent) => void;
+    onKeyDown?: (states: WSCanvasStates, e: React.KeyboardEvent) => void;
+
+    /** cell click ( row=-1 if column header click ; col=-1 if row header click ) */
+    onPreviewMouseDown?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
+    onMouseDown?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
+
+    onPreviewMouseUp?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void;
+    onMouseUp?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void;
+
+    onPreviewMouseMove?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void;
+    onMouseMove?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => void;
+
+    onPreviewMouseDoubleClick?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
+    onMouseDoubleClick?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
+
+    onPreviewMouseWheel?: (states: WSCanvasStates, e: WheelEvent) => void;
+    onMouseWheel?: (states: WSCanvasStates, e: WheelEvent) => void;
+
+    onContextMenu?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
+
+    onRowsAppended?: (states: WSCanvasStates, rowFrom: number, rowto: number) => void;
 }

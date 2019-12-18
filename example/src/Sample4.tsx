@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
     WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnToSortInfo, WSCanvasApi, useWindowSize,
-    WSCanvasStates, WSCanvasHandlers, WSCanvasColumnClickBehavior
+    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord
 } from "./lib";
 import * as _ from 'lodash';
 
@@ -31,7 +31,6 @@ class IUpdateEntityNfo<T> {
 
 export function Sample4() {
     const [ds, setDs] = useState<IUpdateEntityNfo<MyData[]>>(new IUpdateEntityNfo<MyData[]>([], []));
-    const [gridHandlers, setGridHandlers] = useState<WSCanvasHandlers | undefined>(undefined);
     const [gridApi, setGridApi] = useState<WSCanvasApi | null>(null);
     const [gridStates, setGridState] = useState<WSCanvasStates | null>(null);
     const [dirty, setDirty] = useState(false);
@@ -56,8 +55,8 @@ export function Sample4() {
 
     const addItem = () => {
         const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
-        newset.current.push({ description: "*some new", timestamp: new Date() });
-        setDs(newset);
+        newset.current.push({ description: "test" + ds.current.length, timestamp: new Date() });
+        setDs(newset);        
     }
 
     useEffect(() => {
@@ -71,16 +70,9 @@ export function Sample4() {
     }, [ds, dirty]);
 
     useEffect(() => {
-        const newset = new IUpdateEntityNfo<MyData[]>([{ description: "first", timestamp: new Date() }]);
+        const newset = new IUpdateEntityNfo<MyData[]>([{ description: "test", timestamp: new Date() }]);
         setDs(newset);
     }, []);
-
-    useEffect(() => {
-        const handlers = {
-            onStateChanged: (states) => setGridState(states)
-        } as WSCanvasHandlers;
-        setGridHandlers(handlers);
-    }, [ds]);
 
     return <div style={{ margin: "1em" }}>
 
@@ -114,14 +106,13 @@ export function Sample4() {
             DEL
         </button>
 
-        <button color="primary" disabled={!dirty} onClick={() => {            
+        <button color="primary" disabled={!dirty} onClick={() => {
             setDs(new IUpdateEntityNfo<MyData[]>(ds.current.slice()));
         }}>SAVE</button>
 
         <WSCanvas
             containerStyle={{ marginTop: "1em" }}
             dataSource={ds}
-            handlers={gridHandlers} onApi={(states, api) => setGridApi(api)}
             fullwidth
             immediateSort={false}
             height={Math.max(300, winSize.height * .4)}
@@ -160,6 +151,11 @@ export function Sample4() {
                 return fieldname === "modify_timestamp";
             }}
             focusInsertedRow={true}
+            onApi={(states, api) => setGridApi(api)}
+            onStateChanged={(states) => setGridState(states)}
+            onRowsAppended={(states, rowFrom, rowTo) => {
+                console.log("rows appended from:" + rowFrom + " to:" + rowTo);
+            }}
         />
     </div>
 }
