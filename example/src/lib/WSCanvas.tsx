@@ -155,7 +155,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const debugSize = useElementSize(debugRef);
 
-    const [stateNfo, setStateNfo] = useState<WSCanvasState>(new WSCanvasState());
+    const [stateNfo, setStateNfo] = useState<WSCanvasState>(new WSCanvasState());    
 
     const [children, setChildren] = useState<JSX.Element[]>([]);
     const [filterChildren, setFilterChildren] = useState<JSX.Element[]>([]);
@@ -2987,6 +2987,12 @@ export function WSCanvas(props: WSCanvasProps) {
                 setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
             }
+            api.openCustomEdit = (states, cell) => {
+                const state = states.state.dup();
+                state.customEditCell = cell;
+                setStateNfo(state);
+                openCellCustomEdit(states.state, cell, states.overrideRowHeight);
+            }
             api.closeCustomEdit = (states, confirm) => {
                 const state = states.state.dup();
                 closeCustomEdit(state, confirm);
@@ -3030,8 +3036,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const state = states.state.dup();
                 const vm = states.vm;
                 const orh = states.overrideRowHeight;
-                focusCell(state, vm, cell, scrollTo, endingCell, clearSelection, false);
-                //rectifyScrollOffset(state, vm);
+                focusCell(state, vm, cell, scrollTo, endingCell, clearSelection, false);                                
                 setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
             }

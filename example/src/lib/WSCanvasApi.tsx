@@ -16,6 +16,7 @@ export class WSCanvasApi {
     focusCell: (states: WSCanvasStates, coord: WSCanvasCellCoord, scrollTo?: boolean, endingCell?: boolean, clearSelection?: boolean) => void;
     scrollTo: (states: WSCanvasStates, coord: WSCanvasCellCoord) => void;
     setSorting: (states: WSCanvasStates, sorting: WSCanvasColumnSortInfo[]) => void;
+    openCustomEdit: (states: WSCanvasStates, cell: WSCanvasCellCoord) => void;
     closeCustomEdit: (states: WSCanvasStates, confirm: boolean) => void;
     setCustomEditValue: (states: WSCanvasStates, val: any) => void;
     goToNextCell: (states: WSCanvasStates) => void;
@@ -40,6 +41,7 @@ export class WSCanvasApi {
         this.focusCell = () => { };
         this.scrollTo = () => { };
         this.setSorting = () => { };
+        this.openCustomEdit = () => { };
         this.closeCustomEdit = () => { };
         this.setCustomEditValue = () => { };
         this.goToNextCell = () => { };

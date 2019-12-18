@@ -41,14 +41,14 @@ export function Sample4() {
                 type: "text",
                 header: "Description",
                 field: "description",
-                width: 100,                
+                width: 100,
             },
             {
                 type: "text",
                 header: "Last modify",
                 field: "timestamp",
                 width: 250,
-                readonly: true,                
+                readonly: true,
                 renderTransform: (cell, value) => {
                     const row = ds.current[cell.row];
                     if (row) {
@@ -78,20 +78,6 @@ export function Sample4() {
         setColumns(cols);
     }, [colVisible, gridApi]);
 
-    const addItem = () => {
-        const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
-        newset.current.push({
-            idx: ds.current.length > 0 ? _.max(ds.current.map((r) => r.idx))! + 1 : 0,
-            description: "test" + ds.current.length,
-            timestamp: new Date()
-        });
-        setDs(newset);
-
-        if (gridApi && gridStates) {
-            gridApi.focusCell(gridStates, new WSCanvasCellCoord(newset.current.length - 1, 1));
-        }
-    }
-
     useEffect(() => {
         const qcur = JSON.stringify(ds.current);
         const qorig = JSON.stringify(ds.original);
@@ -113,7 +99,20 @@ export function Sample4() {
 
     return <div style={{ margin: "1em" }}>
 
-        <button onClick={() => { addItem() }}>ADD</button>
+        <button onClick={() => {
+            const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
+            newset.current.push({
+                idx: ds.current.length > 0 ? _.max(ds.current.map((r) => r.idx))! + 1 : 0,
+                description: "test" + ds.current.length,
+                timestamp: new Date()
+            });
+            setDs(newset);
+
+            if (gridApi && gridStates) {
+                const cell = new WSCanvasCellCoord(newset.current.length - 1, 1);
+                gridApi.focusCell(gridStates, cell);                
+            }
+        }}>ADD</button>
 
         <button disabled={gridStates === null || gridStates.state.viewSelection.empty}
             onClick={() => {
