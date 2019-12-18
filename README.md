@@ -4,7 +4,7 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.8.12](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/513632060951df8a20b83dee39667529cc0ac883/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.8.13](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/11c59983ddf55d24a479be350a61a24dba9564cf/example) )
 
 ---
 
