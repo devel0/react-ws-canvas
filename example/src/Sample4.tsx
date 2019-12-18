@@ -32,42 +32,51 @@ export function Sample4() {
     const [gridStates, setGridState] = useState<WSCanvasStates | null>(null);
     const [dirty, setDirty] = useState(false);
     const winSize = useWindowSize();
+    const [colVisible, setColVisible] = useState(true);
+    const [columns, setColumns] = useState<WSCanvasColumn[]>([]);
 
-    const columns = [
-        {
-            type: "number",
-            header: "idx",
-            field: "idx",
-            width: 100,
-            sortOrder: 0,
-            sortDirection: WSCanvasSortDirection.Ascending,
-            lessThan: (a, b) => a < b,
-            textAlign: () => "center",            
-        },
-        {
-            type: "text",
-            header: "Description",
-            field: "description",
-            width: 100
-        },
-        {
-            type: "text",
-            header: "Last modify",
-            field: "modify_timestamp",
-            width: 250,
-            readonly: true,
-            renderTransform: (cell, value) => {
-                const row = ds.current[cell.row];
-                if (row) {
-                    if (gridApi && row.timestamp) {
-                        return gridApi.formatCellDataAsDateTime(row.timestamp) + " (custom user) " + row.timestamp.getTime();
+    useEffect(() => {
+        const cols = [
+            {
+                type: "text",
+                header: "Description",
+                field: "description",
+                width: 100
+            },
+            {
+                type: "text",
+                header: "Last modify",
+                field: "modify_timestamp",
+                width: 250,
+                readonly: true,
+                renderTransform: (cell, value) => {
+                    const row = ds.current[cell.row];
+                    if (row) {
+                        if (gridApi && row.timestamp) {
+                            return gridApi.formatCellDataAsDateTime(row.timestamp) + " (custom user) " + row.timestamp.getTime();
+                        }
+                        return "";
                     }
-                    return "";
-                }
-                return undefined;
-            },            
+                    return undefined;
+                },
+            }
+        ] as WSCanvasColumn[];
+
+        if (colVisible) {
+            cols.splice(0, 0, {
+                type: "number",
+                header: "idx",
+                field: "idx",
+                width: 100,
+                sortOrder: 0,
+                sortDirection: WSCanvasSortDirection.Ascending,
+                lessThan: (a, b) => a < b,
+                textAlign: () => "center",
+            });
         }
-    ] as WSCanvasColumn[];
+
+        setColumns(cols);
+    }, [colVisible]);
 
     const addItem = () => {
         const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
@@ -134,6 +143,20 @@ export function Sample4() {
             setDs(new IUpdateEntityNfo<MyData[]>(ds.current.slice()));
         }}>SAVE</button>
 
+        <button onClick={() => {
+            setColVisible(!colVisible); if (gridApi && gridStates) {
+                gridApi.resetView();
+                //gridApi.paint(gridStates, true);
+            }
+        }}>
+            toggle col
+        </button>
+
+        <br />
+        paitncnt:{gridStates && gridStates.state.paintcnt}<br />
+        colWidthExpanded:{gridStates && gridStates.state.colWidthExpanded}        <br />
+        colWidthExpanded:{gridStates && Array.from(gridStates.state.columnWidthOverride).map((x) => x[1].toFixed(0)).join(",")}        <br />
+
         <WSCanvas
             columns={columns}
             rowsCount={ds.current.length}
@@ -148,8 +171,8 @@ export function Sample4() {
                 const row = (q as any[])[cell.row];
                 if (row) { (row as any)[columns[cell.col].field] = value; }
             }}
-            commitCellDataset={(q) => { setDs(new IUpdateEntityNfo<MyData[]>(q, ds.original)); }}            
-            
+            commitCellDataset={(q) => { setDs(new IUpdateEntityNfo<MyData[]>(q, ds.original)); }}
+
             containerStyle={{ marginTop: "1em" }}
             fullwidth
             immediateSort={false}
@@ -158,6 +181,7 @@ export function Sample4() {
             columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
             focusInsertedRow={true}
 
+            debug={true}
             onApi={(states, api) => setGridApi(api)}
             onStateChanged={(states) => setGridState(states)}
             onRowsAppended={(states, rowFrom, rowTo) => {

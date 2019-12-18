@@ -10,6 +10,7 @@ import { GraphicsSize } from "./Utils";
 
 export class WSCanvasState {
     constructor() {
+        this.colsCountBackup = 0;
         this.filteredSortedRowsCount = 0;
         this.widthBackup = 0;
         this.heightBackup = 0;
@@ -25,7 +26,7 @@ export class WSCanvasState {
         this.touchStart = [0, 0];
         this.touchCur = [0, 0];
 
-        this.lastPartialColScrolled =-1;
+        this.lastPartialColScrolled = -1;
         this.focusedCell = new WSCanvasCellCoord();
         this.focusedFilterColIdx = -1;
         this.filters = [];
@@ -59,10 +60,10 @@ export class WSCanvasState {
         this.paintcnt = 0;
         this.debugNfo = "";
         this.initialized = false;
-        this.rowsCountBackup = 0;
-        this.winSizeBackup = { width: 0, height: 0 };
+        this.rowsCountBackup = 0;        
     }
 
+    colsCountBackup: number;
     filteredSortedRowsCount: number;
     widthBackup: number;
     heightBackup: number;
@@ -117,8 +118,7 @@ export class WSCanvasState {
     paintcnt: number;
     debugNfo: string;
     initialized: boolean;
-    rowsCountBackup: number;
-    winSizeBackup: GraphicsSize;
+    rowsCountBackup: number;    
 
     dup() {
         const q = _.cloneDeep(this) as WSCanvasState;

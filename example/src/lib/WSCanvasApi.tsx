@@ -25,9 +25,10 @@ export class WSCanvasApi {
     viewRowToRealRow: (states: WSCanvasStates, viewRow: number) => number;
     formatCellDataAsDate: (cellData: any) => string;
     formatCellDataAsTime: (cellData: any) => string;
-    formatCellDataAsDateTime: (cellData: any) => string;    
+    formatCellDataAsDateTime: (cellData: any) => string;
 
     paint: (states: WSCanvasStates) => void;
+    resetView: () => void;
 
     constructor() {
         this.clearSelection = () => { };
@@ -48,8 +49,9 @@ export class WSCanvasApi {
         this.viewRowToRealRow = () => 0;
         this.formatCellDataAsDate = () => "";
         this.formatCellDataAsTime = () => "";
-        this.formatCellDataAsDateTime = () => "";        
+        this.formatCellDataAsDateTime = () => "";
 
         this.paint = () => { };
+        this.resetView = () => { };
     }
 }
