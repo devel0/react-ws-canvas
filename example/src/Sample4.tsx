@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
     WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasApi, useWindowSize,
-    WSCanvasStates, WSCanvasColumnClickBehavior
+    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord
 } from "./lib";
 import * as _ from 'lodash';
 
@@ -41,14 +41,14 @@ export function Sample4() {
                 type: "text",
                 header: "Description",
                 field: "description",
-                width: 100
+                width: 100,                
             },
             {
                 type: "text",
                 header: "Last modify",
-                field: "modify_timestamp",
+                field: "timestamp",
                 width: 250,
-                readonly: true,
+                readonly: true,                
                 renderTransform: (cell, value) => {
                     const row = ds.current[cell.row];
                     if (row) {
@@ -76,7 +76,7 @@ export function Sample4() {
         }
 
         setColumns(cols);
-    }, [colVisible]);
+    }, [colVisible, gridApi]);
 
     const addItem = () => {
         const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
@@ -86,6 +86,10 @@ export function Sample4() {
             timestamp: new Date()
         });
         setDs(newset);
+
+        if (gridApi && gridStates) {
+            gridApi.focusCell(gridStates, new WSCanvasCellCoord(newset.current.length - 1, 1));
+        }
     }
 
     useEffect(() => {
@@ -144,7 +148,8 @@ export function Sample4() {
         }}>SAVE</button>
 
         <button onClick={() => {
-            setColVisible(!colVisible); if (gridApi && gridStates) { gridApi.resetView(); }
+            setColVisible(!colVisible);
+            //if (gridApi && gridStates) { gridApi.resetView(); }
         }}>
             toggle col
         </button>
@@ -171,7 +176,6 @@ export function Sample4() {
             height={Math.max(300, winSize.height * .4)}
             showColNumber={true}
             columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
-            focusInsertedRow={true}
 
             debug={false}
             onApi={(states, api) => setGridApi(api)}

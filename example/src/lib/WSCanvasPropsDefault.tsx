@@ -39,8 +39,7 @@ export const WSCanvasPropsDefault = () => {
         showPartialColumns: true,
         showPartialRows: true,
         preventWheelOnBounds: true,
-        newRowsInsertAtViewIndex: undefined,
-        focusInsertedRow: false,
+        newRowsInsertAtViewIndex: undefined,        
 
         getCellData: undefined,
         renderTransform: undefined,

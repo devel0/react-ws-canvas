@@ -58,7 +58,6 @@ export function WSCanvas(props: WSCanvasProps) {
         showPartialRows,
         preventWheelOnBounds,
         newRowsInsertAtViewIndex,
-        focusInsertedRow,
 
         getCellData,
         renderTransform,
@@ -1247,6 +1246,8 @@ export function WSCanvas(props: WSCanvasProps) {
     /** side effect on state ; NO side effect on vm */
     const focusCell = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord,
         scrollTo: boolean = true, endingCell: boolean = false, clearPreviousSel: boolean = true, dontApplySelect: boolean = false) => {
+
+        console.log("focus scroll:" + String(scrollTo));
         if (rowsCount === 0) return;
         if (canvasRef.current) canvasRef.current.focus({ preventScroll: true });
         const viewCell = realCellToView(vm, cell);
@@ -2421,11 +2422,11 @@ export function WSCanvas(props: WSCanvasProps) {
                 let stateUpdated = false;
                 let state: WSCanvasState | undefined = undefined;
 
-                const isOverCell = computeIsOverCell(stateNfo, x, y);                
+                const isOverCell = computeIsOverCell(stateNfo, x, y);
                 if (isOverCell !== stateNfo.cursorOverCell) {
                     stateUpdated = true;
                     state = stateNfo.dup();
-                    state.cursorOverCell = isOverCell;                    
+                    state.cursorOverCell = isOverCell;
                 }
 
                 if (onMouseOverCell) {
@@ -2525,7 +2526,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         const startX = state.resizingColStartNfo[0];
                         const startWidth = state.resizingColStartNfo[1];
                         const newWidth = startWidth + (x - startX);
-                        
+
                         state.columnWidthOverride.set(state.resizingCol, newWidth);
                         state.columnWidthOverrideTrack = JSON.stringify([...state.columnWidthOverride]);
                     }
@@ -2600,7 +2601,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    const handleWheel = (e: WheelEvent) => {        
+    const handleWheel = (e: WheelEvent) => {
         if (onPreviewMouseWheel) onPreviewMouseWheel(mkstates(stateNfo, viewMap, overridenRowHeight), e);
 
         if (!e.defaultPrevented && stateNfo.cursorOverCell) {
@@ -2885,12 +2886,6 @@ export function WSCanvas(props: WSCanvasProps) {
                 rectifyScrollOffset(state, vm);
             }
 
-            if (focusInsertedRow) {
-                const cell = new WSCanvasCellCoord(rowsCount - 1, 0);
-                focusCell(state, vm, cell, true, false, true, false);
-                rectifyScrollOffset(state, vm);
-            }
-
             setViewMap(vm);
             setStateNfo(state);
 
@@ -2944,7 +2939,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
         }
     }, [winSize.width, winSize.height, width, height, debugSize,
-        stateNfo, viewMap, overridenRowHeight, cs, systemReset]);
+        stateNfo, viewMap, overridenRowHeight, cs, systemReset, onApi]);
 
     useLayoutEffect(() => {
         if (debug) console.log("*** layout");
@@ -3035,6 +3030,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const vm = states.vm;
                 const orh = states.overrideRowHeight;
                 focusCell(state, vm, cell, scrollTo, endingCell, clearSelection);
+                //rectifyScrollOffset(state, vm);
                 setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
             }
@@ -3117,7 +3113,7 @@ export function WSCanvas(props: WSCanvasProps) {
             outer size: {fullwidth ? winSize.width : width} x {height}<br />
             toplevel_container_mp:{toplevel_container_mp} ( size: {toplevel_container_size.width} x {toplevel_container_size.height} )<br />
             canvas_container_mp{canvas_container_mp}<br />
-            canvas size:{cs.width} x {cs.height}<br /> */}            
+            canvas size:{cs.width} x {cs.height}<br /> */}
 
             <canvas ref={canvasRef}
                 tabIndex={0}

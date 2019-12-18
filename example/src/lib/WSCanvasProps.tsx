@@ -68,9 +68,7 @@ export interface WSCanvasProps {
     /** prevent wheel default window scroll when scroll at top or bottom */
     preventWheelOnBounds: boolean;
     /** if set new rows goes inserted at given view index  */
-    newRowsInsertAtViewIndex?: number;
-    /** if true added row gets focused */
-    focusInsertedRow: boolean;
+    newRowsInsertAtViewIndex?: number;    
 
     /** retrieve data from a cell ( or use columns ) */
     getCellData?: (coord: WSCanvasCellCoord) => any;
