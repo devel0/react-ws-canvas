@@ -149,7 +149,7 @@ export function Sample4() {
 
         <button onClick={() => {
             setColVisible(!colVisible);
-            //if (gridApi && gridStates) { gridApi.resetView(); }
+            if (gridApi && gridStates) { gridApi.resetView(); }
         }}>
             toggle col
         </button>
