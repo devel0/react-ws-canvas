@@ -207,8 +207,10 @@ export function WSCanvas(props: WSCanvasProps) {
     const realRowToViewRow = (vm: ViewMap | null, row: number) => {
         if (vm === null)
             return row;
-        else
-            return vm.realToView[row];
+        else {
+            const res = vm.realToView[row];
+            return res || row;
+        }
     }
 
     const realColToViewCol = (vm: ViewMap | null, col: number) => col; // not yet implemented (eg. column order)
@@ -1246,8 +1248,7 @@ export function WSCanvas(props: WSCanvasProps) {
     /** side effect on state ; NO side effect on vm */
     const focusCell = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord,
         scrollTo: boolean = true, endingCell: boolean = false, clearPreviousSel: boolean = true, dontApplySelect: boolean = false) => {
-
-        console.log("focus scroll:" + String(scrollTo));
+        
         if (rowsCount === 0) return;
         if (canvasRef.current) canvasRef.current.focus({ preventScroll: true });
         const viewCell = realCellToView(vm, cell);
@@ -3029,7 +3030,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const state = states.state.dup();
                 const vm = states.vm;
                 const orh = states.overrideRowHeight;
-                focusCell(state, vm, cell, scrollTo, endingCell, clearSelection);
+                focusCell(state, vm, cell, scrollTo, endingCell, clearSelection, false);
                 //rectifyScrollOffset(state, vm);
                 setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
