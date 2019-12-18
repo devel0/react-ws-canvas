@@ -26,8 +26,7 @@ export function Sample1() {
     <WSCanvas      
       fullwidth
       height={winSize.height * .8}
-      containerStyle={{ margin: "1em" }}
-      // columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
+      containerStyle={{ margin: "1em" }}      
       dataSource={rows}
       getCellData={(cell) => rows[cell.row][cell.col]}
       prepareCellDataset={() => rows.slice()}

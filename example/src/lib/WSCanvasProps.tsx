@@ -1,7 +1,7 @@
 import { WSCanvasScrollbarMode } from "./WSCanvasScrollbarMode";
 import { WSCanvasSelectMode } from "./WSCanvasSelectionMode";
 import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
-import { WSCanvasColumnType, WSCanvasColumnClickBehavior } from "./WSCanvasColumn";
+import { WSCanvasColumnType, WSCanvasColumnClickBehavior, WSCanvasColumn } from "./WSCanvasColumn";
 import { WSCanvasApi } from "./WSCanvasApi";
 import { CSSProperties } from "react";
 import { WSCanvasColumnSortInfo } from "./WSCanvasSortDirection";
@@ -14,7 +14,7 @@ export interface WSCanvasCellDataNfo {
 }
 
 /** see WSCanvasPropsDefault for default values */
-export interface WSCanvasProps {        
+export interface WSCanvasProps {
     /** width 100% */
     fullwidth: boolean;
     /** width of canvas */
@@ -25,10 +25,12 @@ export interface WSCanvasProps {
     dataSource: any;
     /** nr of rows in the grid */
     rowsCount: number;
-    /** nr of cols in the grid */
-    colsCount: number;
-    /** width of column in the grid */
-    colWidth: (cidx: number) => number;
+    /** nr of cols in the grid ( or use columns ) */
+    colsCount?: number;
+    /** compact column info */
+    columns?: WSCanvasColumn[];
+    /** width of column in the grid ( or use columns ) */
+    colWidth?: (cidx: number) => number;
     /** expand column width to fit control width ( if column width sum not already exceed control width ) */
     colWidthExpand: boolean;
     /** height of rows in the grid */
@@ -70,9 +72,9 @@ export interface WSCanvasProps {
     /** if true added row gets focused */
     focusInsertedRow: boolean;
 
-    /** retrieve data from a cell */
-    getCellData: (coord: WSCanvasCellCoord) => any;
-    /** allow to transform data before being displayed (useful for enum types); if defined must return input data as is or transformed */
+    /** retrieve data from a cell ( or use columns ) */
+    getCellData?: (coord: WSCanvasCellCoord) => any;
+    /** allow to transform data before being displayed (useful for enum types); if defined must return input data as is or transformed ( or use columns ) */
     renderTransform?: (cell: WSCanvasCellCoord, data: any) => any;
     /** retrieve cells dataset copy */
     prepareCellDataset: () => any;
@@ -81,19 +83,19 @@ export interface WSCanvasProps {
     /** set cell dataset state */
     commitCellDataset: (dataset: any) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor */
-    getCellCustomEdit?: (states: WSCanvasStates, props: WSCanvasProps, cell: WSCanvasCellCoord,
-        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element | undefined,
-    /** header of given col */
-    getColumnHeader?: (col: number) => string;
-    /** column sort method */
-    getColumnLessThanOp?: (col: number) => (a: any, b: any) => boolean | undefined;
-    /** specify type of a cell */
+    getCellCustomEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord,
+        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined;
+    /** header of given col ( or use columns ) */
+    getColumnHeader?: (col: number) => string | undefined;
+    /** column sort method  ( or use columns ) */
+    getColumnLessThanOp?: (col: number) => ((a: any, b: any) => boolean) | undefined;
+    /** specify type of a cell ( or use columns)  */
     getCellType?: (coord: WSCanvasCellCoord, value: any) => WSCanvasColumnType | undefined;
-    /** specify cell editor inhibit */
+    /** specify cell editor inhibit ( or use columns ) */
     isCellReadonly?: (coord: WSCanvasCellCoord) => boolean | undefined;
-    /** specify predefined column sort ( WSCanvasColumn array helper ) */
-    columnInitialSort: WSCanvasColumnSortInfo[] | undefined;
-    /** specify text align of a cell */
+    /** specify predefined column sort ( WSCanvasColumn array helper or use columns ) */
+    columnInitialSort?: WSCanvasColumnSortInfo[] | undefined;
+    /** specify text align of a cell ( or use columns ) */
     getCellTextAlign?: (coord: WSCanvasCellCoord, value: any) => CanvasTextAlign | undefined;
 
     /** individual cell background customization */
@@ -124,7 +126,7 @@ export interface WSCanvasProps {
     dateTimeCellMomentFormat: string;
     /** margin of text inside cells */
     textMargin: number;
-    /** individual cell text wrap */
+    /** individual cell text wrap ( or use columns ) */
     getCellTextWrap?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => boolean | undefined;
     /** individual cell font customization */
     getCellFont?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
@@ -141,7 +143,7 @@ export interface WSCanvasProps {
     /** default non cell cursor */
     outsideCellCursor: string;
     /** row hover */
-    rowHoverColor: string | undefined;    
+    rowHoverColor: string | undefined;
 
     /** filter apply debounce (ms) */
     filterDebounceMs: number;
@@ -152,7 +154,7 @@ export interface WSCanvasProps {
     /** filter cell background color */
     filterBackground: string;
     /** sort during typings */
-    immediateSort: boolean;    
+    immediateSort: boolean;
 
     /** ms from last column change to recompute row height */
     recomputeRowHeightDebounceFilterMs: number;
@@ -188,7 +190,7 @@ export interface WSCanvasProps {
 
     /** receive api */
     onApi?: (states: WSCanvasStates, api: WSCanvasApi) => void,
-    
+
     onStateChanged?: (states: WSCanvasStates) => void;
 
     onMouseOverCell?: (states: WSCanvasStates, nfo: WSCanvasXYCellCoord | null) => void;

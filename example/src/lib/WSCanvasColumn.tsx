@@ -1,4 +1,8 @@
 import { WSCanvasSortDirection } from "./WSCanvasSortDirection";
+import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
+import { WSCanvasStates } from "./WSCanvasStates";
+import { WSCanvasProps } from "./WSCanvasProps";
+import { CSSProperties } from "react";
 
 export type WSCanvasColumnType = "text" | "number" | "boolean" | "custom" | "date" | "time" | "datetime";
 
@@ -16,10 +20,10 @@ export interface WSCanvasSortingRowInfo {
 /** helper to store column info ; see hints for WSCanvas prop transferring */
 export interface WSCanvasColumn {
     /** hint: getCellType={(cell, data) => columns[cell.col].type} */
-    type: WSCanvasColumnType;
+    type?: WSCanvasColumnType;
 
     /** hint: getColumnHeader={(col) => columns[col].header} */
-    header: string;
+    header?: string;
 
     /** hint:
      * dataSource={rows}
@@ -30,17 +34,26 @@ export interface WSCanvasColumn {
     field: string;
 
     /** hint: getColumnLessThanOp={(col) => columns[col].lessThan} */
-    lessThan: (a: any, b: any) => boolean;
+    lessThan?: (a: any, b: any) => boolean;
+    
+    textAlign?: (coord: WSCanvasCellCoord, value: any) => CanvasTextAlign | undefined;
 
     /** hint: colWidth={(col) => columns[col].width || 100} */
-    width: number;
+    width?: number;
 
     /** hint: columnInitialSort={WSCanvasColumnToSortInfo(columns)} */
-    sortDirection: WSCanvasSortDirection;
+    sortDirection?: WSCanvasSortDirection;
 
     /** hint: columnInitialSort={WSCanvasColumnToSortInfo(columns)} */
-    sortOrder: number;  
+    sortOrder?: number;  
 
     /** hint: getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }} */
-    wrapText?: boolean; 
+    wrapText?: boolean;
+
+    renderTransform?: (cell: WSCanvasCellCoord, value: any) => any;    
+
+    readonly?: boolean | undefined;    
+
+    customEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord, 
+        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined,
 }

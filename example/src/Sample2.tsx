@@ -1,4 +1,4 @@
-import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnToSortInfo, WSCanvasApi, useWindowSize, WSCanvasColumnClickBehavior } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, useWindowSize } from "./lib";
 
 import React, { useState, useEffect } from "react";
 import * as _ from 'lodash';
@@ -14,7 +14,6 @@ interface MyData {
 
 export function Sample2() {
   const [rows, setRows] = useState<MyData[]>([]);
-  const [api, setApi] = useState<WSCanvasApi>(new WSCanvasApi());
   const winSize = useWindowSize();
 
   const ROWS = 5000;
@@ -24,6 +23,7 @@ export function Sample2() {
       type: "text",
       header: "col1",
       field: "col1",
+      textAlign: () => "center",
       lessThan: (a, b) => {
         const aNr = parseInt((a as string).replace("r", ""));
         const bNr = parseInt((b as string).replace("r", ""));
@@ -32,6 +32,7 @@ export function Sample2() {
       },
       sortDirection: WSCanvasSortDirection.Descending,
       sortOrder: 1,
+      width: 120,
     },
     {
       type: "number",
@@ -80,30 +81,19 @@ export function Sample2() {
     }
 
     setRows(_rows);
-
-    // const newApi = new WSCanvasApi();
-    // newApi.onMouseDown = (e, cell) => {
-    //   if (cell) {
-    //     if (cell.row >= 0) {
-    //       const data = rows[cell.row] as MyData;
-    //       if (data) console.log("clicked cell row:" + cell.row + " col1:" + data.col1);
-    //     }
-    //   }
-    // };
-    // setApi(newApi);
   }, []);
 
   return <WSCanvas
-    // api={api}
-    fullwidth height={winSize.height * .8}
-    containerStyle={{ margin: "2em" }}
-    // columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
-    getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
+    columns={columns}
+    rowsCount={rows.length}
     dataSource={rows}
+    getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
     prepareCellDataset={() => rows.slice()}
     commitCellDataset={(q) => setRows(q)}
-    setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}
-    columnInitialSort={WSCanvasColumnToSortInfo(columns)}
+    setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}    
+
+    fullwidth height={winSize.height * .8}
+    containerStyle={{ margin: "2em" }}
     getCellBackgroundColor={(cell) => {
       if (cell.row === 2) return "navy";
       if (cell.col === 1) return "lightyellow";
@@ -114,15 +104,10 @@ export function Sample2() {
     getCellTextColor={(cell) => {
       if (cell.row === 2) return "white";
     }}
-    getCellTextAlign={(cell) => (cell.col === 0) ? "center" : undefined}
-    getColumnHeader={(col) => columns[col].header}
-    getColumnLessThanOp={(col) => columns[col].lessThan}
-    getCellType={(cell) => columns[cell.col].type}
-    colWidth={() => 120}
     rowHeight={() => 30}
     showFilter={true}
     showColNumber={true} showRowNumber={true}
     colWidthExpand={false}
     frozenRowsCount={0} frozenColsCount={0}
-    rowsCount={rows.length} colsCount={columns.length} />
+  />
 }

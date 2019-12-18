@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import {
-    WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasColumnToSortInfo, WSCanvasApi, useWindowSize,
-    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord
+    WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasApi, useWindowSize,
+    WSCanvasStates, WSCanvasColumnClickBehavior
 } from "./lib";
 import * as _ from 'lodash';
 
 interface MyData {
+    idx: number;
     description: string;
     timestamp: Date;
 }
@@ -23,10 +24,6 @@ class IUpdateEntityNfo<T> {
 
     get current() { return this._current; }
     get original() { return this._original; }
-
-    // dup() {
-    //     return _.cloneDeep(this) as IUpdateEntityNfo<T>;
-    // }
 }
 
 export function Sample4() {
@@ -38,25 +35,48 @@ export function Sample4() {
 
     const columns = [
         {
+            type: "number",
+            header: "idx",
+            field: "idx",
+            width: 100,
+            sortOrder: 0,
+            sortDirection: WSCanvasSortDirection.Ascending,
+            lessThan: (a, b) => a < b,
+            textAlign: () => "center"
+        },
+        {
             type: "text",
             header: "Description",
             field: "description",
-            width: 100,
-            sortOrder: 0,
-            sortDirection: WSCanvasSortDirection.Ascending
+            width: 100
         },
         {
             type: "text",
             header: "Last modify",
             field: "modify_timestamp",
-            width: 250
+            width: 250,
+            readonly: () => true,
+            renderTransform: (cell, value) => {
+                const row = ds.current[cell.row];
+                if (row) {
+                    if (gridApi && row.timestamp) {
+                        return gridApi.formatCellDataAsDateTime(row.timestamp) + " (custom user) " + row.timestamp.getTime();
+                    }
+                    return "";
+                }
+                return undefined;
+            }
         }
     ] as WSCanvasColumn[];
 
     const addItem = () => {
         const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
-        newset.current.push({ description: "test" + ds.current.length, timestamp: new Date() });
-        setDs(newset);        
+        newset.current.push({
+            idx: ds.current.length > 0 ? _.max(ds.current.map((r) => r.idx))! + 1 : 0,
+            description: "test" + ds.current.length,
+            timestamp: new Date()
+        });
+        setDs(newset);
     }
 
     useEffect(() => {
@@ -70,7 +90,11 @@ export function Sample4() {
     }, [ds, dirty]);
 
     useEffect(() => {
-        const newset = new IUpdateEntityNfo<MyData[]>([{ description: "test", timestamp: new Date() }]);
+        const newset = new IUpdateEntityNfo<MyData[]>([{
+            idx: 0,
+            description: "test",
+            timestamp: new Date()
+        }]);
         setDs(newset);
     }, []);
 
@@ -111,16 +135,9 @@ export function Sample4() {
         }}>SAVE</button>
 
         <WSCanvas
-            containerStyle={{ marginTop: "1em" }}
+            columns={columns}
+            rowsCount={ds.current.length}
             dataSource={ds}
-            fullwidth
-            immediateSort={false}
-            height={Math.max(300, winSize.height * .4)}
-            rowsCount={ds.current.length} colsCount={columns.length}
-            showColNumber={true} getColumnHeader={(col) => columns[col].header}
-            colWidth={(col) => columns[col].width}
-            columnInitialSort={WSCanvasColumnToSortInfo(columns)}
-            columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
             getCellData={(cell) => {
                 const row = (ds.current as any[])[cell.row];
                 if (row) return (row as any)[columns[cell.col].field];
@@ -132,25 +149,15 @@ export function Sample4() {
                 if (row) { (row as any)[columns[cell.col].field] = value; }
             }}
             commitCellDataset={(q) => { setDs(new IUpdateEntityNfo<MyData[]>(q, ds.original)); }}
-            renderTransform={(cell) => {
-                const fieldname = columns[cell.col].field;
-                const row = ds.current[cell.row];
-                if (row) {
-                    if (fieldname === "modify_timestamp") {
-                        if (gridApi && row.timestamp) {
-                            return gridApi.formatCellDataAsDateTime(row.timestamp) + " (custom user) " + row.timestamp.getTime();
-                        }
-                        return "";
-                    }
-                    return (row as any)[columns[cell.col].field];
-                }
-                return "";
-            }}
-            isCellReadonly={(cell) => {
-                const fieldname = columns[cell.col].field;
-                return fieldname === "modify_timestamp";
-            }}
+
+            containerStyle={{ marginTop: "1em" }}
+            fullwidth
+            immediateSort={false}
+            height={Math.max(300, winSize.height * .4)}
+            showColNumber={true}
+            columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
             focusInsertedRow={true}
+            
             onApi={(states, api) => setGridApi(api)}
             onStateChanged={(states) => setGridState(states)}
             onRowsAppended={(states, rowFrom, rowTo) => {

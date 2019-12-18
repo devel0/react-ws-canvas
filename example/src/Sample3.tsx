@@ -1,5 +1,7 @@
-import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, WSCanvasColumnToSortInfo, mapEnum, 
-  WSCanvasApi, useWindowSize, WSCanvasStates } from "./lib";
+import {
+  WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, mapEnum,
+  WSCanvasApi, useWindowSize, WSCanvasStates
+} from "./lib";
 
 import React, { useState, useEffect, useRef } from "react";
 
@@ -24,14 +26,12 @@ interface MyData {
 
 export function Sample3() {
   const [rows, setRows] = useState<MyData[]>([]);
-
   const [gridApi, setGridApi] = useState<WSCanvasApi | null>(null);
-
   const [gridStateNfo, setGridStateNfo] = useState<WSCanvasStates>({} as WSCanvasStates);
   const [overCellCoord, setOverCellCoord] = useState<string>("");
-
   const tooltipDivRef = useRef<HTMLDivElement>(null);
   const [tooltipTest, setTooltipTest] = useState(false);
+  const winSize = useWindowSize();
 
   const ROWS = 5000;
 
@@ -49,8 +49,11 @@ export function Sample3() {
         }
         return -1;
       },
+      textAlign: () => "center",
       sortDirection: WSCanvasSortDirection.Descending,
       sortOrder: 1,
+      renderTransform: (cell, data) => "( " + data + " )",
+      readonly: true,
     },
     {
       type: "number",
@@ -79,7 +82,44 @@ export function Sample3() {
     {
       type: "text",
       header: "cbox",
-      field: "cboxcol"
+      field: "cboxcol",
+      renderTransform: (cell, data) => {
+        const q = mapEnum(MyEnum).find((x) => x.value === data);
+        if (q) return q.name;
+      },
+      customEdit: (states, cell, containerStyle?, cellWidth?, cellHeight?) => {
+        if (containerStyle) containerStyle.background = "lightyellow";
+
+        return <div>
+          <select
+            autoFocus
+            defaultValue={rows[cell.row].cboxcol}
+            onKeyDown={(e) => {
+              switch (e.key) {
+                case "Tab":
+                case "Enter":
+                  e.preventDefault();
+                  if (gridApi) gridApi.closeCustomEdit(states, true);
+                  break;
+                case "Escape":
+                  if (gridApi) gridApi.closeCustomEdit(states, false);
+                  break;
+              }
+            }}
+            onChange={(e) => {
+              const val = parseInt(e.target.value);
+              const qval: MyEnum = val;
+              const row = rows[cell.row];
+              row.cboxcol = qval;
+              if (gridApi) gridApi.setCustomEditValue(states, qval);
+            }}
+          >
+            {mapEnum(MyEnum).map((x) =>
+              <option key={"k:" + x.value} value={x.value}>{x.name}</option>
+            )}
+          </select>
+        </div>
+      }
     },
     {
       type: "datetime",
@@ -108,7 +148,6 @@ export function Sample3() {
   }
 
   useEffect(() => {
-    //setTimeout(() => {
     console.log("GENERATE DATA");
 
     const _rows: MyData[] = [];
@@ -117,9 +156,7 @@ export function Sample3() {
     }
 
     setRows(_rows);
-  }, []);  
-
-  const winSize = useWindowSize();
+  }, []);
 
   return <div style={{ margin: "1em", border: "1px solid gray" }}>
     <button onClick={() => {
@@ -158,27 +195,10 @@ export function Sample3() {
         </div>
       </div> : null}
 
-    <WSCanvas
-      onApi={(states, api) => { setGridApi(api); }}
-
-      containerStyle={{ margin: "1em" }}
-      fullwidth
-      height={Math.max(300, winSize.height * .8)}
-
-      frozenRowsCount={0} frozenColsCount={0}
-      // columnClickBehavior={columnClickBehavior}
-      columnInitialSort={WSCanvasColumnToSortInfo(columns)}
-      colWidth={(col) => columns[col].width || 100} colWidthExpand={true}
-      showFilter={true}
-      showPartialColumns={true} showPartialRows={true}
-      showColNumber={true} showRowNumber={true}
-
-      rowsCount={rows.length} colsCount={columns.length}
+    <WSCanvas      
+      columns={columns}
+      rowsCount={rows.length}
       dataSource={rows}
-      isCellReadonly={(cell) => {
-        const fieldname = columns[cell.col].field;
-        return fieldname === "col1";
-      }}
       getCellData={(cell) => {
         const fieldname = columns[cell.col].field;
         const row = rows[cell.row];
@@ -186,16 +206,6 @@ export function Sample3() {
           const val = (row as any)[columns[cell.col].field];
           return val;
         }
-      }}
-      renderTransform={(cell, data) => {
-        const fieldname = columns[cell.col].field;
-        switch (fieldname) {
-          case "col1": return "( " + data + " )";
-          case "cboxcol":
-            const q = mapEnum(MyEnum).find((x) => x.value === data);
-            if (q) return q.name;
-        }
-        return data;
       }}
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
@@ -206,57 +216,21 @@ export function Sample3() {
           (row as any)[columns[cell.col].field] = value;
         }
       }}
-      getCellCustomEdit={(states, props, cell, containerStyle) => {
-        const fieldname = columns[cell.col].field;
 
-        if (fieldname === "cboxcol") {
-
-          if (containerStyle) containerStyle.background = "lightyellow";
-
-          return <div>
-            <select
-              autoFocus
-              defaultValue={rows[cell.row].cboxcol}
-              onKeyDown={(e) => {
-                switch (e.key) {
-                  case "Tab":
-                  case "Enter":
-                    e.preventDefault();
-                    if (gridApi) gridApi.closeCustomEdit(states, true);
-                    break;
-                  case "Escape":
-                    if (gridApi) gridApi.closeCustomEdit(states, false);
-                    break;
-                }
-              }}
-              onChange={(e) => {
-                const val = parseInt(e.target.value);
-                const qval: MyEnum = val;
-                const row = rows[cell.row];
-                row.cboxcol = qval;
-                if (gridApi) gridApi.setCustomEditValue(states, qval);
-              }}
-            >
-              {mapEnum(MyEnum).map((x) =>
-                <option key={"k:" + x.value} value={x.value}>{x.name}</option>
-              )}
-            </select>
-          </div>
-
-        }
-        return undefined;
-      }}
-      getColumnLessThanOp={(col) => columns[col].lessThan}
-
-      getCellTextAlign={(cell) => (cell.col === 0) ? "center" : undefined}
-      getCellTextWrap={(cell) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }}
-      getCellType={(cell) => columns[cell.col].type}
-      getColumnHeader={(col) => columns[col].header}
-
+      containerStyle={{ margin: "1em" }}
+      fullwidth
+      height={Math.max(300, winSize.height * .8)}
+      frozenRowsCount={0} frozenColsCount={0}
+      colWidthExpand={true}
+      showFilter={true}
+      showPartialColumns={true} showPartialRows={true}
+      showColNumber={true} showRowNumber={true}
       rowHoverColor={"rgba(248,248,248,1)"}
       rowHeight={() => 35} textMargin={5}
       selectionMode={WSCanvasSelectMode.Cell}
 
+      onStateChanged={(states) => setGridStateNfo(states)}
+      onApi={(states, api) => setGridApi(api)}
       onMouseDown={(states, e, cell) => {
         if (cell) {
           if (cell.row >= 0) {
@@ -287,9 +261,6 @@ export function Sample3() {
             }
           }
         }
-      }}
-      onStateChanged={(states) => {
-        setGridStateNfo(states);
       }}
     />
   </div>

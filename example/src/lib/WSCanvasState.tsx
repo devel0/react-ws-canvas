@@ -25,6 +25,7 @@ export class WSCanvasState {
         this.touchStart = [0, 0];
         this.touchCur = [0, 0];
 
+        this.lastPartialColScrolled =-1;
         this.focusedCell = new WSCanvasCellCoord();
         this.focusedFilterColIdx = -1;
         this.filters = [];
@@ -77,6 +78,7 @@ export class WSCanvasState {
     touchStart: number[];
     touchCur: number[];
 
+    lastPartialColScrolled: number;
     focusedCell: WSCanvasCellCoord;
     focusedFilterColIdx: number;
     filters: WSCanvasFilter[];

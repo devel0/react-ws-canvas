@@ -5,8 +5,8 @@ import { WSCanvasApi } from "./WSCanvasApi";
 import { WSCanvasColumnClickBehavior } from "./WSCanvasColumn";
 import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 
-const DEFAULT_ROW_HEIGHT = 30;
-const DEFAULT_COL_WIDTH = 120;
+export const DEFAULT_ROW_HEIGHT = 30;
+export const DEFAULT_COL_WIDTH = 120;
 
 export const WSCanvasPropsDefault = () => {
     return {        
@@ -19,7 +19,8 @@ export const WSCanvasPropsDefault = () => {
         dataSource: null,
         rowsCount: 0,
         colsCount: 0,
-        colWidth: () => DEFAULT_COL_WIDTH,
+        columns: undefined,
+        colWidth: undefined,
         colWidthExpand: true,
         rowHeight: () => DEFAULT_ROW_HEIGHT,
         frozenRowsCount: 0,
@@ -41,7 +42,7 @@ export const WSCanvasPropsDefault = () => {
         newRowsInsertAtViewIndex: undefined,
         focusInsertedRow: false,
 
-        getCellData: (cell) => null,        
+        getCellData: undefined,
         renderTransform: undefined,
         prepareCellDataset: () => null,
         setCellData: (dataset: any, cell: WSCanvasCellCoord, value: any) => {},
