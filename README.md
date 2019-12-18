@@ -4,14 +4,12 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.8.11](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/7ff9a05d512aa45b29a8f28e6b98f0591f12ccb8/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.8.12](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/513632060951df8a20b83dee39667529cc0ac883/example) )
 
 ---
 
 - [features](#features)
 - [**quickstart**](#quickstart)
-- [states, handlers and **api** usage](#states-handlers-and-api-usage)
-- [tips](#tips)
 - [**examples** list](#examples-list)
 - [how to contribute ( quickstart )](#how-to-contribute--quickstart-)
 - [local deploy](#local-deploy)
@@ -46,21 +44,21 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/selection-mode-multi.png)
 
-- frozen [rows][3], [cols][4]
+- frozen [rows, cols][3]
 
 ![](doc/frozen-rows-cols.png)
 
-- [wrap][21] text cells
+- [wrap][21] text cells ( [helper][121] )
 
 ![](doc/text-wrap.gif)
 
 - rows and cols numbering can be [shown or hidden][5]
 
-- if column numbering visible automatic sort can be customized through [less-than-op][6]
+- if column numbering visible automatic sort can be customized through [less-than-op][6] ( [helper][106] )
 
 - [column click behavior][12] can be full column select, column toggle sort or none to disable sort/select behavior
 
-- [column header][15] can be customized
+- [column header][15] can be customized ( [helper][115] )
 
 - canvas size can be specified through width, height ( [fullwidth][26] option available )
 
@@ -78,47 +76,53 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - [api][10] and [handlers][27] available for control interactions ( [example][11] )
 
-- each individual cell [custom edit][13] ( F2 ) control can be customized ( [example][24] : through keyboard F2, arrows then enter )
+- each individual cell [custom edit][13] ( F2 ) control can be customized also in [column helper][113] ( [example][24] : through keyboard F2, arrows then enter )
 
 ![](doc/custom-combobox.gif)
 
-- [cell style][19] customization and [text align][25]
+- cell [background][19], [font and color][119] customization and [text align][25] also with [helper][125]
 
 ![](doc/cell-style-customization.png)
 
 - container [height min][23] and canvas [styles][20]
 
-- each individual [cell type][14] can be customized
+- each individual [cell type][14] can be customized ( [column helper][114] )
 
 - support mobile touch scrolling rows, cols and scrollbars
 
-[1]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasColumn.tsx#L1
-[2]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L30
-[3]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L24
-[4]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L26
-[5]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L31-L34
-[6]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L48-L49
-[7]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/Sample2.tsx#L98-L100
-[8]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/Sample3.tsx#L128-L130
-[9]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L27-L28
-[10]: https://github.com/devel0/react-ws-canvas/blob/7c4270e17742f55e229e1a66e9d16410a9c97b26/example/src/lib/WSCanvasApi.tsx#L9
-[11]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L118-L156
-[12]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L35-L36
-[13]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/lib/WSCanvasProps.tsx#L87
-[14]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/lib/WSCanvasProps.tsx#L50-L51
-[15]: https://github.com/devel0/react-ws-canvas/blob/3160c5e6548f7543a63d8ae8ef81c896a5bcef9a/example/src/Sample2.tsx#L87
-[16]: https://github.com/devel0/react-ws-canvas/blob/5a7b126b35a08350f1fb3409138c2dfee49360f4/example/src/lib/WSCanvasProps.tsx#L23-L24
-[17]: https://github.com/devel0/react-ws-canvas/blob/5a7b126b35a08350f1fb3409138c2dfee49360f4/example/src/lib/WSCanvasProps.tsx#L68-L69
-[18]: https://github.com/devel0/react-ws-canvas/blob/86ffa34c4b17f6f56b106119c7874c910df9c371/example/src/Sample2.tsx#L93-L99
-[19]: https://github.com/devel0/react-ws-canvas/blob/eea7a9f653fe827300291b3b5b3e6870d9ff4692/example/src/Sample2.tsx#L100-L109
-[20]: https://github.com/devel0/react-ws-canvas/blob/eea7a9f653fe827300291b3b5b3e6870d9ff4692/example/src/lib/WSCanvasProps.tsx#L143-L146
-[21]: https://github.com/devel0/react-ws-canvas/blob/10556d1e377e8258077f4a87cffb21f722c7e4e6/example/src/lib/WSCanvasProps.tsx#L103-L104
-[22]: https://github.com/devel0/react-ws-canvas/blob/6802447dac4247fcb6cd16cab14338d8c8b9dab7/example/src/lib/WSCanvasPropsDefault.tsx#L13
-[23]: https://github.com/devel0/react-ws-canvas/blob/e756188d46ffe9fc96bc68d66de65aa6af42b146/example/src/Sample3.tsx#L120
-[24]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/Sample3.tsx#L240-L279
-[25]: https://github.com/devel0/react-ws-canvas/blob/4029b9f278824215ca2ffdf65cabe6e2ccf32c4c/example/src/lib/WSCanvasProps.tsx#L89
-[26]: https://github.com/devel0/react-ws-canvas/blob/cdd013cda94264770b3e62840148e716ac4e76c5/example/src/Sample3.tsx#L138
-[27]: https://github.com/devel0/react-ws-canvas/blob/7d9b1b9bb9d02854dcf2080a49ddbf60306d0eeb/example/src/lib/WSCanvasHandlers.tsx#L10
+[1]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L7
+[2]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L45
+[3]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L38-L41
+[5]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L50-L55
+[6]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L90-L91
+[106]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L36-L37
+[7]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample1.tsx#L30-L34
+[8]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample4.tsx#L140-L151
+[9]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L42-L43
+[10]: https://github.com/devel0/react-ws-canvas/blob/e24f2847c113acb56b381aa2962ebc70e8b15a24/example/src/lib/WSCanvasApi.tsx#L9
+[11]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample4.tsx#L107-L127
+[12]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L58-L59
+[13]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L85-L87
+[113]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L57-L58
+[14]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L92-L93
+[114]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L22-L23
+[15]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L88-L89
+[115]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L25-L26
+[16]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L34-L35
+[18]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L96-L97
+[118]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L44-L48
+[19]:https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L101-L102
+[119]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L131-L140
+[20]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L181-L184
+[21]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L129-L130
+[121]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L50-L51
+[22]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasPropsDefault.tsx#L11
+[23]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample3.tsx#L222
+[24]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample3.tsx#L90-L122
+[25]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L98-L99
+[125]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L39
+[26]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L18-L19
+[27]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L191-L219
 
 ## quickstart
 
@@ -180,43 +184,6 @@ export default AppQuickStart;
 ```sh
 yarn start
 ```
-
-## states, handlers and api usage
-
-- [declare][500] your grid handlers and api state variables
-
-- handlers
-  - [attach handlers][501]
-  - [define handlers][503]
-- api
-  - [onApi][502] set your api state variable
-  - [invoke api][503] passing states info that comes as argument from handlers. If call an api outside grid handlers can use your own [states copy][505]
-
-[500]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L27-L28
-[501]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L192
-[502]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L193
-[503]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L118-L156
-[504]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L133
-[505]: https://github.com/devel0/react-ws-canvas/blob/c344cb2c2b9e788658e673c5026018922bc0bd8f/example/src/Sample3.tsx#L152
-
-## tips
-
-- prepare column info using [WSCanvasColumn][1000] ( [example][1001] ) then attach required prop using hint provided from WSCanvasColumn field documentation ( ie. `getColumnHeader={(col) => columns[col].header}` )
-
-- to allow read/write cell set `getCellData`, `prepareCellDataset`, `setCellData`, `commitCellDataset` ( [example][1002] )
-
-- to ensure data sync with view set [dataSource][1003]
-
-- to inhibit column sorting set `columnClickBehavior` to [None][1004]
-
-- transform render data on-the-fly using `renderTransform` ( [example][1005] ) useful for enum data value mapping to string when displayed )
-
-[1000]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L17
-[1001]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L21
-[1002]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128-L132
-[1003]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/Sample3.tsx#L128
-[1004]: https://github.com/devel0/react-ws-canvas/blob/3389cbc6b510b209d78fcc277f7ef80d9b8e0b29/example/src/lib/WSCanvasColumn.tsx#L8
-[1005]: https://github.com/devel0/react-ws-canvas/blob/1c0200495ec75a6fe31f467884b9ac79b1e88ad6/example/src/Sample3.tsx#L221-L230
 
 ## examples list
 
@@ -289,7 +256,7 @@ Because I need a library to publish and either a working example to test/debug t
 
 ## development notes
 
-- **key notes**
+- **key notes** (old)
   - [cs.width and cs.height][1508] variables represents [canvas size][1509] and used as starting point for [calculations][1510]
   - [stateNfo, viewMap, overridenRowHeight][1500] are kept separate because stateNfo must light because frequently updated while viewMap and overridenRowHeight can be heavy struct for large grids
   - [view][1501] mapping have a size less-or-equal than rowsCount depending on [filtering][1502] and the order of view may different depending on sorting
