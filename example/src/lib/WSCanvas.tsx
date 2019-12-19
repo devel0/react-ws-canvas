@@ -1115,11 +1115,11 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    const singleSetCellData = (cell: WSCanvasCellCoord, value: any, pasteMode: boolean = false) => {
+    const singleSetCellData = (state: WSCanvasState, cell: WSCanvasCellCoord, value: any, pasteMode: boolean = false) => {
         const q = prepareCellDataset();
         const cellType = _getCellType(cell, value);
         let cellval = value;
-        if (!pasteMode) {
+        if (!pasteMode && state.editMode !== WSCanvasEditMode.direct) {
             switch (cellType) {
                 case "date":
                     cellval = moment(cellval, dateCellMomentFormat);
@@ -1177,9 +1177,9 @@ export function WSCanvas(props: WSCanvasProps) {
     const closeCustomEdit = (state: WSCanvasState, confirm: boolean) => {
         if (state.customEditCell !== null) {
             if (confirm)
-                singleSetCellData(state.customEditCell, state.customEditValue);
+                singleSetCellData(state, state.customEditCell, state.customEditValue);
             else
-                singleSetCellData(state.customEditCell, state.customEditOrigValue);
+                singleSetCellData(state, state.customEditCell, state.customEditOrigValue);
 
             state.customEditCell = null;
             state.customEditValue = null;
@@ -1304,13 +1304,13 @@ export function WSCanvas(props: WSCanvasProps) {
 
         switch (cellType) {
             case "date":
-                singleSetCellData(state.focusedCell, moment(cellData, dateCellMomentFormat));
+                singleSetCellData(state, state.focusedCell, moment(cellData, dateCellMomentFormat));
                 break;
             case "time":
-                singleSetCellData(state.focusedCell, moment(cellData, timeCellMomentFormat));
+                singleSetCellData(state, state.focusedCell, moment(cellData, timeCellMomentFormat));
                 break;
             case "datetime":
-                singleSetCellData(state.focusedCell, moment(cellData, timeCellMomentFormat));
+                singleSetCellData(state, state.focusedCell, moment(cellData, timeCellMomentFormat));
                 break;
         }
     }
@@ -2049,7 +2049,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 if (_getCellType(cell, data) === "boolean") {
                     keyHandled = true;
                     const boolVal = data as boolean;
-                    singleSetCellData(cell, !boolVal);
+                    singleSetCellData(state, cell, !boolVal);
                 }
             };
 
@@ -2177,10 +2177,10 @@ export function WSCanvas(props: WSCanvasProps) {
                                 const cell = viewCellToReal(viewMap, viewCellIt.value);
                                 if (!_isCellReadonly(cell)) {
                                     if (_getCellType(cell, _getCellData(cell)) === "boolean") {
-                                        singleSetCellData(cell, text === "true", true);
+                                        singleSetCellData(state, cell, text === "true", true);
                                     }
                                     else {
-                                        singleSetCellData(cell, text, true);
+                                        singleSetCellData(state, cell, text, true);
                                     }
                                 }
                                 viewCellIt = rngViewCells.next();
@@ -2257,18 +2257,17 @@ export function WSCanvas(props: WSCanvasProps) {
                                 const prevData = _renderTransform(cell, celldata);
                                 if (prevData === undefined) celldata = String(celldata);
                                 const type = _getCellType(cell, prevData);
+                                state.editMode = WSCanvasEditMode.direct;
                                 switch (type) {
                                     case "number":
                                         if (!isNaN(parseFloat(e.key))) {
-                                            singleSetCellData(cell, e.key);
+                                            singleSetCellData(state, cell, e.key);
                                         }
                                         break;
                                     default:
-                                        singleSetCellData(cell, e.key);
+                                        singleSetCellData(state, cell, e.key);
                                         break;
-                                }
-
-                                state.editMode = WSCanvasEditMode.direct;
+                                }                                
                             }
                             break;
 
@@ -2278,7 +2277,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     const celldata = String(_getCellData(cell));
                                     let str = _renderTransform(cell, celldata);
                                     if (str === undefined) str = String(celldata);
-                                    if (str.length > 0) singleSetCellData(cell, str.substring(0, str.length - 1));
+                                    if (str.length > 0) singleSetCellData(state, cell, str.substring(0, str.length - 1));
                                     keyHandled = true;
                                     break;
                                 case "Delete":
@@ -2295,11 +2294,11 @@ export function WSCanvas(props: WSCanvasProps) {
                                 switch (type) {
                                     case "number":
                                         if (!isNaN(parseFloat(String(prevData) + e.key))) {
-                                            singleSetCellData(cell, String(prevData) + e.key);
+                                            singleSetCellData(state, cell, String(prevData) + e.key);
                                         }
                                         break;
                                     default:
-                                        singleSetCellData(cell, String(prevData) + e.key);
+                                        singleSetCellData(state, cell, String(prevData) + e.key);
                                         break;
                                 }
                             }
@@ -2637,7 +2636,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const data = _getCellData(cell);
                 if (_getCellType(cell, data) === "boolean") {
                     const boolVal = data as boolean;
-                    singleSetCellData(cell, !boolVal);
+                    singleSetCellData(state, cell, !boolVal);
                     paint(state, viewMap, overridenRowHeight);
                     if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
                     return;
@@ -3221,7 +3220,7 @@ export function WSCanvas(props: WSCanvasProps) {
             outer size: {fullwidth ? winSize.width : width} x {height}<br />
             toplevel_container_mp:{toplevel_container_mp} ( size: {toplevel_container_size.width} x {toplevel_container_size.height} )<br />
             canvas_container_mp{canvas_container_mp}<br />
-            canvas size:{cs.width} x {cs.height}<br /> */}            
+            canvas size:{cs.width} x {cs.height}<br /> */}                        
 
             <canvas ref={canvasRef}
                 tabIndex={0}
