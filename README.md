@@ -4,7 +4,7 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.8.13](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/11c59983ddf55d24a479be350a61a24dba9564cf/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.9.0](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/53639eb02d4df298b4591c6f231c63cf4db703b2/example) )
 
 ---
 
@@ -101,7 +101,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [7]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample1.tsx#L30-L34
 [8]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample4.tsx#L140-L151
 [9]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L42-L43
-[10]: 
+[10]: https://github.com/devel0/react-ws-canvas/blob/53639eb02d4df298b4591c6f231c63cf4db703b2/example/src/lib/WSCanvasApi.tsx#L13
 [11]: https://github.com/devel0/react-ws-canvas/blob/6e5069b4bd999bee8e47fee39733ee963002ad1b/example/src/Sample4.tsx#L150
 [12]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L58-L59
 [13]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L85-L87
