@@ -76,6 +76,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - [api][10] and [handlers][27] available for control interactions ( [example][11] )
 
+![](doc/api.gif)
+
 - each individual cell [custom edit][13] ( F2 ) control can be customized also in [column helper][113] ( [example][24] : through keyboard F2, arrows then enter )
 
 ![](doc/custom-combobox.gif)
@@ -100,7 +102,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [8]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample4.tsx#L140-L151
 [9]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L42-L43
 [10]: 
-[11]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample4.tsx#L107-L127
+[11]: https://github.com/devel0/react-ws-canvas/blob/6e5069b4bd999bee8e47fee39733ee963002ad1b/example/src/Sample4.tsx#L150
 [12]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L58-L59
 [13]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L85-L87
 [113]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L57-L58
