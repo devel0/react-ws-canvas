@@ -83,6 +83,8 @@ export interface WSCanvasProps {
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined;
     /** header of given col ( or use columns ) */
     getColumnHeader?: (col: number) => string | undefined;
+    /** states whatever colum should hidden */
+    getColumnHidden?: (col:number) => boolean;
     /** column sort method  ( or use columns ) */
     getColumnLessThanOp?: (col: number) => ((a: any, b: any) => boolean) | undefined;
     /** specify type of a cell ( or use columns)  */

@@ -46,6 +46,17 @@ export function Sample4() {
                 renderTransform: (cell, value) => cell.row
             },
             {
+                type: "number",
+                header: "vidx",
+                field: "idx",
+                width: 100,
+                sortOrder: 0,
+                sortDirection: WSCanvasSortDirection.Ascending,
+                lessThan: (a, b) => a < b,
+                textAlign: () => "center",
+                hidden: !colVisible,
+            },
+            {
                 type: "text",
                 header: "Description",
                 field: "description",
@@ -70,19 +81,6 @@ export function Sample4() {
             }
         ] as WSCanvasColumn[];
 
-        if (colVisible) {
-            cols.splice(1, 0, {
-                type: "number",
-                header: "vidx",
-                field: "idx",
-                width: 100,
-                sortOrder: 0,
-                sortDirection: WSCanvasSortDirection.Ascending,
-                lessThan: (a, b) => a < b,
-                textAlign: () => "center",
-            });
-        }
-
         setColumns(cols);
     }, [colVisible, api]);
 
@@ -105,6 +103,97 @@ export function Sample4() {
         setDs(newset);
     }, []);
 
+    const addRow = () => {
+        const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
+        newset.current.push({
+            idx: ds.current.length > 0 ? _.max(ds.current.map((r) => r.idx))! + 1 : 0,
+            description: "test" + ds.current.length,
+            timestamp: new Date()
+        });
+        setDs(newset);
+
+        if (api && gridStates) {
+            api.begin();
+            const cell = new WSCanvasCellCoord(newset.current.length - 1, 2);
+            api.focusCell(cell);
+            api.commit();
+        }
+    }
+
+    const delRow = () => {
+        if (gridStates && api) {
+            const viewRows = gridStates.state.viewSelection.rowIdxs();
+            const idxsToRemove: number[] = [];
+            viewRows.forEach((viewRow) => {
+                const rowIdx = api.viewRowToRealRow(viewRow);
+                idxsToRemove.push(rowIdx);
+            });
+
+            idxsToRemove.sort((a, b) => b - a);
+
+            const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
+
+            const arr = newset.current;
+            for (let i = 0; i < idxsToRemove.length; ++i) {
+                arr.splice(idxsToRemove[i], 1);
+            }
+
+            setDs(newset);
+
+            api.begin();
+            api.clearSelection();
+            api.commit();
+        }
+    }
+
+    const moveRow = (condition: (focusedViewCellRow: number) => boolean, delta: number) => {
+        if (api) {
+            const focusedCell = api.states.state.focusedCell;
+            const focusedViewCell = api.realCellToView(focusedCell);
+
+            if (condition(focusedViewCell.row)) {
+                api.begin();
+
+                const viewCellUpper = focusedViewCell.setRow(focusedViewCell.row + delta);
+                const cellUpper = api.viewCellToReal(viewCellUpper);
+
+                //const COL = columns.findIndex((x) => x.field === "idx"); // alternative
+
+                //const qup = api.getCellData(new WSCanvasCellCoord(cellUpper.row, COL));  // alternative
+                //const qthis = api.getCellData(new WSCanvasCellCoord(focusedCell.row, COL));  // alternative
+                const qup = ds.current[cellUpper.row].idx;
+                const qthis = ds.current[focusedCell.row].idx;
+
+                api.prepareCellDataset();
+                //api.setCellData(new WSCanvasCellCoord(cellUpper.row, COL), qthis);  // alternative
+                //api.setCellData(new WSCanvasCellCoord(focusedCell.row, COL), qup);  // alternative
+                (api.ds[cellUpper.row] as MyData).idx = qthis;
+                (api.ds[focusedCell.row] as MyData).idx = qup;
+                api.commitCellDataset();
+
+                api.filterAndSort();
+                api.selectFocusedCell();
+
+                api.commit();;
+            }
+        }
+    }
+
+    const toggleCol = () => {
+        setColVisible(!colVisible);
+        if (api && gridStates) { api.resetView(); }
+    }
+
+    const selRealRow0 = () => {
+        if (api) {
+            api.begin();
+            const cell = new WSCanvasCellCoord(0, 0);
+            api.setRealSelection(new WSCanvasSelection([new WSCanvasSelectionRange(cell)]));
+            api.focusCell(cell);
+            api.commit();
+        }
+    }
+
     return <div style={{ margin: "1em" }}>
 
         focusedCell:{api ? api.states.state.focusedCell.toString() : ""} - focusedViewCell:{api ? api.realCellToView(api.states.state.focusedCell).toString() : ""}<br />
@@ -113,108 +202,26 @@ export function Sample4() {
         realToView:{(api && api.states.vm) ? api.states.vm.realToView.join('-') : ""}<br />
         viewToReal:{(api && api.states.vm) ? api.states.vm.viewToReal.join('-') : ""}<br />
 
-        <button onClick={() => {
-            const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
-            newset.current.push({
-                idx: ds.current.length > 0 ? _.max(ds.current.map((r) => r.idx))! + 1 : 0,
-                description: "test" + ds.current.length,
-                timestamp: new Date()
-            });
-            setDs(newset);
+        <button onClick={() => addRow()}>ADD</button>
 
-            if (api && gridStates) {
-                api.begin();
-                const cell = new WSCanvasCellCoord(newset.current.length - 1, 2);
-                api.focusCell(cell);
-                api.commit();
-            }
-        }}>ADD</button>
+        <button disabled={gridStates === null || gridStates.state.viewSelection.empty} onClick={() => delRow()}>DEL</button>
 
-        <button disabled={gridStates === null || gridStates.state.viewSelection.empty}
-            onClick={() => {
-                if (gridStates && api) {
-                    const viewRows = gridStates.state.viewSelection.rowIdxs();
-                    const idxsToRemove: number[] = [];
-                    viewRows.forEach((viewRow) => {
-                        const rowIdx = api.viewRowToRealRow(viewRow);
-                        idxsToRemove.push(rowIdx);
-                    });
+        <button disabled={!dirty} onClick={() => setDs(new IUpdateEntityNfo<MyData[]>(ds.current.slice()))}>SAVE</button>
 
-                    idxsToRemove.sort((a, b) => b - a);
+        {api ?
+            <button style={{ marginLeft: "1em" }}
+                disabled={!(api.realCellToView(api.states.state.focusedCell).row > 0)}
+                onClick={() => moveRow((vrow) => vrow > 0, -1)}>UP</button>
+            : null}
 
-                    const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
+        {api ?
+            <button disabled={!(api.realCellToView(api.states.state.focusedCell).row < ds.current.length - 1)}
+                onClick={() => moveRow((vrow) => vrow < ds.current.length - 1, +1)}>DOWN</button>
+            : null}
 
-                    const arr = newset.current;
-                    for (let i = 0; i < idxsToRemove.length; ++i) {
-                        arr.splice(idxsToRemove[i], 1);
-                    }
+        <button style={{ marginLeft: "1em" }} onClick={() => toggleCol()}>toggle col</button>
 
-                    setDs(newset);
-
-                    api.begin();
-                    api.clearSelection();
-                    api.commit();
-                }
-            }}
-        >
-            DEL
-        </button>
-
-        <button color="primary" disabled={!dirty} onClick={() => {
-            setDs(new IUpdateEntityNfo<MyData[]>(ds.current.slice()));
-        }}>SAVE</button>
-
-        {/* UP */}
-        <button style={{ marginLeft: "1em" }} onClick={() => {
-            if (api) {
-                const focusedCell = api.states.state.focusedCell;
-                const focusedViewCell = api.realCellToView(focusedCell);
-
-                if (focusedViewCell.row > 0) {
-                    api.begin();                    
-
-                    const viewCellUpper = focusedViewCell.setRow(focusedViewCell.row - 1);
-                    const cellUpper = api.viewCellToReal(viewCellUpper);
-
-                    const qup = ds.current[cellUpper.row].idx;// api.getCellData(new WSCanvasCellCoord(cellUpper.row, COL));
-                    const qthis = ds.current[focusedCell.row].idx;// api.getCellData(new WSCanvasCellCoord(focusedCell.row, COL));
-
-                    api.prepareCellDataset();
-                    // api.setCellData(new WSCanvasCellCoord(cellUpper.row, COL), qthis);
-                    // api.setCellData(new WSCanvasCellCoord(focusedCell.row, COL), qup);
-                    (api.ds[cellUpper.row] as MyData).idx = qthis;
-                    (api.ds[focusedCell.row] as MyData).idx = qup;
-                    //api.commitCellDataset();
-
-                    api.filterAndSort();
-                    api.selectFocusedCell();
-
-                    api.commit();;
-                }
-            }
-        }}>UP</button>
-
-        {/* DOWN */}
-        <button onClick={() => {
-           
-        }}>DOWN</button>
-
-        <button style={{ marginLeft: "1em" }} onClick={() => {
-            if (api && gridStates) {
-                api.begin();
-                const cell = new WSCanvasCellCoord(0, 0);
-                api.setRealSelection(new WSCanvasSelection([new WSCanvasSelectionRange(cell, cell)]));
-                api.focusCell(cell);
-                api.commit();
-            }
-        }}>TEST SEL REAL ROW 0</button>
-
-        <button onClick={() => {
-            setColVisible(!colVisible);
-            if (api && gridStates) { api.resetView(); }
-        }}>
-            toggle col
-        </button>
+        <button onClick={() => selRealRow0()}>TEST SEL REAL ROW 0</button>
 
         <WSCanvas
             columns={columns}

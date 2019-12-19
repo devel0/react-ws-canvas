@@ -71,6 +71,7 @@ export function WSCanvas(props: WSCanvasProps) {
         commitCellDataset,
         getCellCustomEdit,
         getColumnHeader,
+        getColumnHidden,
         getColumnLessThanOp,
         getCellType,
         isCellReadonly,
@@ -336,8 +337,20 @@ export function WSCanvas(props: WSCanvasProps) {
         return res;
     }
 
+    const _colHidden = (col: number) => {
+        let res: boolean | undefined;
+
+        if (getColumnHidden) res = getColumnHidden(col);
+
+        if (!res && columns) res = columns[col].hidden === true;
+
+        return res === true;
+    }
+
     const _colWidth = (col: number) => {
         let res: number | undefined;
+
+        if (_colHidden(col)) return 0;
 
         if (colWidth) res = colWidth(col);
 
@@ -534,12 +547,12 @@ export function WSCanvas(props: WSCanvasProps) {
                         }
                     }
 
-                    if (debug) {
-                        console.log("+++++++++++");
-                        for (let i = 0; i < colData.length; ++i) {
-                            console.log(colData[i].ri + " - " + colData[i].cellData);
-                        }
-                    }
+                    // if (debug) {
+                    //     console.log("+++++++++++");
+                    //     for (let i = 0; i < colData.length; ++i) {
+                    //         console.log(colData[i].ri + " - " + colData[i].cellData);
+                    //     }
+                    // }
 
                     colData.sort((a, b) => {
                         const valA = a.cellData;
@@ -553,12 +566,12 @@ export function WSCanvas(props: WSCanvasProps) {
                             return ascRes;
                     });
 
-                    if (debug) {
-                        console.log("-----------");
-                        for (let i = 0; i < colData.length; ++i) {
-                            console.log(colData[i].ri + " - " + colData[i].cellData);
-                        }
-                    }
+                    // if (debug) {
+                    //     console.log("-----------");
+                    //     for (let i = 0; i < colData.length; ++i) {
+                    //         console.log(colData[i].ri + " - " + colData[i].cellData);
+                    //     }
+                    // }
 
                     for (let fsri = 0; fsri < filteredSortedToReal.length; ++fsri) {
                         filteredSortedToReal[fsri] = colData[fsri].ri;
@@ -1616,6 +1629,8 @@ export function WSCanvas(props: WSCanvasProps) {
 
                     const drawColNumber = (ciFrom: number, ciTo: number) => {
                         for (let ci = ciFrom; ci <= ciTo; ++ci) {
+                            if (_colHidden(ci)) continue;
+                            
                             const cWidth = overridenColWidth(state, ci);
 
                             const isSelected = highlightColNumber &&
@@ -3042,7 +3057,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 setViewMap(api.states.vm);
                 setStateNfo(api.states.state);
                 if (onStateChanged) onStateChanged(mkstates(api.states.state, api.states.vm, api.states.overrideRowHeight));
-            }            
+            }
 
             api.prepareCellDataset = () => { api.ds = prepareCellDataset(); }
 

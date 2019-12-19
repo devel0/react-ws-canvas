@@ -47,6 +47,7 @@ export const WSCanvasPropsDefault = () => {
         commitCellDataset: (dataset: any) => {},        
         getCellCustomEdit: undefined,
         getColumnHeader: undefined,
+        getColumnHidden: undefined,
         getColumnLessThanOp: undefined,
         getCellType: undefined,
         isCellReadonly: undefined,

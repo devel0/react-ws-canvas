@@ -35,7 +35,7 @@ export interface WSCanvasColumn {
 
     /** hint: getColumnLessThanOp={(col) => columns[col].lessThan} */
     lessThan?: (a: any, b: any) => boolean;
-    
+
     textAlign?: (coord: WSCanvasCellCoord, value: any) => CanvasTextAlign | undefined;
 
     /** hint: colWidth={(col) => columns[col].width || 100} */
@@ -45,15 +45,17 @@ export interface WSCanvasColumn {
     sortDirection?: WSCanvasSortDirection;
 
     /** hint: columnInitialSort={WSCanvasColumnToSortInfo(columns)} */
-    sortOrder?: number;  
+    sortOrder?: number;
 
     /** hint: getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }} */
     wrapText?: boolean;
 
-    renderTransform?: (cell: WSCanvasCellCoord, value: any) => any;    
+    renderTransform?: (cell: WSCanvasCellCoord, value: any) => any;
 
-    readonly?: boolean | undefined;    
+    readonly?: boolean | undefined;
 
-    customEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord, 
+    customEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined,
+
+    hidden?: boolean | undefined;
 }
