@@ -99,7 +99,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [7]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample1.tsx#L30-L34
 [8]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample4.tsx#L140-L151
 [9]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L42-L43
-[10]: https://github.com/devel0/react-ws-canvas/blob/e24f2847c113acb56b381aa2962ebc70e8b15a24/example/src/lib/WSCanvasApi.tsx#L9
+[10]: 
 [11]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample4.tsx#L107-L127
 [12]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L58-L59
 [13]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L85-L87
@@ -193,9 +193,7 @@ yarn start
 | [Sample1](example/src/Sample1.tsx) | 50000 x 200 grid with frozen row/col, filter, custom column width |
 | [Sample2](example/src/Sample2.tsx) | 5000 x 6 grid db-record-like column mapping, initial sort, custom sort, api onMouseDown |
 | [Sample3](example/src/Sample3.tsx) | 5000 x 7 grid db-record-like, data interact del/change row, custom cell editor, rowHover |
-| [Sample4](example/src/Sample4.tsx) | add/del rows using api [toggle column visibility][1000] |
-
-[1000]: https://github.com/devel0/react-ws-canvas/blob/7aa9985067b8c6e6704b925459ed42bcdeb2d4db/example/src/Sample4.tsx#L147
+| [Sample4](example/src/Sample4.tsx) | add/del/move rows using api |
 
 ## how to contribute ( quickstart )
 

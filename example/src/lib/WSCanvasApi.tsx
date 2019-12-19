@@ -17,8 +17,6 @@ export class WSCanvasApi {
     commitCellDataset: () => void;
     getCellData: (cell: WSCanvasCellCoord) => any;
 
-    test: () => void;
-
     filterAndSort: () => void;
     selectFocusedCell: () => void;
     clearSelection: () => void;
@@ -60,9 +58,7 @@ export class WSCanvasApi {
     ds: any;
 
     constructor(states: WSCanvasStates) {
-        this.states = states;
-
-        this.test = () => { };
+        this.states = states;        
 
         this.begin = () => { };
         this.commit = () => { };

@@ -3156,32 +3156,7 @@ export function WSCanvas(props: WSCanvasProps) {
             api.onSync = (action) => {
                 //setWaitingSync(true);
                 setOnSync({ fn: action });
-            }
-
-            api.test = () => {
-                const focusedCell = stateNfo.focusedCell;
-                const focusedViewCell = realCellToView(viewMap, focusedCell);
-
-                if (focusedViewCell.row > 0) {
-                    const state = stateNfo.dup();
-
-                    const viewCellUpper = focusedViewCell.setRow(focusedViewCell.row - 1);
-                    const cellUpper = viewCellToReal(viewMap, viewCellUpper);
-
-                    const qup = _getCellData(new WSCanvasCellCoord(cellUpper.row, 1));
-                    const qthis = _getCellData(new WSCanvasCellCoord(focusedCell.row, 1));
-                    const ds = prepareCellDataset();
-                    setCellData(ds, new WSCanvasCellCoord(cellUpper.row, 1), qthis);
-                    setCellData(ds, new WSCanvasCellCoord(focusedCell.row, 1), qup);
-                    commitCellDataset(ds);
-
-                    filterAndSort(state, viewMap);
-                    selectFocusedCell(state, viewMap);
-
-                    setStateNfo(state);
-                    setViewMap(viewMap);
-                }
-            }
+            }            
 
             onApi(api);
         }
