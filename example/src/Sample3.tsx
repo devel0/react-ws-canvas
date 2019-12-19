@@ -26,7 +26,7 @@ interface MyData {
 
 export function Sample3() {
   const [rows, setRows] = useState<MyData[]>([]);
-  const [gridApi, setGridApi] = useState<WSCanvasApi | null>(null);
+  const [api, setApi] = useState<WSCanvasApi | null>(null);
   const [gridStateNfo, setGridStateNfo] = useState<WSCanvasStates>({} as WSCanvasStates);
   const [overCellCoord, setOverCellCoord] = useState<string>("");
   const tooltipDivRef = useRef<HTMLDivElement>(null);
@@ -99,10 +99,18 @@ export function Sample3() {
                 case "Tab":
                 case "Enter":
                   e.preventDefault();
-                  if (gridApi) gridApi.closeCustomEdit(states, true);
+                  if (api) {
+                    api.begin();
+                    api.closeCustomEdit(true);
+                    api.commit();
+                  }
                   break;
                 case "Escape":
-                  if (gridApi) gridApi.closeCustomEdit(states, false);
+                  if (api) {
+                    api.begin();
+                    api.closeCustomEdit(false);
+                    api.commit();
+                  }
                   break;
               }
             }}
@@ -111,7 +119,11 @@ export function Sample3() {
               const qval: MyEnum = val;
               const row = rows[cell.row];
               row.cboxcol = qval;
-              if (gridApi) gridApi.setCustomEditValue(states, qval);
+              if (api) {
+                api.begin();
+                api.setCustomEditValue(qval);
+                api.commit();
+              }
             }}
           >
             {mapEnum(MyEnum).map((x) =>
@@ -195,7 +207,7 @@ export function Sample3() {
         </div>
       </div> : null}
 
-    <WSCanvas      
+    <WSCanvas
       columns={columns}
       rowsCount={rows.length}
       dataSource={rows}
@@ -230,7 +242,7 @@ export function Sample3() {
       selectionMode={WSCanvasSelectMode.Cell}
 
       onStateChanged={(states) => setGridStateNfo(states)}
-      onApi={(states, api) => setGridApi(api)}
+      onApi={(api) => setApi(api)}
       onMouseDown={(states, e, cell) => {
         if (cell) {
           if (cell.row >= 0) {
@@ -241,11 +253,11 @@ export function Sample3() {
       }}
       onMouseOverCell={(states, nfo) => {
         if (tooltipTest) {
-          if (gridApi && tooltipDivRef && tooltipDivRef.current) {
+          if (api && tooltipDivRef && tooltipDivRef.current) {
             const div = tooltipDivRef.current;
             if (nfo && nfo.cell.row >= 0 && nfo.cell.col >= 0) {
-              const canvasCoord = gridApi.canvasCoord(states);
-              const cellCanvasCoord = gridApi.cellToCanvasCoord(states, nfo.cell);
+              const canvasCoord = api.canvasCoord();
+              const cellCanvasCoord = api.cellToCanvasCoord(nfo.cell);
               if (canvasCoord && cellCanvasCoord) {
                 setOverCellCoord(nfo.cell.toString() + " canvas:" + cellCanvasCoord.toString());
                 div.style["left"] = (canvasCoord.x + cellCanvasCoord.x + cellCanvasCoord.width) + "px";

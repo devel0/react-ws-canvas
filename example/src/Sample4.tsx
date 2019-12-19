@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
     WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasApi, useWindowSize,
-    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord
+    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord, WSCanvasSelection, WSCanvasSelectionRange
 } from "./lib";
 import * as _ from 'lodash';
 
@@ -28,7 +28,7 @@ class IUpdateEntityNfo<T> {
 
 export function Sample4() {
     const [ds, setDs] = useState<IUpdateEntityNfo<MyData[]>>(new IUpdateEntityNfo<MyData[]>([], []));
-    const [gridApi, setGridApi] = useState<WSCanvasApi | null>(null);
+    const [api, setApi] = useState<WSCanvasApi | null>(null);
     const [gridStates, setGridState] = useState<WSCanvasStates | null>(null);
     const [dirty, setDirty] = useState(false);
     const winSize = useWindowSize();
@@ -37,6 +37,14 @@ export function Sample4() {
 
     useEffect(() => {
         const cols = [
+            {
+                type: "text",
+                header: "ridx",
+                field: "ridx",
+                width: 100,
+                textAlign: () => "center",
+                renderTransform: (cell, value) => cell.row
+            },
             {
                 type: "text",
                 header: "Description",
@@ -52,8 +60,8 @@ export function Sample4() {
                 renderTransform: (cell, value) => {
                     const row = ds.current[cell.row];
                     if (row) {
-                        if (gridApi && row.timestamp) {
-                            return gridApi.formatCellDataAsDateTime(row.timestamp) + " (custom user) " + row.timestamp.getTime();
+                        if (api && row.timestamp) {
+                            return api.formatCellDataAsDateTime(row.timestamp) + " (custom user) " + row.timestamp.getTime();
                         }
                         return "";
                     }
@@ -63,9 +71,9 @@ export function Sample4() {
         ] as WSCanvasColumn[];
 
         if (colVisible) {
-            cols.splice(0, 0, {
+            cols.splice(1, 0, {
                 type: "number",
-                header: "idx",
+                header: "vidx",
                 field: "idx",
                 width: 100,
                 sortOrder: 0,
@@ -76,7 +84,7 @@ export function Sample4() {
         }
 
         setColumns(cols);
-    }, [colVisible, gridApi]);
+    }, [colVisible, api]);
 
     useEffect(() => {
         const qcur = JSON.stringify(ds.current);
@@ -99,6 +107,12 @@ export function Sample4() {
 
     return <div style={{ margin: "1em" }}>
 
+        focusedCell:{api ? api.states.state.focusedCell.toString() : ""} - focusedViewCell:{api ? api.realCellToView(api.states.state.focusedCell).toString() : ""}<br />
+        viewSelection:{api ? api.states.state.viewSelection.toString() : ""}<br />
+        apiOverCell:{api ? String(api.states.state.cursorOverCell) : ""}<br />
+        realToView:{(api && api.states.vm) ? api.states.vm.realToView.join('-') : ""}<br />
+        viewToReal:{(api && api.states.vm) ? api.states.vm.viewToReal.join('-') : ""}<br />
+
         <button onClick={() => {
             const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
             newset.current.push({
@@ -108,19 +122,21 @@ export function Sample4() {
             });
             setDs(newset);
 
-            if (gridApi && gridStates) {
-                const cell = new WSCanvasCellCoord(newset.current.length - 1, 1);
-                gridApi.focusCell(gridStates, cell);                
+            if (api && gridStates) {
+                api.begin();
+                const cell = new WSCanvasCellCoord(newset.current.length - 1, 2);
+                api.focusCell(cell);
+                api.commit();
             }
         }}>ADD</button>
 
         <button disabled={gridStates === null || gridStates.state.viewSelection.empty}
             onClick={() => {
-                if (gridStates && gridApi) {
+                if (gridStates && api) {
                     const viewRows = gridStates.state.viewSelection.rowIdxs();
                     const idxsToRemove: number[] = [];
                     viewRows.forEach((viewRow) => {
-                        const rowIdx = gridApi.viewRowToRealRow(gridStates, viewRow);
+                        const rowIdx = api.viewRowToRealRow(viewRow);
                         idxsToRemove.push(rowIdx);
                     });
 
@@ -135,7 +151,9 @@ export function Sample4() {
 
                     setDs(newset);
 
-                    gridApi.clearSelection(gridStates);
+                    api.begin();
+                    api.clearSelection();
+                    api.commit();
                 }
             }}
         >
@@ -146,9 +164,54 @@ export function Sample4() {
             setDs(new IUpdateEntityNfo<MyData[]>(ds.current.slice()));
         }}>SAVE</button>
 
+        {/* UP */}
+        <button style={{ marginLeft: "1em" }} onClick={() => {
+            if (api) {
+                const focusedCell = api.states.state.focusedCell;
+                const focusedViewCell = api.realCellToView(focusedCell);
+
+                if (focusedViewCell.row > 0) {
+                    api.begin();                    
+
+                    const viewCellUpper = focusedViewCell.setRow(focusedViewCell.row - 1);
+                    const cellUpper = api.viewCellToReal(viewCellUpper);
+
+                    const qup = ds.current[cellUpper.row].idx;// api.getCellData(new WSCanvasCellCoord(cellUpper.row, COL));
+                    const qthis = ds.current[focusedCell.row].idx;// api.getCellData(new WSCanvasCellCoord(focusedCell.row, COL));
+
+                    api.prepareCellDataset();
+                    // api.setCellData(new WSCanvasCellCoord(cellUpper.row, COL), qthis);
+                    // api.setCellData(new WSCanvasCellCoord(focusedCell.row, COL), qup);
+                    (api.ds[cellUpper.row] as MyData).idx = qthis;
+                    (api.ds[focusedCell.row] as MyData).idx = qup;
+                    //api.commitCellDataset();
+
+                    api.filterAndSort();
+                    api.selectFocusedCell();
+
+                    api.commit();;
+                }
+            }
+        }}>UP</button>
+
+        {/* DOWN */}
+        <button onClick={() => {
+           
+        }}>DOWN</button>
+
+        <button style={{ marginLeft: "1em" }} onClick={() => {
+            if (api && gridStates) {
+                api.begin();
+                const cell = new WSCanvasCellCoord(0, 0);
+                api.setRealSelection(new WSCanvasSelection([new WSCanvasSelectionRange(cell, cell)]));
+                api.focusCell(cell);
+                api.commit();
+            }
+        }}>TEST SEL REAL ROW 0</button>
+
         <button onClick={() => {
             setColVisible(!colVisible);
-            if (gridApi && gridStates) { gridApi.resetView(); }
+            if (api && gridStates) { api.resetView(); }
         }}>
             toggle col
         </button>
@@ -171,17 +234,13 @@ export function Sample4() {
 
             containerStyle={{ marginTop: "1em" }}
             fullwidth
-            immediateSort={false}
             height={Math.max(300, winSize.height * .4)}
             showColNumber={true}
             columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
 
             debug={false}
-            onApi={(states, api) => setGridApi(api)}
+            onApi={(api) => setApi(api)}
             onStateChanged={(states) => setGridState(states)}
-            onRowsAppended={(states, rowFrom, rowTo) => {
-                console.log("rows appended from:" + rowFrom + " to:" + rowTo);
-            }}
         />
     </div>
 }

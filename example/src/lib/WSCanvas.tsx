@@ -27,6 +27,12 @@ export interface ViewMap {
     realToView: number[];
 }
 
+interface SyncFnNfo {
+    fn: WSCanvasSyncFn;
+}
+
+export declare type WSCanvasSyncFn = (states: WSCanvasStates) => void;
+
 export function WSCanvas(props: WSCanvasProps) {
     const winSize = useWindowSize();
 
@@ -45,7 +51,6 @@ export function WSCanvas(props: WSCanvasProps) {
         frozenColsCount,
         selectionModeMulti,
         selectionMode,
-        selectFocusedCellOrRow,
         showFocusedCellOutline,
         showRowNumber,
         highlightRowNumber,
@@ -101,7 +106,6 @@ export function WSCanvas(props: WSCanvasProps) {
         filterTextMargin,
         filterIgnoreCase,
         filterBackground,
-        immediateSort,
 
         recomputeRowHeightDebounceFilterMs,
         rowNumberColWidth,
@@ -136,8 +140,7 @@ export function WSCanvas(props: WSCanvasProps) {
         onMouseDoubleClick,
         onPreviewMouseWheel,
         onMouseWheel,
-        onContextMenu,
-        onRowsAppended,
+        onContextMenu
     } = props;
 
     useEffect(() => {
@@ -155,7 +158,10 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const debugSize = useElementSize(debugRef);
 
-    const [stateNfo, setStateNfo] = useState<WSCanvasState>(new WSCanvasState());    
+    const [stateNfo, setStateNfo] = useState<WSCanvasState>(new WSCanvasState());
+    const synced = useDebounce(stateNfo, 100);
+    const [onSync, setOnSync] = useState<SyncFnNfo | undefined>(undefined);
+    const [waitingSync, setWaitingSync] = useState(false);
 
     const [children, setChildren] = useState<JSX.Element[]>([]);
     const [filterChildren, setFilterChildren] = useState<JSX.Element[]>([]);
@@ -209,7 +215,7 @@ export function WSCanvas(props: WSCanvasProps) {
             return row;
         else {
             const res = vm.realToView[row];
-            return res || row;
+            return res === undefined ? row : res;
         }
     }
 
@@ -236,6 +242,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const computeViewRows = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, withHorizontalScrollbar: boolean) => {
         const h = cs.height - (showColNumber ? (colNumberRowHeightFull() + 1) : 0) - 2;
         const hAvailOrig = h - (withHorizontalScrollbar ? scrollBarThk : 0);
+        //console.log("compute view rows havail:" + hAvailOrig);
         if (overridenRowHeight) {
             let hAvail = hAvailOrig;
             let rCnt = 0;
@@ -246,9 +253,12 @@ export function WSCanvas(props: WSCanvasProps) {
                 const rh = getRowHeight(orh, ri);
 
                 hAvail -= rh;
+                //console.log(" consume " + rh.toFixed());
                 ++viewRowIdx;
             }
-            return Math.min(rowsCount, rCnt - 1);
+            //console.log("->rcnt: " + rCnt);
+            return rCnt - 1;
+            //return Math.min(rowsCount, rCnt - 1);
         }
         return Math.floor(hAvailOrig / (rowHeight(-1) + 1)); // initial compute
     };
@@ -452,6 +462,11 @@ export function WSCanvas(props: WSCanvasProps) {
         } as WSCanvasStates;
     }
 
+    const selectFocusedCell = (state: WSCanvasState, vm: ViewMap | null) => {
+        const focusedViewCell = realCellToView(vm, state.focusedCell);
+        state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(focusedViewCell)]);
+    }
+
     const filterAndSort = (state: WSCanvasState, vm: ViewMap | null) => {
         let appendingRows = newRowsInsertAtViewIndex && rowsCount > state.rowsCountBackup;
 
@@ -518,11 +533,13 @@ export function WSCanvas(props: WSCanvasProps) {
                             });
                         }
                     }
-                    // if (debug) {
-                    //     for (let i=0; i < colData.length; ++i) {
-                    //         console.log(colData[i].ri + " - " + colData[i].cellData);
-                    //     }
-                    // }
+
+                    if (debug) {
+                        console.log("+++++++++++");
+                        for (let i = 0; i < colData.length; ++i) {
+                            console.log(colData[i].ri + " - " + colData[i].cellData);
+                        }
+                    }
 
                     colData.sort((a, b) => {
                         const valA = a.cellData;
@@ -536,12 +553,12 @@ export function WSCanvas(props: WSCanvasProps) {
                             return ascRes;
                     });
 
-                    // if (debug) {
-                    //     console.log("-----------");
-                    //     for (let i=0; i < colData.length; ++i) {
-                    //         console.log(colData[i].ri + " - " + colData[i].cellData);
-                    //     }
-                    // }
+                    if (debug) {
+                        console.log("-----------");
+                        for (let i = 0; i < colData.length; ++i) {
+                            console.log(colData[i].ri + " - " + colData[i].cellData);
+                        }
+                    }
 
                     for (let fsri = 0; fsri < filteredSortedToReal.length; ++fsri) {
                         filteredSortedToReal[fsri] = colData[fsri].ri;
@@ -813,6 +830,43 @@ export function WSCanvas(props: WSCanvasProps) {
     const formatCellDataAsTime = (cellData: any) => moment(cellData as Date).format(timeCellMomentFormat);
     const formatCellDataAsDateTime = (cellData: any) => moment(cellData as Date).format(dateTimeCellMomentFormat);
 
+    // TODO: optimize
+    const viewSelectionToReal = (vm: ViewMap | null, viewSelection: WSCanvasSelection) => {
+        let res = new WSCanvasSelection([]);
+
+        const viewRanges = viewSelection.ranges;
+
+        for (let vrngi = 0; vrngi < viewRanges.length; ++vrngi) {
+            const viewRng = viewRanges[vrngi];
+            let viewRngCells = viewRng.cells();
+            let viewCell = viewRngCells.next();
+            while (!viewCell.done) {
+                res = res.add(viewCellToReal(vm, viewCell.value));
+                viewCell = viewRngCells.next();
+            }
+        }
+
+        return res;
+    }
+
+    const realSelectionToView = (vm: ViewMap | null, realSelection: WSCanvasSelection) => {
+        let res = new WSCanvasSelection([]);
+
+        const realRanges = realSelection.ranges;
+
+        for (let rrngi = 0; rrngi < realRanges.length; ++rrngi) {
+            const realRng = realRanges[rrngi];
+            let realRngCells = realRng.cells();
+            let realCell = realRngCells.next();
+            while (!realCell.done) {
+                res = res.add(realCellToView(vm, realCell.value));
+                realCell = realRngCells.next();
+            }
+        }
+
+        return res;
+    }
+
     /**
      * 
      * (NO side effects on state/vm) 
@@ -822,11 +876,14 @@ export function WSCanvas(props: WSCanvasProps) {
     const redrawCellInternal = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, viewCell: WSCanvasCellCoord, ctx: CanvasRenderingContext2D, cWidth: number, x: number, y: number) => {
 
         const cell = viewCellToReal(vm, viewCell)!;
+        const viewSelContainsCell = state.viewSelection.containsCell(viewCell, selectionMode);
+        if (cell.row === 0 && cell.col === 0) {
+
+        }
         const isSelected = (
-            ((selectFocusedCellOrRow && state.viewSelection.ranges.length === 1) || state.viewSelection.ranges.length > 1) ||
+            ((state.viewSelection.ranges.length === 1) || state.viewSelection.ranges.length > 1) ||
             (state.viewSelection.ranges.length === 1 && !state.viewSelection.ranges[0].from.equals(state.viewSelection.ranges[0].to))
-        ) &&
-            state.viewSelection.containsCell(viewCell, selectionMode);
+        ) && viewSelContainsCell;
 
         // https://usefulangle.com/post/17/html5-canvas-drawing-1px-crisp-straight-lines
         const x_ = x - 0.5;
@@ -1224,7 +1281,7 @@ export function WSCanvas(props: WSCanvasProps) {
         state.viewSelection = (selectionModeMulti && endingCell) ?
             state.viewSelection.extendsTo(viewCell) :
             (!selectionModeMulti || clearPreviousSel) ?
-                new WSCanvasSelection([new WSCanvasSelectionRange(viewCell, viewCell)]) :
+                new WSCanvasSelection([new WSCanvasSelectionRange(viewCell)]) :
                 state.viewSelection.add(viewCell);
     }
 
@@ -1248,7 +1305,7 @@ export function WSCanvas(props: WSCanvasProps) {
     /** side effect on state ; NO side effect on vm */
     const focusCell = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord,
         scrollTo: boolean = true, endingCell: boolean = false, clearPreviousSel: boolean = true, dontApplySelect: boolean = false) => {
-        
+
         if (rowsCount === 0) return;
         if (canvasRef.current) canvasRef.current.focus({ preventScroll: true });
         const viewCell = realCellToView(vm, cell);
@@ -1952,7 +2009,7 @@ export function WSCanvas(props: WSCanvasProps) {
             state.focusedCell = viewCellToReal(vm, focusedViewCell.nextRow().setCol(0));
         //        focusCell(state, vm, state.focusedCell, true, false, true);
         const newViewCell = realCellToView(vm, state.focusedCell);
-        state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(newViewCell, newViewCell)]);
+        state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(newViewCell)]);
         setStateNfo(state);
         paint(state, vm, orh);
         if (canvasContainerDivRef.current) {
@@ -2971,49 +3028,69 @@ export function WSCanvas(props: WSCanvasProps) {
     //#region API    
     useEffect(() => {
         if (onApi) {
-            const api = new WSCanvasApi();
+            const api = new WSCanvasApi(mkstates(stateNfo, viewMap, overridenRowHeight));
 
-            api.clearSelection = (states) => {
-                const state = states.state.dup();
-                clearSelection(state);
-                setStateNfo(state);
-                if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
-            };
+            api.begin = () => {
+                api.states = mkstates(
+                    api.states.state.dup(),
+                    api.states.vm ? _.cloneDeep(api.states.vm) as ViewMap : null,
+                    _.cloneDeep(api.states.overrideRowHeight) as number[]);
+            }
 
-            api.getSelection = (states) => states.state.viewSelection;
-            api.setSelection = (states, selection: WSCanvasSelection) => {
-                const state = states.state.dup();
-                state.viewSelection = selection;
-                setStateNfo(state);
-                if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
+            api.commit = () => {
+                setOverridenRowHeight(api.states.overrideRowHeight);
+                setViewMap(api.states.vm);
+                setStateNfo(api.states.state);
+                if (onStateChanged) onStateChanged(mkstates(api.states.state, api.states.vm, api.states.overrideRowHeight));
+            }            
+
+            api.prepareCellDataset = () => { api.ds = prepareCellDataset(); }
+
+            api.setCellData = (cell, value) => setCellData(api.ds, cell, value);
+
+            api.commitCellDataset = () => commitCellDataset(api.ds);
+
+            api.getCellData = (cell) => _getCellData(cell);
+
+            api.filterAndSort = () => filterAndSort(api.states.state, api.states.vm);
+
+            api.selectFocusedCell = () => selectFocusedCell(api.states.state, api.states.vm);
+
+            api.clearSelection = () => clearSelection(api.states.state);
+
+            api.getViewSelection = () => api.states.state.viewSelection;
+
+            api.getRealSelection = () => viewSelectionToReal(api.states.vm, api.states.state.viewSelection);
+
+            api.setViewSelection = (viewSelection: WSCanvasSelection) => api.states.state.viewSelection = viewSelection;
+
+            api.setRealSelection = (realSelection: WSCanvasSelection) =>
+                api.states.state.viewSelection = realSelectionToView(api.states.vm, realSelection);
+
+            api.viewSelectionToReal = (selection) => viewSelectionToReal(api.states.vm, selection);
+
+            api.realSelectionToView = (selection) => realSelectionToView(api.states.vm, selection);
+
+            api.openCustomEdit = (cell) => {
+                api.states.state.customEditCell = cell;
+                setStateNfo(api.states.state);
+                openCellCustomEdit(api.states.state, cell, api.states.overrideRowHeight);
             }
-            api.openCustomEdit = (states, cell) => {
-                const state = states.state.dup();
-                state.customEditCell = cell;
-                setStateNfo(state);
-                openCellCustomEdit(states.state, cell, states.overrideRowHeight);
-            }
-            api.closeCustomEdit = (states, confirm) => {
-                const state = states.state.dup();
-                closeCustomEdit(state, confirm);
-                setStateNfo(state);
-            }
-            api.setCustomEditValue = (states, val) => {
-                const state = states.state.dup();
-                state.customEditValue = val;
-                setStateNfo(state);
-            }
-            api.goToNextCell = (states) => {
-                goToNextCell(states.state, states.vm, states.overrideRowHeight);
-            }
-            api.triggerKey = (states, e: React.KeyboardEvent) => {
-                handleKeyDown(e);
-            }
-            api.clientXYToCanvasCoord = (states, x: number, y: number) => clientXYToCanvasCoord(x, y);
-            api.cellToCanvasCoord = (states, cell) => {
-                const state = states.state;
-                const vm = states.vm;
-                const orh = states.overrideRowHeight;
+
+            api.closeCustomEdit = (confirm) => closeCustomEdit(api.states.state, confirm);
+
+            api.setCustomEditValue = (val) => api.states.state.customEditValue = val;
+
+            api.goToNextCell = () => goToNextCell(api.states.state, api.states.vm, api.states.overrideRowHeight);
+
+            api.triggerKey = (e: React.KeyboardEvent) => handleKeyDown(e);
+
+            api.clientXYToCanvasCoord = (x: number, y: number) => clientXYToCanvasCoord(x, y);
+
+            api.cellToCanvasCoord = (cell) => {
+                const state = api.states.state;
+                const vm = api.states.vm;
+                const orh = api.states.overrideRowHeight;
                 const viewCell = realCellToView(vm, cell);
                 const leftTopCell = viewCellToCanvasCoord(state, vm, orh, state.viewScrollOffset, props.showPartialColumns);
                 const tmp = viewCellToCanvasCoord(state, vm, orh, viewCell, props.showPartialColumns);
@@ -3024,50 +3101,76 @@ export function WSCanvas(props: WSCanvasProps) {
                         tmp.width, tmp.height);
                 } else return null;
             }
-            api.canvasCoordToCellCoord = (states, ccoord) => canvasToCellCoord(states.state, states.vm, states.overrideRowHeight, ccoord, showPartialColumns);
-            api.canvasCoord = (states) => {
+
+            api.canvasCoordToCellCoord = (ccoord) =>
+                canvasToCellCoord(api.states.state, api.states.vm, api.states.overrideRowHeight, ccoord, showPartialColumns);
+
+            api.canvasCoord = () => {
                 if (canvasRef && canvasRef.current) {
                     const c = canvasRef.current;
                     const br = c.getBoundingClientRect();
                     return new WSCanvasCoord(br.left, br.top, br.width, br.height);
                 } else return null;
             }
-            api.focusCell = (states, cell, scrollTo, endingCell, clearSelection) => {
-                const state = states.state.dup();
-                const vm = states.vm;
-                const orh = states.overrideRowHeight;
-                focusCell(state, vm, cell, scrollTo, endingCell, clearSelection, false);                                
-                setStateNfo(state);
-                if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
-            }
-            //
 
-            api.scrollTo = (states, coord) => {
-                const state = states.state.dup();
-                const vm = states.vm;
-                const orh = states.overrideRowHeight;
-                scrollTo(state, vm, coord);
-                setStateNfo(state);
-                if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
-            }
-            api.setSorting = (states, newSorting) => {
-                const state = stateNfo.dup();
-                const vm = states.vm;
-                const orh = states.overrideRowHeight;
-                state.columnsSort = newSorting;
-                setStateNfo(state);
-                if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
-            }
-            api.viewRowToRealRow = ((states, viewRow) => viewRowToRealRow(states.vm, viewRow));
+            api.focusCell = (cell, scrollTo, endingCell, clearSelection) =>
+                focusCell(api.states.state, api.states.vm, cell, scrollTo, endingCell, clearSelection, false);
+
+            api.scrollTo = (coord) => scrollTo(api.states.state, api.states.vm, coord);
+
+            api.setSorting = (newSorting) => api.states.state.columnsSort = newSorting;
+
+            api.viewRowToRealRow = (viewRow) => viewRowToRealRow(api.states.vm, viewRow);
+
+            api.realRowToViewRow = (realRow) => realRowToViewRow(api.states.vm, realRow);
+
+            api.realCellToView = (realCell) => realCellToView(api.states.vm, realCell);
+
+            api.viewCellToReal = (viewCell) => viewCellToReal(api.states.vm, viewCell);
+
             api.formatCellDataAsDate = (cellData: any) => formatCellDataAsDate(cellData);
-            api.formatCellDataAsTime = (cellData: any) => formatCellDataAsDate(cellData);
-            api.formatCellDataAsDateTime = (cellData: any) => formatCellDataAsDateTime(cellData);
-            api.paint = (states) => paint(states.state, states.vm, states.overrideRowHeight);
-            api.resetView = () => { resetState(); }
 
-            onApi(mkstates(stateNfo, viewMap, overridenRowHeight), api);
+            api.formatCellDataAsTime = (cellData: any) => formatCellDataAsDate(cellData);
+
+            api.formatCellDataAsDateTime = (cellData: any) => formatCellDataAsDateTime(cellData);
+
+            api.paint = () => paint(api.states.state, api.states.vm, api.states.overrideRowHeight);
+
+            api.resetView = () => resetState();
+
+            api.onSync = (action) => {
+                //setWaitingSync(true);
+                setOnSync({ fn: action });
+            }
+
+            api.test = () => {
+                const focusedCell = stateNfo.focusedCell;
+                const focusedViewCell = realCellToView(viewMap, focusedCell);
+
+                if (focusedViewCell.row > 0) {
+                    const state = stateNfo.dup();
+
+                    const viewCellUpper = focusedViewCell.setRow(focusedViewCell.row - 1);
+                    const cellUpper = viewCellToReal(viewMap, viewCellUpper);
+
+                    const qup = _getCellData(new WSCanvasCellCoord(cellUpper.row, 1));
+                    const qthis = _getCellData(new WSCanvasCellCoord(focusedCell.row, 1));
+                    const ds = prepareCellDataset();
+                    setCellData(ds, new WSCanvasCellCoord(cellUpper.row, 1), qthis);
+                    setCellData(ds, new WSCanvasCellCoord(focusedCell.row, 1), qup);
+                    commitCellDataset(ds);
+
+                    filterAndSort(state, viewMap);
+                    selectFocusedCell(state, viewMap);
+
+                    setStateNfo(state);
+                    setViewMap(viewMap);
+                }
+            }
+
+            onApi(api);
         }
-    }, [dataSource]);
+    }, [dataSource, stateNfo, viewMap, overridenRowHeight]);
     //#endregion
 
     const baseDivContainerStyle = {
@@ -3105,6 +3208,15 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
+    useEffect(() => {
+        //if (waitingSync) return;
+        if (debug) console.log("************VIEW SYNCED");
+        if (onSync !== undefined) {
+            onSync.fn(mkstates(stateNfo, viewMap, overridenRowHeight));
+            setOnSync(undefined);
+        }
+    }, [synced]);
+
     return <div ref={toplevelContainerDivRef}
         style={{
             width: fullwidth ? winSize.width : width,
@@ -3120,6 +3232,8 @@ export function WSCanvas(props: WSCanvasProps) {
             toplevel_container_mp:{toplevel_container_mp} ( size: {toplevel_container_size.width} x {toplevel_container_size.height} )<br />
             canvas_container_mp{canvas_container_mp}<br />
             canvas size:{cs.width} x {cs.height}<br /> */}
+
+            selection:{stateNfo.viewSelection.toString()}
 
             <canvas ref={canvasRef}
                 tabIndex={0}

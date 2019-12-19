@@ -1,8 +1,7 @@
 import { WSEditorSelectionBounds } from "./WSCanvasSelectionBounds";
 import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 
-export class WSCanvasSelectionRange
-{
+export class WSCanvasSelectionRange {
     private _from: WSCanvasCellCoord;
     private _to: WSCanvasCellCoord;
 
@@ -12,9 +11,12 @@ export class WSCanvasSelectionRange
     /** compute this range bounds */
     get bounds(): WSEditorSelectionBounds { return new WSEditorSelectionBounds(this); }
 
-    constructor(from: WSCanvasCellCoord, to: WSCanvasCellCoord) {
+    constructor(from: WSCanvasCellCoord, to?: WSCanvasCellCoord) {
         this._from = from;
-        this._to = to;
+        if (to === undefined)
+            this._to = from;
+        else
+            this._to = to;
     }
 
     /** returns copy of this */

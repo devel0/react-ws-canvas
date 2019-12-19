@@ -42,9 +42,7 @@ export interface WSCanvasProps {
     /** selection mode allow append using ctrl key */
     selectionModeMulti: boolean;
     /** selection mode row or cell */
-    selectionMode: WSCanvasSelectMode;
-    /** select focused cell or row depending on selectionMode */
-    selectFocusedCellOrRow: boolean;
+    selectionMode: WSCanvasSelectMode;    
     /** show focused cell outline */
     showFocusedCellOutline: boolean;
     /** show row numbers column */
@@ -150,9 +148,7 @@ export interface WSCanvasProps {
     /** filter match ignore case */
     filterIgnoreCase: boolean;
     /** filter cell background color */
-    filterBackground: string;
-    /** sort during typings */
-    immediateSort: boolean;
+    filterBackground: string;    
 
     /** ms from last column change to recompute row height */
     recomputeRowHeightDebounceFilterMs: number;
@@ -187,7 +183,7 @@ export interface WSCanvasProps {
     dbgDiv: React.RefObject<HTMLDivElement> | undefined;
 
     /** receive api */
-    onApi?: (states: WSCanvasStates, api: WSCanvasApi) => void,
+    onApi?: (api: WSCanvasApi) => void,
 
     onStateChanged?: (states: WSCanvasStates) => void;
 
@@ -213,6 +209,4 @@ export interface WSCanvasProps {
     onMouseWheel?: (states: WSCanvasStates, e: WheelEvent) => void;
 
     onContextMenu?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
-
-    onRowsAppended?: (states: WSCanvasStates, rowFrom: number, rowto: number) => void;
 }
