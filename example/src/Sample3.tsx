@@ -1,6 +1,6 @@
 import {
   WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasSelectMode, mapEnum,
-  WSCanvasApi, useWindowSize, WSCanvasStates
+  WSCanvasApi, useWindowSize, WSCanvasStates, getFieldData, setFieldData
 } from "./lib";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -13,6 +13,10 @@ enum MyEnum {
   third
 }
 
+interface MyDataNested {
+  nfo: string;
+}
+
 interface MyData {
   col1: string;
   col2: number;
@@ -22,6 +26,7 @@ interface MyData {
   col6: Date;
   col7: string;
   cboxcol: MyEnum;
+  nested: MyDataNested;
 }
 
 export function Sample3() {
@@ -143,7 +148,12 @@ export function Sample3() {
       header: "description",
       field: "col7",
       wrapText: true,
-    }
+    },
+    {
+      type: "text",
+      header: "nested data",
+      field: "nested.nfo",
+    },
   ] as WSCanvasColumn[];
 
   const newObj = (ri: number) => {
@@ -155,7 +165,10 @@ export function Sample3() {
       col5: new Date(new Date().getTime() + (ri * 60 * 1000)), // +1 min
       col6: new Date(new Date().getTime() + (ri * 24 * 60 * 60 * 1000 + ri * 60 * 1000)), // +1 day +1min
       col7: ri % 2 === 0 ? "short text" : "long text that will be wrapped because too long",
-      cboxcol: (ri % 3) as MyEnum
+      cboxcol: (ri % 3) as MyEnum,
+      nested: {
+        nfo: "nested nfo:" + ri
+      }
     } as MyData;
   }
 
@@ -214,19 +227,14 @@ export function Sample3() {
       getCellData={(cell) => {
         const fieldname = columns[cell.col].field;
         const row = rows[cell.row];
-        if (row) {
-          const val = (row as any)[columns[cell.col].field];
-          return val;
-        }
+        if (row) return getFieldData(row, fieldname);
       }}
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
       setCellData={(q, cell, value) => {
         const fieldname = columns[cell.col].field;
         const row = rows[cell.row];
-        if (row) {
-          (row as any)[columns[cell.col].field] = value;
-        }
+        if (row) setFieldData(row, fieldname, value);
       }}
 
       containerStyle={{ margin: "1em" }}

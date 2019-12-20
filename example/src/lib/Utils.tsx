@@ -53,7 +53,7 @@ export function useDivMarginPadding(div: React.RefObject<HTMLDivElement>, consid
             if (considerParent) {
                 let p = div.current.parentElement;
                 while (p) {
-                    const qp = getComputedStyleMarginPadding(p);                    
+                    const qp = getComputedStyleMarginPadding(p);
 
                     res[0] += qp[0];
                     res[1] += qp[1];
@@ -181,4 +181,28 @@ export function mapEnum(e: any) {
         }
     }
     return res;
+}
+
+function getFieldDataRecurse(obj: any, pathParts: string[], lvl: number = 0): any {
+    if (lvl === pathParts.length - 1)
+        return obj[pathParts[lvl]];
+    else
+        return getFieldDataRecurse(obj[pathParts[lvl]], pathParts, lvl + 1);
+}
+
+export function getFieldData(obj: any, path: string) {
+    const fields = path.split('.');    
+    return getFieldDataRecurse(obj, fields);
+}
+
+function setFieldDataRecurse(obj: any, pathParts: string[], newValue: any, lvl: number = 0): any {
+    if (lvl === pathParts.length - 1)
+        obj[pathParts[lvl]] = newValue;
+    else
+        setFieldDataRecurse(obj[pathParts[lvl]], pathParts, newValue, lvl + 1);
+}
+
+export function setFieldData(obj: any, path: string, newValue: any) {
+    const fields = path.split('.');    
+    return setFieldDataRecurse(obj, fields, newValue);
 }
