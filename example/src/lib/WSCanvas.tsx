@@ -480,7 +480,7 @@ export function WSCanvas(props: WSCanvasProps) {
         state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(focusedViewCell)]);
     }
 
-    const filterAndSort = (state: WSCanvasState, vm: ViewMap | null) => {
+    const filterAndSort = (state: WSCanvasState, vm: ViewMap | null) => {        
         let appendingRows = newRowsInsertAtViewIndex && rowsCount > state.rowsCountBackup;
 
         //
@@ -590,7 +590,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
         }
 
-        state.filteredSortedRowsCount = (vm === null) ? rowsCount : vm.viewToReal.length;
+        state.filteredSortedRowsCount = (vm === null) ? rowsCount : vm.viewToReal.length;        
     }
 
     if (!stateNfo.initialized) {
@@ -1468,7 +1468,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         state.colsCountBackup = _colsCount;
 
-        if (debug) console.log("PAINT (rows:" + rowsCount + " cols:" + _colsCount + ")");
+        if (debug) console.log("PAINT (rows:" + rowsCount + " cols:" + _colsCount + " filteredSortedRowsCount:" + state.filteredSortedRowsCount + ")");
 
         let stateChanged = false;
         ++state.paintcnt;
@@ -2955,13 +2955,20 @@ export function WSCanvas(props: WSCanvasProps) {
     useEffect(() => {
         if (debug) console.log("*** dataSource");
 
-        if (stateNfo.editMode === WSCanvasEditMode.direct) return;
+        if (stateNfo.editMode === WSCanvasEditMode.direct && rowsCount === stateNfo.filteredSortedRowsCount)
+            return;
 
         const vm = {} as ViewMap;
         const state = stateNfo.dup();
         if (state.initialized && rowsCount > 0) {
             filterAndSort(state, vm);
             recomputeGeometry2(state, vm);
+
+            if (state.focusedCell.row >= state.filteredSortedRowsCount) {
+                const viewCell = new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, state.focusedCell.col);
+                state.focusedCell = viewCellToReal(vm, viewCell);
+                state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(viewCell)]);                
+            }
 
             if (state.focusedFilterColIdx >= 0 && viewMap) {
                 const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
@@ -3148,7 +3155,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
 
             api.focusCell = (cell, scrollTo, endingCell, clearSelection) =>
-                focusCell(api.states.state, api.states.vm, cell, scrollTo, endingCell, clearSelection, false);
+                focusCell(api.states.state, api.states.vm, cell, scrollTo, endingCell, clearSelection, false);            
 
             api.scrollTo = (coord) => scrollTo(api.states.state, api.states.vm, coord);
 
