@@ -199,7 +199,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const viewRowToRealRow = (vm: ViewMap | null, viewRow: number) => {
         if (viewRow < 0) return viewRow;
 
-        if (vm === null)
+        if (vm === null || vm.viewToReal === undefined)
             return viewRow;
         else {
             if (vm.viewToReal)
@@ -212,7 +212,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const viewColToRealCol = (vm: ViewMap | null, viewCol: number) => viewCol; // not yet impemented (eg. column order)
 
     const realRowToViewRow = (vm: ViewMap | null, row: number) => {
-        if (vm === null)
+        if (vm === null || vm.realToView === undefined)
             return row;
         else {
             const res = vm.realToView[row];
