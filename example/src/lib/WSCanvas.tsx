@@ -893,10 +893,13 @@ export function WSCanvas(props: WSCanvasProps) {
         if (cell.row === 0 && cell.col === 0) {
 
         }
-        const isSelected = (
+        let isSelected = (
             ((state.viewSelection.ranges.length === 1) || state.viewSelection.ranges.length > 1) ||
             (state.viewSelection.ranges.length === 1 && !state.viewSelection.ranges[0].from.equals(state.viewSelection.ranges[0].to))
         ) && viewSelContainsCell;
+
+        if (state.focusedCellSelectFollow)
+            isSelected = state.focusedCell.equals(cell);
 
         // https://usefulangle.com/post/17/html5-canvas-drawing-1px-crisp-straight-lines
         const x_ = x - 0.5;
@@ -1337,6 +1340,11 @@ export function WSCanvas(props: WSCanvasProps) {
 
     /** side effect on state ; NO side effect on vm */
     const scrollTo = (state: WSCanvasState, vm: ViewMap | null, cell: WSCanvasCellCoord) => {
+        if (cell.row >= rowsCount) {
+            state.scrollToWhenAvail = cell;
+            return;
+        }
+
         const viewCell = realCellToView(vm, cell);
 
         // adjust scrollOffset.row
@@ -1630,7 +1638,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     const drawColNumber = (ciFrom: number, ciTo: number) => {
                         for (let ci = ciFrom; ci <= ciTo; ++ci) {
                             if (_colHidden(ci)) continue;
-                            
+
                             const cWidth = overridenColWidth(state, ci);
 
                             const isSelected = highlightColNumber &&
@@ -2221,6 +2229,8 @@ export function WSCanvas(props: WSCanvasProps) {
                     applyState = false;
                 }
 
+                if (state.focusedCellSelectFollow) { state.focusedCellSelectFollow = false; applyState = true; }
+
                 if (!keyHandled) {
                     const cell = state.focusedCell;
 
@@ -2267,7 +2277,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     default:
                                         singleSetCellData(state, cell, e.key);
                                         break;
-                                }                                
+                                }
                             }
                             break;
 
@@ -2345,6 +2355,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     const shift_key = e.getModifierState("Shift");
 
                     const state = stateNfo.dup();
+                    if (state.focusedCellSelectFollow) state.focusedCellSelectFollow = false;
 
                     if (!evalClickStart(state, ccoord)) {
                         cellCoord = canvasToCellCoord(state, viewMap, overridenRowHeight, ccoord, showPartialColumns);
@@ -2948,14 +2959,20 @@ export function WSCanvas(props: WSCanvasProps) {
 
         const vm = {} as ViewMap;
         const state = stateNfo.dup();
-        if (stateNfo.initialized && rowsCount > 0) {
+        if (state.initialized && rowsCount > 0) {
             filterAndSort(state, vm);
             recomputeGeometry2(state, vm);
 
-            if (stateNfo.focusedFilterColIdx >= 0 && viewMap) {
+            if (state.focusedFilterColIdx >= 0 && viewMap) {
                 const q = viewCellToReal(vm, new WSCanvasCellCoord(0, viewColToRealCol(vm, state.focusedFilterColIdx)));
                 focusCell(state, vm, q, true, false, true, !selectFirstOnFilter);
                 rectifyScrollOffset(state, vm);
+            }
+
+            if ((stateNfo.scrollToWhenAvail != null) && stateNfo.scrollToWhenAvail.row < rowsCount) {
+                const cell = state.scrollToWhenAvail!;
+                state.scrollToWhenAvail = null;
+                scrollTo(state, vm, cell);
             }
 
             setViewMap(vm);
@@ -3068,7 +3085,10 @@ export function WSCanvas(props: WSCanvasProps) {
 
             api.filterAndSort = () => filterAndSort(api.states.state, api.states.vm);
 
-            api.selectFocusedCell = () => selectFocusedCell(api.states.state, api.states.vm);
+            api.selectFocusedCell = () => {
+                selectFocusedCell(api.states.state, api.states.vm);
+                api.states.state.focusedCellSelectFollow = true;
+            }
 
             api.clearSelection = () => clearSelection(api.states.state);
 
@@ -3155,7 +3175,7 @@ export function WSCanvas(props: WSCanvasProps) {
             api.onSync = (action) => {
                 //setWaitingSync(true);
                 setOnSync({ fn: action });
-            }            
+            }
 
             onApi(api);
         }
@@ -3220,7 +3240,7 @@ export function WSCanvas(props: WSCanvasProps) {
             outer size: {fullwidth ? winSize.width : width} x {height}<br />
             toplevel_container_mp:{toplevel_container_mp} ( size: {toplevel_container_size.width} x {toplevel_container_size.height} )<br />
             canvas_container_mp{canvas_container_mp}<br />
-            canvas size:{cs.width} x {cs.height}<br /> */}                        
+            canvas size:{cs.width} x {cs.height}<br /> */}
 
             <canvas ref={canvasRef}
                 tabIndex={0}

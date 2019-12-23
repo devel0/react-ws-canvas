@@ -28,6 +28,8 @@ export class WSCanvasState {
 
         this.lastPartialColScrolled = -1;
         this.focusedCell = new WSCanvasCellCoord();
+        this.focusedCellSelectFollow = false;
+        this.scrollToWhenAvail = null;
         this.focusedFilterColIdx = -1;
         this.filters = [];
         this.filtersTrack = "";
@@ -60,7 +62,7 @@ export class WSCanvasState {
         this.paintcnt = 0;
         this.debugNfo = "";
         this.initialized = false;
-        this.rowsCountBackup = 0;        
+        this.rowsCountBackup = 0;
     }
 
     colsCountBackup: number;
@@ -81,6 +83,8 @@ export class WSCanvasState {
 
     lastPartialColScrolled: number;
     focusedCell: WSCanvasCellCoord;
+    focusedCellSelectFollow: boolean;
+    scrollToWhenAvail: WSCanvasCellCoord | null;
     focusedFilterColIdx: number;
     filters: WSCanvasFilter[];
     /** json serialization of filters to work with debounce */
@@ -118,7 +122,7 @@ export class WSCanvasState {
     paintcnt: number;
     debugNfo: string;
     initialized: boolean;
-    rowsCountBackup: number;    
+    rowsCountBackup: number;
 
     dup() {
         const q = _.cloneDeep(this) as WSCanvasState;
