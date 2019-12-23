@@ -2699,7 +2699,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
                 else {
                     if (!preventWheelOnBounds && state.viewScrollOffset.row === state.filteredSortedRowsCount - state.viewRowsCount) prevent = false;
-                    state.viewScrollOffset = state.viewScrollOffset.setRow(Math.min(state.viewScrollOffset.row + 1, state.filteredSortedRowsCount - state.viewRowsCount));
+                    state.viewScrollOffset = state.viewScrollOffset.setRow(Math.min(state.viewScrollOffset.row + 1, Math.max(0, state.filteredSortedRowsCount - state.viewRowsCount)));
                 }
             }
             else if (e.deltaY < 0) {
