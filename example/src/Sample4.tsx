@@ -121,27 +121,27 @@ export function Sample4() {
     }
 
     const delRow = () => {
-        if (gridStates && api) {
-            const viewRows = gridStates.state.viewSelection.rowIdxs();
+        if (api) {
+            api.begin();
+
+            const viewRows = api.states.state.viewSelection.rowIdxs();
             const idxsToRemove: number[] = [];
             viewRows.forEach((viewRow) => {
                 const rowIdx = api.viewRowToRealRow(viewRow);
                 idxsToRemove.push(rowIdx);
             });
 
-            idxsToRemove.sort((a, b) => b - a);
+            idxsToRemove.sort((a, b) => b - a);            
 
-            const newset = new IUpdateEntityNfo<MyData[]>(ds.current.slice());
+            api.prepareCellDataset();
+            const newset = api.ds as MyData[];
 
-            const arr = newset.current;
+            const arr = newset;
             for (let i = 0; i < idxsToRemove.length; ++i) {
                 arr.splice(idxsToRemove[i], 1);
-            }
+            }            
+            api.commitCellDataset();                
 
-            setDs(newset);
-
-            api.begin();
-            api.clearSelection();
             api.commit();
         }
     }
@@ -196,7 +196,7 @@ export function Sample4() {
 
     return <div style={{ margin: "1em" }}>
 
-        focusedCell:{api ? api.states.state.focusedCell.toString() : ""} - focusedViewCell:{api ? api.realCellToView(api.states.state.focusedCell).toString() : ""}<br />
+        focusedCell:{api ? api.states.state.focusedCell.toString() : ""} - focusedViewCell:{api ? api.realCellToView(api.states.state.focusedCell).toString() : ""} - rowsCount:{api ? api.states.props.rowsCount : -1} - filteredSortedrRowsCount:{api ? api.states.state.filteredSortedRowsCount : -1}<br />
         viewSelection:{api ? api.states.state.viewSelection.toString() : ""}<br />
         apiOverCell:{api ? String(api.states.state.cursorOverCell) : ""}<br />
         realToView:{(api && api.states.vm) ? api.states.vm.realToView.join('-') : ""}<br />
@@ -245,7 +245,7 @@ export function Sample4() {
             showColNumber={true}
             columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
 
-            debug={false}
+            debug={true}
             onApi={(api) => setApi(api)}
             onStateChanged={(states) => setGridState(states)}
         />
