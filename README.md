@@ -126,8 +126,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [26]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L18-L19
 [27]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L191-L219
 [28]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L169-L171
-[29]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L227-L231
-[30]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L234-L238
+[29]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L230
+[30]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L237
 
 ## quickstart
 
