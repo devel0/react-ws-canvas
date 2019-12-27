@@ -72,7 +72,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/initial-sort.png)
 
-- data getter/setter can follow a [worksheet][7] or a [db record type][8] ( [example of nested field][28] wit [get][29] and [set][30] methods)
+- data getter/setter can follow a [worksheet][7] or a [db record type][8] ( [example of nested field][28] using [getFieldData][29] and [setFieldData][30] methods)
 
 - [api][10] and [handlers][27] available for control interactions ( [example][11] )
 
