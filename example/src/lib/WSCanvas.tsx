@@ -499,7 +499,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         let data: any = undefined;
                         const cell = new WSCanvasCellCoord(ri, colIdx);
                         const cellData = _getCellData(cell);
-                        if (_renderTransform && (filterUseDatasource === undefined || !filterUseDatasource(cell)))
+                        if (_renderTransform(cell, cellData) && (filterUseDatasource === undefined || !filterUseDatasource(cell)))
                             data = _renderTransform(cell, cellData);
                         else
                             data = cellData;
