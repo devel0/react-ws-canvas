@@ -59,6 +59,7 @@ export function WSCanvas(props: WSCanvasProps) {
         columnClickBehavior,
         showFilter,
         selectFirstOnFilter,
+        filterUseDatasource,
         showPartialColumns,
         showPartialRows,
         preventWheelOnBounds,
@@ -480,7 +481,7 @@ export function WSCanvas(props: WSCanvasProps) {
         state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(focusedViewCell)]);
     }
 
-    const filterAndSort = (state: WSCanvasState, vm: ViewMap | null) => {        
+    const filterAndSort = (state: WSCanvasState, vm: ViewMap | null) => {
         let appendingRows = newRowsInsertAtViewIndex && rowsCount > state.rowsCountBackup;
 
         //
@@ -495,7 +496,13 @@ export function WSCanvas(props: WSCanvasProps) {
                     let matching = true;
                     for (let fi = 0; fi < stateNfo.filters.length; ++fi) {
                         const { colIdx, filter } = stateNfo.filters[fi];
-                        const data = _getCellData(new WSCanvasCellCoord(ri, colIdx));
+                        let data: any = undefined;
+                        const cell = new WSCanvasCellCoord(ri, colIdx);
+                        const cellData = _getCellData(cell);
+                        if (_renderTransform && (filterUseDatasource === undefined || !filterUseDatasource(cell)))
+                            data = _renderTransform(cell, cellData);
+                        else
+                            data = cellData;
 
                         const F = filterIgnoreCase ? String(filter).toLowerCase() : String(filter);
                         const S = filterIgnoreCase ? String(data).toLowerCase() : String(data);
@@ -590,7 +597,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
         }
 
-        state.filteredSortedRowsCount = (vm === null) ? rowsCount : vm.viewToReal.length;        
+        state.filteredSortedRowsCount = (vm === null) ? rowsCount : vm.viewToReal.length;
     }
 
     if (!stateNfo.initialized) {
@@ -2145,7 +2152,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             postEditFormat(state);
                         }
                         state.editMode = WSCanvasEditMode.none;
-                        const nextViewRow = new WSCanvasCellCoord(Math.min(state.filteredSortedRowsCount-1, focusedViewCell.row + 1), focusedViewCell.col);
+                        const nextViewRow = new WSCanvasCellCoord(Math.min(state.filteredSortedRowsCount - 1, focusedViewCell.row + 1), focusedViewCell.col);
                         state.focusedCell = viewCellToReal(viewMap, nextViewRow);
                         break;
 
@@ -2968,7 +2975,7 @@ export function WSCanvas(props: WSCanvasProps) {
             if (state.focusedCell.row >= state.filteredSortedRowsCount) {
                 const viewCell = new WSCanvasCellCoord(state.filteredSortedRowsCount - 1, state.focusedCell.col);
                 state.focusedCell = viewCellToReal(vm, viewCell);
-                state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(viewCell)]);                
+                state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(viewCell)]);
             }
 
             if (state.focusedFilterColIdx >= 0 && viewMap) {
@@ -3156,7 +3163,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
 
             api.focusCell = (cell, scrollTo, endingCell, clearSelection) =>
-                focusCell(api.states.state, api.states.vm, cell, scrollTo, endingCell, clearSelection, false);            
+                focusCell(api.states.state, api.states.vm, cell, scrollTo, endingCell, clearSelection, false);
 
             api.scrollTo = (coord) => scrollTo(api.states.state, api.states.vm, coord);
 

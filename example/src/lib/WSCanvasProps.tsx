@@ -59,6 +59,8 @@ export interface WSCanvasProps {
     showFilter: boolean;
     /** whatever select first avail row after filtering [default: false] */
     selectFirstOnFilter: boolean;
+    /** if set true filter consider datasource instead of renderTransform if present [default: ()=>false]*/
+    filterUseDatasource: (cell: WSCanvasCellCoord) => boolean;
     /** show or truncate partial columns [default: true] */
     showPartialColumns: boolean;
     /** show or truncate partial rows [default: true] */
@@ -150,7 +152,7 @@ export interface WSCanvasProps {
     /** filter match ignore case [default: true] */
     filterIgnoreCase: boolean;
     /** filter cell background color [default: "yellow"] */
-    filterBackground: string;
+    filterBackground: string;    
 
     /** ms from last column change to recompute row height [default: 0] */
     recomputeRowHeightDebounceFilterMs: number;

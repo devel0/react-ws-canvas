@@ -52,6 +52,9 @@ export interface WSCanvasColumn {
 
     renderTransform?: (cell: WSCanvasCellCoord, value: any) => any;
 
+    /** if true datasource will be used instead of renderTransform if present */
+    filterUseDataSource?: boolean;
+
     readonly?: boolean | undefined;
 
     customEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord,
