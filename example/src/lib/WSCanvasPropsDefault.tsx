@@ -27,7 +27,7 @@ export const WSCanvasPropsDefault = () => {
         frozenColsCount: 0,
         selectionModeMulti: true,
         selectionMode: WSCanvasSelectMode.Cell,        
-        showFocusedCellOutline: true,
+        showFocusedCellOutline: false,
         showRowNumber: false,
         highlightRowNumber: true,
         showColNumber: false,
