@@ -637,24 +637,26 @@ export function WSCanvas(props: WSCanvasProps) {
 
                     if (ctx) {
                         for (let ci = 0; ci < _colsCount; ++ci) {
-                            const cell = new WSCanvasCellCoord(ri, ci);
-                            const colW = overridenColWidth(state, ci);
-                            if (colW > 0) {
-                                const qWrap = _getCellTextWrap(cell, props);
-                                if (qWrap === true) {
-                                    let celldata = _getCellData(cell);
-                                    let str = _renderTransform(cell, celldata);
-                                    if (str === undefined) str = String(celldata);
-                                    let cellFont = font;
-                                    if (getCellFont !== undefined) {
-                                        const q = getCellFont(cell, props);
-                                        if (q) cellFont = q;
+                            if (getCellTextWrap || (columns && columns[ci].wrapText)) {
+                                const cell = new WSCanvasCellCoord(ri, ci);
+                                const colW = overridenColWidth(state, ci);
+                                if (colW > 0) {
+                                    const qWrap = _getCellTextWrap(cell, props);
+                                    if (qWrap === true) {
+                                        let celldata = _getCellData(cell);
+                                        let str = _renderTransform(cell, celldata);
+                                        if (str === undefined) str = String(celldata);
+                                        let cellFont = font;
+                                        if (getCellFont !== undefined) {
+                                            const q = getCellFont(cell, props);
+                                            if (q) cellFont = q;
+                                        }
+                                        ctx.font = cellFont;
+                                        const txtWidth = ctx.measureText(str).width;
+                                        const f = Math.ceil(txtWidth / colW);
+                                        const q = rh * f;
+                                        if (q > rh) rh = q;
                                     }
-                                    ctx.font = cellFont;
-                                    const txtWidth = ctx.measureText(str).width;
-                                    const f = Math.ceil(txtWidth / colW);
-                                    const q = rh * f;
-                                    if (q > rh) rh = q;
                                 }
                             }
                         }
@@ -1485,10 +1487,10 @@ export function WSCanvas(props: WSCanvasProps) {
 
                                     x += cWidth + 1;
 
-                                    if (updateExceededCol) {                                        
-                                        if (ciTo !== state.lastPartialColScrolled && state.focusedCell.col === ciTo && x > cs.width) {                                            
+                                    if (updateExceededCol) {
+                                        if (ciTo !== state.lastPartialColScrolled && state.focusedCell.col === ciTo && x > cs.width) {
                                             state.lastPartialColScrolled = ciTo;
-                                            colExceeded = true;                                            
+                                            colExceeded = true;
                                             break;
                                         }
                                     }
@@ -1517,10 +1519,10 @@ export function WSCanvas(props: WSCanvasProps) {
                         if (frozenRowsCount > 0) drawRows(0, frozenRowsCount - 1, false);
                         drawRows(state.viewScrollOffset.row + frozenRowsCount,
                             Math.min(state.filteredSortedRowsCount - 1, state.viewScrollOffset.row + state.viewRowsCount - (showPartialRows ? 0 : 1)), true);
-                    }                    
+                    }
 
                     // autoscroll when click on partial column
-                    if (colExceeded && state.viewColsCount >= 1) {                        
+                    if (colExceeded && state.viewColsCount >= 1) {
                         scrollTo(state, vm, state.focusedCell);
                         if (debug) console.log("paintfrom:1");
                         paint(state, vm, orh);
