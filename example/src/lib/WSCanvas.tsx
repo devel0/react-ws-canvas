@@ -2145,7 +2145,8 @@ export function WSCanvas(props: WSCanvasProps) {
                             postEditFormat(state);
                         }
                         state.editMode = WSCanvasEditMode.none;
-                        state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextRow());
+                        const nextViewRow = new WSCanvasCellCoord(Math.min(state.filteredSortedRowsCount-1, focusedViewCell.row + 1), focusedViewCell.col);
+                        state.focusedCell = viewCellToReal(viewMap, nextViewRow);
                         break;
 
                     case "Escape":
