@@ -238,6 +238,7 @@ export function Sample4() {
                 if (row) { (row as any)[columns[cell.col].field] = value; }
             }}
             commitCellDataset={(q) => { setDs(new IUpdateEntityNfo<MyData[]>(q, ds.original)); }}
+            showFilter={true}
 
             containerStyle={{ marginTop: "1em" }}
             fullwidth
