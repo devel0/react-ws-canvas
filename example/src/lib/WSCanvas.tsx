@@ -680,24 +680,26 @@ export function WSCanvas(props: WSCanvasProps) {
 
                     if (ctx) {
                         for (let ci = 0; ci < _colsCount; ++ci) {
-                            const cell = new WSCanvasCellCoord(ri, ci);
-                            const colW = overridenColWidth(state, ci);
-                            if (colW > 0) {
-                                const qWrap = _getCellTextWrap(cell, props);
-                                if (qWrap === true) {
-                                    let celldata = _getCellData(cell);
-                                    let str = _renderTransform(cell, celldata);
-                                    if (str === undefined) str = String(celldata);
-                                    let cellFont = font;
-                                    if (getCellFont !== undefined) {
-                                        const q = getCellFont(cell, props);
-                                        if (q) cellFont = q;
+                            if (getCellTextWrap || (columns && columns[ci].wrapText)) {
+                                const cell = new WSCanvasCellCoord(ri, ci);
+                                const colW = overridenColWidth(state, ci);
+                                if (colW > 0) {
+                                    const qWrap = _getCellTextWrap(cell, props);
+                                    if (qWrap === true) {
+                                        let celldata = _getCellData(cell);
+                                        let str = _renderTransform(cell, celldata);
+                                        if (str === undefined) str = String(celldata);
+                                        let cellFont = font;
+                                        if (getCellFont !== undefined) {
+                                            const q = getCellFont(cell, props);
+                                            if (q) cellFont = q;
+                                        }
+                                        ctx.font = cellFont;
+                                        const txtWidth = ctx.measureText(str).width;
+                                        const f = Math.ceil(txtWidth / colW);
+                                        const q = rh * f;
+                                        if (q > rh) rh = q;
                                     }
-                                    ctx.font = cellFont;
-                                    const txtWidth = ctx.measureText(str).width;
-                                    const f = Math.ceil(txtWidth / colW);
-                                    const q = rh * f;
-                                    if (q > rh) rh = q;
                                 }
                             }
                         }
