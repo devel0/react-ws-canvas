@@ -9,6 +9,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 ---
 
 - [features](#features)
+- [todo](#todo)
 - [**quickstart**](#quickstart)
 - [**examples** list](#examples-list)
 - [how to contribute ( quickstart )](#how-to-contribute--quickstart-)
@@ -128,6 +129,10 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [28]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L169-L171
 [29]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L230
 [30]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L237
+
+## todo
+
+- improve dataset view/real management to help grid in maintain previous dataset order/filter when acting manual operations through api such as row add
 
 ## quickstart
 
