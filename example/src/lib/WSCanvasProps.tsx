@@ -153,6 +153,8 @@ export interface WSCanvasProps {
     filterIgnoreCase: boolean;
     /** filter cell background color [default: "yellow"] */
     filterBackground: string;    
+    /** if autoselect all text when click on filter */
+    filterAutoSelectAll: boolean;
 
     /** ms from last column change to recompute row height [default: 0] */
     recomputeRowHeightDebounceFilterMs: number;

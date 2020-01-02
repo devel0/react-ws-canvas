@@ -83,7 +83,8 @@ export const WSCanvasPropsDefault = () => {
         filterDebounceMs: 500,
         filterTextMargin: 3,
         filterIgnoreCase: true,
-        filterBackground: "yellow",        
+        filterBackground: "yellow",       
+        filterAutoSelectAll: false, 
 
         recomputeRowHeightDebounceFilterMs: 0,
         rowNumberColWidth: 80,

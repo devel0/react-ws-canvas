@@ -108,6 +108,7 @@ export function WSCanvas(props: WSCanvasProps) {
         filterTextMargin,
         filterIgnoreCase,
         filterBackground,
+        filterAutoSelectAll,
 
         recomputeRowHeightDebounceFilterMs,
         rowNumberColWidth,
@@ -1777,9 +1778,10 @@ export function WSCanvas(props: WSCanvasProps) {
                                         _setStateNfo(state);
                                         if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                                     }
-                                    e.target.setSelectionRange(0, e.target.value.length);
+                                    if (filterAutoSelectAll)
+                                        e.target.setSelectionRange(0, e.target.value.length);                                    
                                 }}
-                                onBlur={(e) => { // workaround                                                                                                            
+                                onBlur={(e) => { // workaround                                    
                                     if (!canceling && e.target) e.target.focus();
                                 }}
                                 onKeyDown={(e) => {
