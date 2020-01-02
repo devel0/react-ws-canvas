@@ -99,8 +99,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [5]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L50-L55
 [6]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L90-L91
 [106]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L36-L37
-[7]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample1.tsx#L30-L34
-[8]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample4.tsx#L140-L151
+[7]: https://github.com/devel0/react-ws-canvas/blob/cbd9d6d75100a45cb7d0ee073c6d5ab03f3a354e/example/src/Sample1.tsx#L31-L35
+[8]: https://github.com/devel0/react-ws-canvas/blob/cbd9d6d75100a45cb7d0ee073c6d5ab03f3a354e/example/src/Sample4.tsx#L231-L240
 [9]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L42-L43
 [10]: https://github.com/devel0/react-ws-canvas/blob/53639eb02d4df298b4591c6f231c63cf4db703b2/example/src/lib/WSCanvasApi.tsx#L13
 [11]: https://github.com/devel0/react-ws-canvas/blob/6e5069b4bd999bee8e47fee39733ee963002ad1b/example/src/Sample4.tsx#L150
@@ -119,7 +119,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [20]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L181-L184
 [21]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L129-L130
 [121]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L50-L51
-[22]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasPropsDefault.tsx#L11
+[22]: https://github.com/devel0/react-ws-canvas/blob/cbd9d6d75100a45cb7d0ee073c6d5ab03f3a354e/example/src/lib/WSCanvasPropsDefault.tsx#L11
 [23]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample3.tsx#L222
 [24]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/Sample3.tsx#L90-L122
 [25]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L98-L99
@@ -127,12 +127,10 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [26]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L18-L19
 [27]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasProps.tsx#L191-L219
 [28]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L169-L171
-[29]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L230
-[30]: https://github.com/devel0/react-ws-canvas/blob/d0767d8e1327ff69090ad0dbd7f4eefd907c7a69/example/src/Sample3.tsx#L237
+[29]: https://github.com/devel0/react-ws-canvas/blob/cbd9d6d75100a45cb7d0ee073c6d5ab03f3a354e/example/src/Sample3.tsx#L229
+[30]: https://github.com/devel0/react-ws-canvas/blob/cbd9d6d75100a45cb7d0ee073c6d5ab03f3a354e/example/src/Sample3.tsx#L235
 
 ## todo
-
-- improve dataset view/real management to help grid in maintain previous dataset order/filter when acting manual operations through api such as row add
 
 ## quickstart
 
@@ -178,11 +176,11 @@ const AppQuickStart: React.FC = () => {
     rowsCount={rows.length} colsCount={COLS}
     showColNumber={true} showRowNumber={true}
     columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
-    dataSource={rows}
-    getCellData={(cell) => rows[cell.row][cell.col]}
+    rows={rows}
+    rowGetCellData={(row, colIdx) => row[colIdx]}
     prepareCellDataset={() => rows.slice()}
     commitCellDataset={(q) => setRows(q)}
-    setCellData={(q, cell, value) => q[cell.row][cell.col] = value}
+    rowSetCellData={(row, colIdx, value) => row[colIdx] = value}
   />;
 }
 
