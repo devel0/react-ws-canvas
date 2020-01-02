@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useLayoutEffect, CSSProperties, useCallback } from "react";
-import useDebounce, { useElementSize, toColumnName, useWindowSize, useDivMarginPadding, GraphicsSize } from "./Utils";
+import useDebounce, { useElementSize, toColumnName, useWindowSize, useDivMarginPadding, GraphicsSize, getFieldData } from "./Utils";
 import { WSCanvasProps } from "./WSCanvasProps";
 import { WSCanvasEditMode } from "./WSCanvasEditMode";
 import { WSCanvasState } from "./WSCanvasState";
@@ -40,7 +40,7 @@ export function WSCanvas(props: WSCanvasProps) {
         fullwidth,
         width,
         height,
-        dataSource,
+        rows,
         rowsCount,
         colsCount,
         columns,
@@ -65,10 +65,10 @@ export function WSCanvas(props: WSCanvasProps) {
         preventWheelOnBounds,
         newRowsInsertAtViewIndex,
 
-        getCellData,
+        rowGetCellData,
         renderTransform,
         prepareCellDataset,
-        setCellData,
+        rowSetCellData,
         commitCellDataset,
         getCellCustomEdit,
         getColumnHeader,
@@ -301,15 +301,29 @@ export function WSCanvas(props: WSCanvasProps) {
         return res;
     }
 
-    const _getCellData = (cell: WSCanvasCellCoord) => {
+    const _rowGetCellData = (row: any, colIdx: number) => {
         let res: any = undefined;
 
-        if (getCellData) {
-            res = getCellData(cell);
-            //if (res === undefined && columns) res = 
+        if (rowGetCellData) {
+            res = rowGetCellData(row, colIdx);
         }
+
         return res;
     }
+
+    const _getCellData = (cell: WSCanvasCellCoord) => {
+        return _rowGetCellData(rows[cell.row], cell.col);
+    }
+
+    // const _getCellData = (cell: WSCanvasCellCoord) => {
+    //     let res: any = undefined;
+
+    //     if (getCellData) {
+    //         res = getCellData(cell);
+    //         //if (res === undefined && columns) res = 
+    //     }
+    //     return res;
+    // }    
 
     const _getCellType = (cell: WSCanvasCellCoord, value: any) => {
         let res: WSCanvasColumnType | undefined = undefined;
@@ -507,12 +521,39 @@ export function WSCanvas(props: WSCanvasProps) {
         state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(focusedViewCell)]);
     }
 
-    const filterAndSort = (state: WSCanvasState, vm: ViewMap | null) => {
+    const sortData = (state: WSCanvasState) => {
+        if (debug) console.log("*** SORT DATA");
+        //if (columns) {
+        const newDataset = prepareCellDataset();
+
+        const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");
+
+        for (let si = 0; si < orderedColumnSort.length; ++si) {
+            const columnSort = orderedColumnSort[si];
+            const colIdx = columnSort.columnIndex;
+            //const field = columns[colIdx].field;
+            const lto = _lessThanOp(columnSort.columnIndex);
+
+            newDataset.sort((a: any, b: any) => {
+                const valA = _rowGetCellData(a, colIdx);// getFieldData(a, field);
+                const valB = _rowGetCellData(b, colIdx);// getFieldData(b, field);
+                let ascRes = -1;
+                ascRes = lto(valA, valB) ? -1 : 1;
+
+                if (columnSort.sortDirection === WSCanvasSortDirection.Descending)
+                    return -ascRes;
+                else
+                    return ascRes;
+            });
+        }
+
+        commitCellDataset(newDataset);
+        //}
+    }
+
+    const filterData = (state: WSCanvasState, vm: ViewMap | null) => {
         let appendingRows = newRowsInsertAtViewIndex && rowsCount > state.rowsCountBackup;
 
-        //
-        // FILTER
-        //
         const filteredToReal: number[] = [];
         if (rowsCount > 0) {
             if (stateNfo.filters) {
@@ -548,79 +589,9 @@ export function WSCanvas(props: WSCanvasProps) {
         }
         else return;
 
-        //
-        // SORT
-        //
         if (vm !== null) {
-            if (state.columnsSort.length === 0) {
-                vm.viewToReal = filteredToReal;
-                vm.realToView = buildInverseView(filteredToReal);
-            } else {
-                const filteredSortedToReal = new Array<number>(filteredToReal.length);
-
-                const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");
-
-                for (let si = 0; si < orderedColumnSort.length; ++si) {
-                    const columnSort = orderedColumnSort[si];
-                    const columnType = _getCellType(new WSCanvasCellCoord(0, columnSort.columnIndex), null);
-                    const lto = _lessThanOp(columnSort.columnIndex);
-
-                    let colData: WSCanvasSortingRowInfo[] = [];
-                    for (let fsri = 0; fsri < filteredSortedToReal.length; ++fsri) {
-                        if (si > 0) {
-                            colData.push({
-                                ri: filteredSortedToReal[fsri],
-                                cellData: _getCellData(new WSCanvasCellCoord(filteredSortedToReal[fsri], columnSort.columnIndex))
-                            });
-                        } else {
-                            colData.push({
-                                ri: filteredToReal[fsri],
-                                cellData: _getCellData(new WSCanvasCellCoord(filteredToReal[fsri], columnSort.columnIndex))
-                            });
-                        }
-                    }
-
-                    // if (debug) {
-                    //     console.log("+++++++++++");
-                    //     for (let i = 0; i < colData.length; ++i) {
-                    //         console.log(colData[i].ri + " - " + colData[i].cellData);
-                    //     }
-                    // }
-
-                    colData.sort((a, b) => {
-                        const valA = a.cellData;
-                        const valB = b.cellData;
-                        let ascRes = -1;
-                        ascRes = lto(valA, valB) ? -1 : 1;
-
-                        if (columnSort.sortDirection === WSCanvasSortDirection.Descending)
-                            return -ascRes;
-                        else
-                            return ascRes;
-                    });
-
-                    // if (debug) {
-                    //     console.log("-----------");
-                    //     for (let i = 0; i < colData.length; ++i) {
-                    //         console.log(colData[i].ri + " - " + colData[i].cellData);
-                    //     }
-                    // }
-
-                    for (let fsri = 0; fsri < filteredSortedToReal.length; ++fsri) {
-                        filteredSortedToReal[fsri] = colData[fsri].ri;
-                    }
-                }
-
-                vm.viewToReal = filteredSortedToReal;
-                vm.realToView = buildInverseView(filteredSortedToReal);
-            }
-
-            if (appendingRows && newRowsInsertAtViewIndex) {
-                const newRealIdxs: number[] = [];
-                for (let i = state.rowsCountBackup; i < rowsCount; ++i) newRealIdxs.push(i);
-                vm.viewToReal.splice(newRowsInsertAtViewIndex, 0, ...newRealIdxs);
-                vm.realToView = buildInverseView(vm.viewToReal);
-            }
+            vm.viewToReal = filteredToReal;
+            vm.realToView = buildInverseView(filteredToReal);
         }
 
         state.filteredSortedRowsCount = (vm === null) ? rowsCount : vm.viewToReal.length;
@@ -635,8 +606,10 @@ export function WSCanvas(props: WSCanvasProps) {
 
             state.initialized = true;
 
+            sortData(state);
+
             const vm = {} as ViewMap;
-            filterAndSort(state, vm);
+            filterData(state, vm);
             _setViewMap(vm);
             _setStateNfo(state);
             if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
@@ -1171,7 +1144,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     break;
             }
         }
-        setCellData(q, cell, cellval);
+        rowSetCellData(q[cell.row], cell.col, cellval);
         commitCellDataset(q);
     }
 
@@ -2282,7 +2255,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                             const viewCell = viewCellIt.value;
                                             const cell = viewCellToReal(viewMap, viewCell);
                                             if (!_isCellReadonly(cell)) {
-                                                setCellData(ds, cell, "");
+                                                rowSetCellData(ds[cell.row], cell.col, "");
                                             }
                                             viewCellIt = viewCellRng.next();
                                         }
@@ -2461,10 +2434,13 @@ export function WSCanvas(props: WSCanvasProps) {
                                                     });
                                                 }
 
+                                                /*
                                                 clearSelection(state);
                                                 const vm = {} as ViewMap;
-                                                filterAndSort(state, vm);
-                                                _setViewMap(vm);
+                                                filterData(state, vm);
+                                                _setViewMap(vm);*/
+
+                                                sortData(state);
                                             }
                                             break;
 
@@ -2950,7 +2926,7 @@ export function WSCanvas(props: WSCanvasProps) {
             if (overridenRowHeight === null && rowsCount > 0 && canvasRef.current && canvasRef.current.getContext('2d')) {
                 const state = stateNfo.dup();
                 const vm = {} as ViewMap;
-                filterAndSort(state, vm);
+                filterData(state, vm);
                 recomputeGeometry2(state, vm);
                 recomputeOverridenRowHeight(state);
                 if (debug) console.log("paintfrom:4");
@@ -2982,7 +2958,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (debug) console.log("*** debounceCol");
         const state = stateNfo.dup();
         const vm = {} as ViewMap;
-        filterAndSort(state, vm);
+        filterData(state, vm);
         recomputeGeometry2(state, vm);
         _setViewMap(vm);
         _setStateNfo(state);
@@ -3008,7 +2984,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
 
         if (state.initialized && rowsCount > 0) {
-            filterAndSort(state, vm);
+            filterData(state, vm);
             if (state.filteredSortedRowsCount > 0 && rowsCount === 0) {
                 state.filteredSortedRowsCount = 0;
             }
@@ -3040,7 +3016,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     adjustFocusAndSel();
                 }
             }
-            
+
             if (realRowToViewRow(vm, state.focusedCell.row) >= state.filteredSortedRowsCount) {
                 adjustFocusAndSel();
             }
@@ -3062,7 +3038,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
         }
-    }, [dataSource, rowsCount]);
+    }, [rows, rowsCount]);
 
     //#region APPLY FILTER 
     useEffect(() => {
@@ -3070,7 +3046,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const vm = {} as ViewMap;
         const state = stateNfo.dup();
         if (stateNfo.initialized && rowsCount > 0) {
-            filterAndSort(state, vm);
+            filterData(state, vm);
             recomputeGeometry2(state, vm);
 
             if (stateNfo.focusedFilterColIdx >= 0 && viewMap) {
@@ -3160,13 +3136,15 @@ export function WSCanvas(props: WSCanvasProps) {
 
             api.prepareCellDataset = () => { api.ds = prepareCellDataset(); }
 
-            api.setCellData = (cell, value) => setCellData(api.ds, cell, value);
+            api.setCellData = (cell, value) => rowSetCellData(api.ds[cell.row], cell.col, value);
 
             api.commitCellDataset = () => commitCellDataset(api.ds);
 
             api.getCellData = (cell) => _getCellData(cell);
 
-            api.filterAndSort = () => filterAndSort(api.states.state, api.states.vm);
+            api.filter = () => filterData(api.states.state, api.states.vm);
+
+            api.sort = () => sortData(api.states.state);
 
             api.selectFocusedCell = () => {
                 selectFocusedCell(api.states.state, api.states.vm);
@@ -3263,7 +3241,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             onApi(api);
         }
-    }, [dataSource, stateNfo, viewMap, overridenRowHeight]);
+    }, [rows, stateNfo, viewMap, overridenRowHeight]);
     //#endregion
 
     const baseDivContainerStyle = {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
     WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasApi, useWindowSize,
-    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord, WSCanvasSelection, WSCanvasSelectionRange
+    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord, WSCanvasSelection, WSCanvasSelectionRange, setFieldData
 } from "./lib";
 import * as _ from 'lodash';
 
@@ -131,7 +131,7 @@ export function Sample4() {
                 idxsToRemove.push(rowIdx);
             });
 
-            idxsToRemove.sort((a, b) => b - a);            
+            idxsToRemove.sort((a, b) => b - a);
 
             api.prepareCellDataset();
             const newset = api.ds as MyData[];
@@ -139,8 +139,8 @@ export function Sample4() {
             const arr = newset;
             for (let i = 0; i < idxsToRemove.length; ++i) {
                 arr.splice(idxsToRemove[i], 1);
-            }            
-            api.commitCellDataset();                
+            }
+            api.commitCellDataset();
 
             api.commit();
         }
@@ -171,7 +171,9 @@ export function Sample4() {
                 (api.ds[focusedCell.row] as MyData).idx = qup;
                 api.commitCellDataset();
 
-                api.filterAndSort();
+                api.filter();
+                api.sort();
+                api.focusCell(api.viewCellToReal(viewCellUpper));
                 api.selectFocusedCell();
 
                 api.commit();;
@@ -226,16 +228,14 @@ export function Sample4() {
         <WSCanvas
             columns={columns}
             rowsCount={ds.current.length}
-            dataSource={ds}
-            getCellData={(cell) => {
-                const row = (ds.current as any[])[cell.row];
-                if (row) return (row as any)[columns[cell.col].field];
+            rows={ds.current}
+            rowGetCellData={(row, colIdx) => {
+                if (row) return row[columns[colIdx].field];
                 return "";
             }}
             prepareCellDataset={() => ds.current.slice()}
-            setCellData={(q, cell, value) => {
-                const row = (q as any[])[cell.row];
-                if (row) { (row as any)[columns[cell.col].field] = value; }
+            rowSetCellData={(row,colIdx,value) => {                
+                if (row) setFieldData(row, columns[colIdx].field, value);
             }}
             commitCellDataset={(q) => { setDs(new IUpdateEntityNfo<MyData[]>(q, ds.original)); }}
             showFilter={true}
@@ -244,7 +244,7 @@ export function Sample4() {
             fullwidth
             height={Math.max(300, winSize.height * .4)}
             showColNumber={true}
-            columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
+            columnClickBehavior={WSCanvasColumnClickBehavior.None}
 
             debug={true}
             onApi={(api) => setApi(api)}

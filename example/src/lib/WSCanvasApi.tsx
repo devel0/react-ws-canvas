@@ -27,8 +27,11 @@ export class WSCanvasApi {
     /** retrieve data of given real cell */
     getCellData: (cell: WSCanvasCellCoord) => any;
 
-    /** force filter and sort */
-    filterAndSort: () => void;
+    /** force filter */
+    filter: () => void;
+
+    /** force sort */
+    sort: () => void;
 
     /** set selection to focused cell */
     selectFocusedCell: () => void;
@@ -139,7 +142,8 @@ export class WSCanvasApi {
         this.getCellData = () => null;
 
         this.clearSelection = () => { };
-        this.filterAndSort = () => { };
+        this.filter = () => { };
+        this.sort = () => { };
         this.selectFocusedCell = () => { };
         this.getViewSelection = () => new WSCanvasSelection([]);
         this.getRealSelection = () => new WSCanvasSelection([]);

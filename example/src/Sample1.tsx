@@ -23,15 +23,16 @@ export function Sample1() {
   }, []);
 
   return <div>
-    <WSCanvas      
+    <WSCanvas
+
       fullwidth
       height={winSize.height * .8}
-      containerStyle={{ margin: "1em" }}      
-      dataSource={rows}
-      getCellData={(cell) => rows[cell.row][cell.col]}
+      containerStyle={{ margin: "1em" }}
+      rows={rows}
+      rowGetCellData={(row, colIdx) => row[colIdx]}      
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
-      setCellData={(q, cell, value) => q[cell.row][cell.col] = value}
+      rowSetCellData={(row, colIdx, value) => row[colIdx] = value}
       colWidth={(ci) => {
         let w = 50;
         for (let i = 0; i < ci; ++i) {

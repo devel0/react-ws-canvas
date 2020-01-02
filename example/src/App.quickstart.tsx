@@ -27,11 +27,11 @@ const AppQuickStart: React.FC = () => {
     rowsCount={rows.length} colsCount={COLS}
     showColNumber={true} showRowNumber={true}
     columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
-    dataSource={rows}
-    getCellData={(cell) => rows[cell.row][cell.col]}
+    rows={rows}
+    rowGetCellData={(row, colIdx) => row[colIdx]}    
     prepareCellDataset={() => rows.slice()}
     commitCellDataset={(q) => setRows(q)}
-    setCellData={(q, cell, value) => q[cell.row][cell.col] = value}
+    rowSetCellData={(row, colIdx, value) => row[colIdx] = value}
   />;
 }
 

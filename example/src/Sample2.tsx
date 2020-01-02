@@ -1,4 +1,4 @@
-import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, useWindowSize } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, useWindowSize, setFieldData } from "./lib";
 
 import React, { useState, useEffect } from "react";
 import * as _ from 'lodash';
@@ -86,12 +86,13 @@ export function Sample2() {
   return <WSCanvas
     columns={columns}
     rowsCount={rows.length}
-    dataSource={rows}
-    getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
+    rows={rows}
+    rowGetCellData={(row, colIdx) => row[columns[colIdx].field]}
+    // getCellData={(cell) => (rows[cell.row] as any)[columns[cell.col].field]}
     prepareCellDataset={() => rows.slice()}
     commitCellDataset={(q) => setRows(q)}
-    setCellData={(q, cell, value) => (q[cell.row] as any)[columns[cell.col].field] = value}    
-
+    rowSetCellData={(row, colIdx, value) => setFieldData(row, columns[colIdx].field, value)}
+    
     fullwidth height={winSize.height * .8}
     containerStyle={{ margin: "2em" }}
     getCellBackgroundColor={(cell) => {

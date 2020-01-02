@@ -21,8 +21,8 @@ export interface WSCanvasProps {
     width: number;
     /** height of canvas [default: window.innerHeight] */
     height: number;
-    /** datasource to sync refresh [default: null] */
-    dataSource: any;
+    /** rows datasource (note: when sort changes array order will change accordingly) [default: []] */
+    rows: any[];
     /** nr of rows in the grid [default: 0] */
     rowsCount: number;
     /** nr of cols in the grid ( or use columns ) [default: 0] */
@@ -69,17 +69,17 @@ export interface WSCanvasProps {
     preventWheelOnBounds: boolean;
     /** if set new rows goes inserted at given view index [default: undefined] */
     newRowsInsertAtViewIndex?: number;
-
-    /** retrieve data from a cell ( or use columns ) [default: undefined] */
-    getCellData?: (coord: WSCanvasCellCoord) => any;
+    
+    /** retrieve data from a row */
+    rowGetCellData?: (row: any, colIdx: number) => any;
     /** allow to transform data before being displayed (useful for enum types); if defined must return input data as is or transformed ( or use columns ) [default: undefined] */
     renderTransform?: (cell: WSCanvasCellCoord, data: any) => any;
-    /** retrieve cells dataset copy [default: null] */
-    prepareCellDataset: () => any;
-    /** apply change to dataset [default: {}] */
-    setCellData: (dataset: any, cell: WSCanvasCellCoord, value: any) => void;
+    /** retrieve rows dataset copy [default: []] */
+    prepareCellDataset: () => any[];
+    /** set row cell data [default: {}] */
+    rowSetCellData: (row: any, colIdx: number, value: any) => void;    
     /** set cell dataset state [default: {}] */
-    commitCellDataset: (dataset: any) => void;
+    commitCellDataset: (dataset: any[]) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor [default: undefined] */
     getCellCustomEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined;

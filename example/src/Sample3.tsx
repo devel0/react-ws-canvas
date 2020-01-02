@@ -223,17 +223,15 @@ export function Sample3() {
     <WSCanvas
       columns={columns}
       rowsCount={rows.length}
-      dataSource={rows}
-      getCellData={(cell) => {
-        const fieldname = columns[cell.col].field;
-        const row = rows[cell.row];
-        if (row) return getFieldData(row, fieldname);
-      }}
+      rows={rows}
+      rowGetCellData={(row, colIdx) => {
+        const fieldname = columns[colIdx].field;
+        return getFieldData(row, fieldname);
+      }}      
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
-      setCellData={(q, cell, value) => {
-        const fieldname = columns[cell.col].field;
-        const row = rows[cell.row];
+      rowSetCellData={(row, colIdx, value) => {
+        const fieldname = columns[colIdx].field;
         if (row) setFieldData(row, fieldname, value);
       }}
 
