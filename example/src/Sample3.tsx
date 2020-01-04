@@ -55,7 +55,7 @@ export function Sample3() {
         return -1;
       },
       textAlign: () => "center",
-      sortDirection: WSCanvasSortDirection.Descending,
+      sortDirection: WSCanvasSortDirection.Ascending,
       sortOrder: 1,
       renderTransform: (cell, data) => "( " + data + " )",
       readonly: true,
@@ -65,7 +65,7 @@ export function Sample3() {
       header: "col2",
       field: "col2",
       lessThan: (a, b) => (a as number) < (b as number),
-      sortDirection: WSCanvasSortDirection.Ascending,
+      sortDirection: WSCanvasSortDirection.Descending,
       sortOrder: 0,
     },
     {
