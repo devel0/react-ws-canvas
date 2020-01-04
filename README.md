@@ -69,7 +69,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - column width [autoexpand][16]
 
-- column custom [initial sort][18]
+- column custom [initial sort][18] ( *note*: prepareCellDataset, rowSetCellData, commitCellDataset must defined to make sort working )
 
 ![](doc/initial-sort.png)
 
