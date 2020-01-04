@@ -37,6 +37,7 @@ export function Sample3() {
   const tooltipDivRef = useRef<HTMLDivElement>(null);
   const [tooltipTest, setTooltipTest] = useState(false);
   const winSize = useWindowSize();
+  const dbgDiv = useRef<HTMLDivElement>(null);
 
   const ROWS = 5000;
 
@@ -207,6 +208,7 @@ export function Sample3() {
 
     <span style={{ marginLeft: "1em" }}>
       gridStateNfo:{(gridStateNfo && gridStateNfo.state && gridStateNfo.state.focusedCell) ? gridStateNfo.state.focusedCell.toString() : ""}
+      <div ref={dbgDiv}></div>
     </span>
 
     {tooltipTest ?
@@ -220,14 +222,14 @@ export function Sample3() {
         </div>
       </div> : null}
 
-    <WSCanvas
+    <WSCanvas  
       columns={columns}
       rowsCount={rows.length}
       rows={rows}
       rowGetCellData={(row, colIdx) => {
         const fieldname = columns[colIdx].field;
         return getFieldData(row, fieldname);
-      }}      
+      }}
       prepareCellDataset={() => rows.slice()}
       commitCellDataset={(q) => setRows(q)}
       rowSetCellData={(row, colIdx, value) => {
