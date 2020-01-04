@@ -523,7 +523,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const sortData = (state: WSCanvasState) => {
-        if (debug) console.log("*** SORT DATA");
+        if (debug) console.log("*** SORT DATA " + _.orderBy(state.columnsSort, x => x.sortOrder).map(x => "cidx:" + x.columnIndex + " dir:" + x.sortDirection + " ord:" + x.sortOrder).join(" - "));
         //if (columns) {
         const newDataset = prepareCellDataset();
 
@@ -535,11 +535,21 @@ export function WSCanvas(props: WSCanvasProps) {
             //const field = columns[colIdx].field;
             const lto = _lessThanOp(columnSort.columnIndex);
 
+            if (debug) console.log(" sorting by col:" + colIdx + " dir:" + columnSort.sortOrder);
+
             newDataset.sort((a: any, b: any) => {
-                const valA = _rowGetCellData(a, colIdx);// getFieldData(a, field);
-                const valB = _rowGetCellData(b, colIdx);// getFieldData(b, field);
+                const valA = _rowGetCellData(a, colIdx);
+                const valB = _rowGetCellData(b, colIdx);
+                let a_lessThan_b = lto(valA, valB);
+                let b_lessThan_a = lto(valB, valA);
                 let ascRes = -1;
-                ascRes = lto(valA, valB) ? -1 : 1;
+                if (a_lessThan_b) {
+                    if (b_lessThan_a) ascRes = 0;
+                    else ascRes = -1;
+                } else {
+                    if (!b_lessThan_a) ascRes = 0;
+                    else ascRes = 1;
+                }
 
                 if (columnSort.sortDirection === WSCanvasSortDirection.Descending)
                     return -ascRes;
@@ -1779,7 +1789,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                         if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                                     }
                                     if (filterAutoSelectAll)
-                                        e.target.setSelectionRange(0, e.target.value.length);                                    
+                                        e.target.setSelectionRange(0, e.target.value.length);
                                 }}
                                 onBlur={(e) => { // workaround                                    
                                     if (!canceling && e.target) e.target.focus();
@@ -2414,7 +2424,6 @@ export function WSCanvas(props: WSCanvasProps) {
                                         case WSCanvasColumnClickBehavior.ToggleSort:
                                             {
                                                 if (!shift_key) {
-                                                    //TODO: check single sort canceling multisort                                                    
                                                     state.columnsSort = state.columnsSort.filter((x) => x.columnIndex === cellCoord!.col);
                                                 }
 
@@ -3265,6 +3274,7 @@ export function WSCanvas(props: WSCanvasProps) {
             <b>paint cnt</b> => {stateNfo.paintcnt} ; <b>W:</b> => {cs.width.toFixed(0)} x <b>H:</b> => {cs.height.toFixed(0)}<br />
             <b>state size</b> => <span style={{ color: stateNfoSize > 2000 ? "red" : "" }}>{stateNfoSize}</span><br />
             <b>rows cnt</b> => {rowsCount} ; filtered:{stateNfo.filteredSortedRowsCount} ; focused:{stateNfo.focusedCell.toString()} ; scroll:{stateNfo.viewScrollOffset.toString()} ; isOverCell:{String(stateNfo.cursorOverCell)}<br />
+            <b>col sort</b> => {_.orderBy(stateNfo.columnsSort, x => x.sortOrder).map(x => "cidx:" + x.columnIndex + " dir:" + x.sortDirection + " ord:" + x.sortOrder).join(" - ")}<br />
             <b>custom edit val</b> => {stateNfo.customEditValue}<br />
         </div> : null;
     }
