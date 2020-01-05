@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
     WSCanvas, WSCanvasColumn, WSCanvasSortDirection, WSCanvasApi, useWindowSize,
-    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord, WSCanvasSelection, WSCanvasSelectionRange, setFieldData
+    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord, WSCanvasSelection, WSCanvasSelectionRange, setFieldData, getFieldData
 } from "./lib";
 import * as _ from 'lodash';
 
@@ -230,8 +230,8 @@ export function Sample4() {
             rowsCount={ds.current.length}
             rows={ds.current}
             rowGetCellData={(row, colIdx) => {
-                if (row) return row[columns[colIdx].field];
-                return "";
+                if (row) return getFieldData(row, columns[colIdx].field);
+                return "";                
             }}
             prepareCellDataset={() => ds.current.slice()}
             rowSetCellData={(row,colIdx,value) => {                
