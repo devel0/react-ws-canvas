@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useLayoutEffect, CSSProperties, useCallback } from "react";
+import React, { useRef, useEffect, useState, useLayoutEffect, CSSProperties } from "react";
 import useDebounce, { useElementSize, toColumnName, useWindowSize, useDivMarginPadding, GraphicsSize, getFieldData } from "./Utils";
 import { WSCanvasProps } from "./WSCanvasProps";
 import { WSCanvasEditMode } from "./WSCanvasEditMode";
@@ -10,7 +10,7 @@ import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 import { WSCanvasSelectionRange } from "./WSCanvasSelectionRange";
 import { WSCanvasRect, WSCanvasRectMode } from "./WSCanvasRect";
 import { WSCanvasCoord } from "./WSCanvasCoord";
-import { WSCanvasColumnClickBehavior, WSCanvasSortingRowInfo, WSCanvasColumnType } from "./WSCanvasColumn";
+import { WSCanvasColumnClickBehavior, WSCanvasColumnType } from "./WSCanvasColumn";
 import { WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasColumnToSortInfo } from "./WSCanvasSortDirection";
 
 import moment from "moment";
@@ -69,6 +69,7 @@ export function WSCanvas(props: WSCanvasProps) {
         renderTransform,
         prepareCellDataset,
         cellDatasetGetRows,
+        //cellDatasetSetRows,
         rowSetCellData,
         commitCellDataset,
         getCellCustomEdit,
@@ -525,20 +526,21 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const sortData = (state: WSCanvasState) => {
         if (debug) console.log("*** SORT DATA " + _.orderBy(state.columnsSort, x => x.sortOrder).map(x => "cidx:" + x.columnIndex + " dir:" + x.sortDirection + " ord:" + x.sortOrder).join(" - "));
-        //if (columns) {
-        const newDataset = prepareCellDataset();
+        
+        const ds = prepareCellDataset();
 
         const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");
 
         for (let si = 0; si < orderedColumnSort.length; ++si) {
             const columnSort = orderedColumnSort[si];
-            const colIdx = columnSort.columnIndex;
-            //const field = columns[colIdx].field;
+            const colIdx = columnSort.columnIndex;            
             const lto = _lessThanOp(columnSort.columnIndex);
 
             if (debug) console.log(" sorting by col:" + colIdx + " dir:" + columnSort.sortOrder);
+            
+            const dsRows = cellDatasetGetRows(ds);
 
-            cellDatasetGetRows(newDataset).sort((a: any, b: any) => {
+            dsRows.sort((a: any, b: any) => {
                 const valA = _rowGetCellData(a, colIdx);
                 const valB = _rowGetCellData(b, colIdx);
                 let a_lessThan_b = lto(valA, valB);
@@ -557,10 +559,11 @@ export function WSCanvas(props: WSCanvasProps) {
                 else
                     return ascRes;
             });
+
+            //cellDatasetSetRows(newDataset, dsRows);
         }
 
-        commitCellDataset(newDataset);
-        //}
+        commitCellDataset(ds);        
     }
 
     const filterData = (state: WSCanvasState, vm: ViewMap | null) => {
@@ -1138,7 +1141,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const singleSetCellData = (state: WSCanvasState, cell: WSCanvasCellCoord, value: any, pasteMode: boolean = false) => {
-        const q = prepareCellDataset();
+        const ds = prepareCellDataset();
         const cellType = _getCellType(cell, value);
         let cellval = value;
         if (!pasteMode && state.editMode !== WSCanvasEditMode.direct) {
@@ -1156,8 +1159,10 @@ export function WSCanvas(props: WSCanvasProps) {
                     break;
             }
         }
-        rowSetCellData(cellDatasetGetRows(q)[cell.row], cell.col, cellval);
-        commitCellDataset(q);
+        const dsRows = cellDatasetGetRows(ds);
+        rowSetCellData(dsRows[cell.row], cell.col, cellval);
+        //cellDatasetSetRows(ds, dsRows);
+        commitCellDataset(ds);
     }
 
     const openCellCustomEdit = (state: WSCanvasState, cell: WSCanvasCellCoord, orh: number[] | null) => {
