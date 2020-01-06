@@ -4,7 +4,7 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.10.2](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/197d1feb56fcd88523aae0a8bad15862bae40cb3/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.11.2](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/197d1feb56fcd88523aae0a8bad15862bae40cb3/example) )
 
 ---
 
@@ -75,6 +75,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - data getter/setter can follow a [worksheet][7] or a [db record type][8] ( [example of nested field][28] using [getFieldData][29] and [setFieldData][30] methods)
 
+- optional dataset on external object with [ds rows getter mapper][32] useful in some circumstance when need to preserve rows array object ref
+
 - [api][10] and [handlers][27] available for control interactions ( [example][11] ) ; props can be accessed [inversely]([31]) through api
 
 ![](doc/api.gif)
@@ -130,6 +132,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [29]: https://github.com/devel0/react-ws-canvas/blob/cbd9d6d75100a45cb7d0ee073c6d5ab03f3a354e/example/src/Sample3.tsx#L229
 [30]: https://github.com/devel0/react-ws-canvas/blob/cbd9d6d75100a45cb7d0ee073c6d5ab03f3a354e/example/src/Sample3.tsx#L235
 [31]: https://github.com/devel0/react-ws-canvas/blob/e893299287fd041f84e900262d5915bf8670fc6b/example/src/Sample4.tsx#L201
+[32]: https://github.com/devel0/react-ws-canvas/blob/1606876a64be83e6c1c9e78cfdeeea5f243f52f5/example/src/lib/WSCanvasProps.tsx#L79-L80
 
 ## todo
 
