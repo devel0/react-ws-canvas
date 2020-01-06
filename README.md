@@ -77,7 +77,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - optional dataset on external object with [ds rows getter mapper][32] useful in some circumstance when need to preserve rows array object ref
 
-- [api][10] and [handlers][27] available for control interactions ( [example][11] ) ; props can be accessed [inversely]([31]) through api
+- [api][10] and [handlers][27] available for control interactions ( [example][11] ) ; props can be accessed [inversely][31] through api
 
 ![](doc/api.gif)
 
