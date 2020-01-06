@@ -68,6 +68,7 @@ export function WSCanvas(props: WSCanvasProps) {
         rowGetCellData,
         renderTransform,
         prepareCellDataset,
+        cellDatasetGetRows,
         rowSetCellData,
         commitCellDataset,
         getCellCustomEdit,
@@ -537,7 +538,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             if (debug) console.log(" sorting by col:" + colIdx + " dir:" + columnSort.sortOrder);
 
-            newDataset.sort((a: any, b: any) => {
+            cellDatasetGetRows(newDataset).sort((a: any, b: any) => {
                 const valA = _rowGetCellData(a, colIdx);
                 const valB = _rowGetCellData(b, colIdx);
                 let a_lessThan_b = lto(valA, valB);
@@ -1155,7 +1156,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     break;
             }
         }
-        rowSetCellData(q[cell.row], cell.col, cellval);
+        rowSetCellData(cellDatasetGetRows(q)[cell.row], cell.col, cellval);
         commitCellDataset(q);
     }
 
@@ -2267,7 +2268,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                             const viewCell = viewCellIt.value;
                                             const cell = viewCellToReal(viewMap, viewCell);
                                             if (!_isCellReadonly(cell)) {
-                                                rowSetCellData(ds[cell.row], cell.col, "");
+                                                rowSetCellData(cellDatasetGetRows(ds)[cell.row], cell.col, "");
                                             }
                                             viewCellIt = viewCellRng.next();
                                         }

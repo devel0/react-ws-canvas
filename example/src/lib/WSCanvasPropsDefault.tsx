@@ -44,6 +44,7 @@ export const WSCanvasPropsDefault = () => {
         rowGetCellData: undefined,
         renderTransform: undefined,
         prepareCellDataset: () => [],
+        cellDatasetGetRows: (ds) => ds as any[],
         rowSetCellData: (row:any, colIdx:number, value: any) => {},
         commitCellDataset: (dataset: any) => {},        
         getCellCustomEdit: undefined,

@@ -75,11 +75,13 @@ export interface WSCanvasProps {
     /** allow to transform data before being displayed (useful for enum types); if defined must return input data as is or transformed ( or use columns ) [default: undefined] */
     renderTransform?: (cell: WSCanvasCellCoord, data: any) => any;
     /** retrieve rows dataset copy [default: []] */
-    prepareCellDataset: () => any[];
+    prepareCellDataset: () => any;
+    /** retrieve rows from dataset [default: (ds) => ds as any[]] */
+    cellDatasetGetRows: (ds:any) => any[];
     /** set row cell data [default: {}] */
     rowSetCellData: (row: any, colIdx: number, value: any) => void;    
     /** set cell dataset state [default: {}] */
-    commitCellDataset: (dataset: any[]) => void;
+    commitCellDataset: (dataset: any) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor [default: undefined] */
     getCellCustomEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined;

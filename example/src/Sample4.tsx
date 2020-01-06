@@ -246,7 +246,7 @@ export function Sample4() {
             showColNumber={true}
             columnClickBehavior={WSCanvasColumnClickBehavior.None}
 
-            debug={true}
+            debug={false}
             onApi={(api) => setApi(api)}
             onStateChanged={(states) => setGridState(states)}
         />
