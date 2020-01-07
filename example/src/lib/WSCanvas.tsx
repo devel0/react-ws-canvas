@@ -1147,15 +1147,15 @@ export function WSCanvas(props: WSCanvasProps) {
         if (!pasteMode && state.editMode !== WSCanvasEditMode.direct) {
             switch (cellType) {
                 case "date":
-                    cellval = moment(cellval, dateCellMomentFormat);
+                    cellval = moment(cellval, dateCellMomentFormat).format();
                     break;
 
                 case "time":
-                    cellval = moment(cellval, timeCellMomentFormat);
+                    cellval = moment(cellval, timeCellMomentFormat).format();
                     break;
 
                 case "datetime":
-                    cellval = moment(cellval, dateTimeCellMomentFormat);
+                    cellval = moment(cellval, dateTimeCellMomentFormat).format();
                     break;
             }
         }
@@ -1331,13 +1331,13 @@ export function WSCanvas(props: WSCanvasProps) {
 
         switch (cellType) {
             case "date":
-                singleSetCellData(state, state.focusedCell, moment(cellData, dateCellMomentFormat));
+                singleSetCellData(state, state.focusedCell, moment(cellData, dateCellMomentFormat).format());
                 break;
             case "time":
-                singleSetCellData(state, state.focusedCell, moment(cellData, timeCellMomentFormat));
+                singleSetCellData(state, state.focusedCell, moment(cellData, timeCellMomentFormat).format());
                 break;
             case "datetime":
-                singleSetCellData(state, state.focusedCell, moment(cellData, timeCellMomentFormat));
+                singleSetCellData(state, state.focusedCell, moment(cellData, timeCellMomentFormat).format());
                 break;
         }
     }
