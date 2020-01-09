@@ -526,18 +526,18 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const sortData = (state: WSCanvasState) => {
         if (debug) console.log("*** SORT DATA " + _.orderBy(state.columnsSort, x => x.sortOrder).map(x => "cidx:" + x.columnIndex + " dir:" + x.sortDirection + " ord:" + x.sortOrder).join(" - "));
-        
+
         const ds = prepareCellDataset();
 
         const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");
 
         for (let si = 0; si < orderedColumnSort.length; ++si) {
             const columnSort = orderedColumnSort[si];
-            const colIdx = columnSort.columnIndex;            
+            const colIdx = columnSort.columnIndex;
             const lto = _lessThanOp(columnSort.columnIndex);
 
             if (debug) console.log(" sorting by col:" + colIdx + " dir:" + columnSort.sortOrder);
-            
+
             const dsRows = cellDatasetGetRows(ds);
 
             dsRows.sort((a: any, b: any) => {
@@ -563,7 +563,7 @@ export function WSCanvas(props: WSCanvasProps) {
             //cellDatasetSetRows(newDataset, dsRows);
         }
 
-        commitCellDataset(ds);        
+        commitCellDataset(ds);
     }
 
     const filterData = (state: WSCanvasState, vm: ViewMap | null) => {
@@ -2194,7 +2194,13 @@ export function WSCanvas(props: WSCanvasProps) {
                     case "C":
                         if (ctrl_key) {
                             keyHandled = true;
-                            navigator.clipboard.writeText(_getCellData(state.focusedCell));
+                            if (navigator.clipboard) {
+                                try {
+                                    await navigator.clipboard.writeText(_getCellData(state.focusedCell));
+                                } catch (err) {
+                                    console.error(err);
+                                }
+                            }
                         }
                         break;
 
@@ -2203,21 +2209,27 @@ export function WSCanvas(props: WSCanvasProps) {
                         if (ctrl_key) {
                             keyHandled = true;
                             e.persist();
-                            const text = await navigator.clipboard.readText();
-                            const rngView = state.viewSelection;
-                            let rngViewCells = rngView.cells();
-                            let viewCellIt = rngViewCells.next();
-                            while (!viewCellIt.done) {
-                                const cell = viewCellToReal(viewMap, viewCellIt.value);
-                                if (!_isCellReadonly(cell)) {
-                                    if (_getCellType(cell, _getCellData(cell)) === "boolean") {
-                                        singleSetCellData(state, cell, text === "true", true);
+                            if (navigator.clipboard) {
+                                try {
+                                    const text = await navigator.clipboard.readText();
+                                    const rngView = state.viewSelection;
+                                    let rngViewCells = rngView.cells();
+                                    let viewCellIt = rngViewCells.next();
+                                    while (!viewCellIt.done) {
+                                        const cell = viewCellToReal(viewMap, viewCellIt.value);
+                                        if (!_isCellReadonly(cell)) {
+                                            if (_getCellType(cell, _getCellData(cell)) === "boolean") {
+                                                singleSetCellData(state, cell, text === "true", true);
+                                            }
+                                            else {
+                                                singleSetCellData(state, cell, text, true);
+                                            }
+                                        }
+                                        viewCellIt = rngViewCells.next();
                                     }
-                                    else {
-                                        singleSetCellData(state, cell, text, true);
-                                    }
+                                } catch (err) {
+                                    console.error(err);
                                 }
-                                viewCellIt = rngViewCells.next();
                             }
                         }
                         break;
