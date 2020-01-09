@@ -4,7 +4,7 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.11.3](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/1c12310c519f3e6e08e8b95c61fb123a20d0ced7/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.11.4](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example) )
 
 ---
 
@@ -93,6 +93,10 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - each individual [cell type][14] can be customized ( [column helper][114] )
 
+- clipboard copy to/from spreadsheet with ctrl-c and ctrl-v or [api][34] ( [example api][33] )
+
+![](doc/clipboard.png)
+
 - support mobile touch scrolling rows, cols and scrollbars
 
 [1]: https://github.com/devel0/react-ws-canvas/blob/513632060951df8a20b83dee39667529cc0ac883/example/src/lib/WSCanvasColumn.tsx#L7
@@ -133,6 +137,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [30]: https://github.com/devel0/react-ws-canvas/blob/cbd9d6d75100a45cb7d0ee073c6d5ab03f3a354e/example/src/Sample3.tsx#L235
 [31]: https://github.com/devel0/react-ws-canvas/blob/e893299287fd041f84e900262d5915bf8670fc6b/example/src/Sample4.tsx#L201
 [32]: https://github.com/devel0/react-ws-canvas/blob/1606876a64be83e6c1c9e78cfdeeea5f243f52f5/example/src/lib/WSCanvasProps.tsx#L79-L80
+[33]: https://github.com/devel0/react-ws-canvas/blob/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example/src/Sample3.tsx#L211
+[34]: https://github.com/devel0/react-ws-canvas/blob/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example/src/lib/WSCanvasApi.tsx#L108-L115
 
 ## todo
 
