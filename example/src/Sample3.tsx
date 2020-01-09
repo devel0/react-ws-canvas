@@ -203,8 +203,13 @@ export function Sample3() {
     }}>CHANGE ROW</button>
 
     <button onClick={() => { setTooltipTest(!tooltipTest) }}>
-      TOGGLE TOOLTIP TEST API
+      TOGGLE TOOLTIP
     </button>
+
+    <button onClick={() => {
+      if (api)
+        api.copyWorksheetToClipboard();
+    }}>COPY ENTIRE TO CLIP</button>
 
     <span style={{ marginLeft: "1em" }}>
       gridStateNfo:{(gridStateNfo && gridStateNfo.state && gridStateNfo.state.focusedCell) ? gridStateNfo.state.focusedCell.toString() : ""}
@@ -222,7 +227,7 @@ export function Sample3() {
         </div>
       </div> : null}
 
-    <WSCanvas  
+    <WSCanvas
       columns={columns}
       rowsCount={rows.length}
       rows={rows}

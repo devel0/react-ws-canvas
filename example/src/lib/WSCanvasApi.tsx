@@ -105,6 +105,15 @@ export class WSCanvasApi {
     /** convert view cell to real cell */
     viewCellToReal: (realCell: WSCanvasCellCoord) => WSCanvasCellCoord;
 
+    /** copy current selection to clipboard suitable to paste in spreadsheet */
+    copySelectionToClipboard: (sel: WSCanvasSelection) => void;
+
+    /** copy entire worksheet to clipboard suitable to paste in spreadsheet */
+    copyWorksheetToClipboard: () => void;
+
+    /** states if current selection cover entire worksheet */
+    selectionIsFullWorksheet: () => boolean;
+
     /** format given Date object accordingly moment format for Date (see props) */
     formatCellDataAsDate: (cellData: any) => string;
 
@@ -151,6 +160,9 @@ export class WSCanvasApi {
         this.setRealSelection = () => { };
         this.realSelectionToView = () => new WSCanvasSelection([]);
         this.viewSelectionToReal = () => new WSCanvasSelection([]);
+        this.copySelectionToClipboard = () => { };
+        this.copyWorksheetToClipboard = () => { };
+        this.selectionIsFullWorksheet = () => false;        
 
         this.clientXYToCanvasCoord = () => null;
         this.cellToCanvasCoord = () => null;

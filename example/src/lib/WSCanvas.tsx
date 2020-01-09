@@ -1482,6 +1482,76 @@ export function WSCanvas(props: WSCanvasProps) {
         setSystemReset(1);
     };
 
+    const selectionIsFullWorksheet = (state: WSCanvasState, viewSel: WSCanvasSelection) => {
+        const bnds = viewSel.bounds;
+
+        if (bnds) {
+            return bnds.minRowIdx === 0 && bnds.minColIdx === 0 &&
+                bnds.maxRowIdx === (state.filteredSortedRowsCount - 1) && bnds.maxColIdx === (_colsCount - 1);
+        }
+        return false;
+    }
+
+    const getCellDataAsText = (cell: WSCanvasCellCoord) => {
+        const data = _getCellData(cell);
+        const type = _getCellType(cell, data);
+        let str = "";
+        switch (type) {
+            case "date": str = formatCellDataAsDate(data); break;
+            case "time": str = formatCellDataAsTime(data); break;
+            case "datetime": str = formatCellDataAsDateTime(data); break;
+            default:
+                str = _renderTransform(cell, data);
+                if (str === undefined) str = String(data);
+                break;
+        }
+
+        return str;
+    }
+
+    const getSelectionAsClipboardText = (state: WSCanvasState, viewSel: WSCanvasSelection) => {
+        const rngView = viewSel;
+        let rngViewCells = rngView.cells();
+        let viewCellIt = rngViewCells.next();
+        let viewRowIdx = -1;
+        let res: string[] = [];
+        let firstCol = false;
+        while (!viewCellIt.done) {
+            const cell = viewCellToReal(viewMap, viewCellIt.value);
+            const str = getCellDataAsText(cell);
+
+            if (cell.row !== viewRowIdx) {
+                if (viewRowIdx !== -1) res.push("\n");
+                viewRowIdx = cell.row;
+                firstCol = true;
+            }
+            if (!firstCol) res.push("\t" + str); else res.push(str);
+            firstCol = false;
+
+            viewCellIt = rngViewCells.next();
+        }
+
+        return res.join("");
+    }
+
+    const getWorksheetAsTextClipboard = (state: WSCanvasState) => {
+        let res: string[] = [];
+
+        for (let rowIdx = 0; rowIdx < state.filteredSortedRowsCount; ++rowIdx) {
+            for (let colIdx = 0; colIdx < _colsCount; ++colIdx) {
+                const cell = new WSCanvasCellCoord(rowIdx, colIdx);
+
+                const str = getCellDataAsText(cell);
+
+                if (colIdx !== 0) res.push("\t" + str); else res.push(str);
+
+                if (colIdx === _colsCount - 1) res.push("\n");
+            }
+        }
+
+        return res.join("");
+    }
+
     /**
      *=====================================================================================================
      * PAINT
@@ -2093,6 +2163,8 @@ export function WSCanvas(props: WSCanvasProps) {
                 realColToViewCol(viewMap, state.focusedCell.col),
                 state.focusedCell.filterRow);
 
+            let clipboardCopied = false;
+
             if (state.editMode !== WSCanvasEditMode.F2 && state.focusedFilterColIdx === -1) {
                 //const focusedViewCell = viewCellToReal
                 switch (e.key) {
@@ -2192,15 +2264,30 @@ export function WSCanvas(props: WSCanvasProps) {
 
                     case "c":
                     case "C":
+                        //
+                        // https://www.w3.org/TR/clipboard-apis/#dom-clipboard-write
+                        //
                         if (ctrl_key) {
                             keyHandled = true;
+
                             if (navigator.clipboard) {
                                 try {
-                                    await navigator.clipboard.writeText(_getCellData(state.focusedCell));
+                                    let res = "";
+
+                                    if (selectionIsFullWorksheet(state, state.viewSelection))
+                                        res = getWorksheetAsTextClipboard(state); // optimized, skip iter selection
+                                    else
+                                        res = getSelectionAsClipboardText(state, state.viewSelection);
+
+                                    navigator.clipboard.writeText(res)
+                                        .then(() => {
+                                            //console.log("data copied");
+                                        })
                                 } catch (err) {
                                     console.error(err);
                                 }
                             }
+                            clipboardCopied = true;
                         }
                         break;
 
@@ -2211,21 +2298,43 @@ export function WSCanvas(props: WSCanvasProps) {
                             e.persist();
                             if (navigator.clipboard) {
                                 try {
+                                    // const q = await (navigator.clipboard as any).read();
+                                    // console.log(q);
+                                    // const q2 = await q[0].getType("text/plain");
+                                    // const text = await (new Response(q2)).text();
+                                    // console.log("text:" + text);
+
                                     const text = await navigator.clipboard.readText();
+
+                                    const textRows = text.split("\n");
+
                                     const rngView = state.viewSelection;
-                                    let rngViewCells = rngView.cells();
-                                    let viewCellIt = rngViewCells.next();
-                                    while (!viewCellIt.done) {
-                                        const cell = viewCellToReal(viewMap, viewCellIt.value);
-                                        if (!_isCellReadonly(cell)) {
-                                            if (_getCellType(cell, _getCellData(cell)) === "boolean") {
-                                                singleSetCellData(state, cell, text === "true", true);
-                                            }
-                                            else {
-                                                singleSetCellData(state, cell, text, true);
+                                    let vcellbnds = rngView.bounds;
+
+                                    if (vcellbnds && textRows.length > 0) {
+
+                                        for (let vrowidx = vcellbnds.minRowIdx; vrowidx <= vcellbnds.maxRowIdx; ++vrowidx) {
+                                            let textRow = textRows[(vrowidx - vcellbnds.minRowIdx) % textRows.length];
+                                            let textCols = textRow.split('\t');
+
+                                            for (let vcolidx = vcellbnds.minColIdx; vcolidx <= vcellbnds.maxColIdx; ++vcolidx) {
+
+                                                const cell = viewCellToReal(viewMap, new WSCanvasCellCoord(vrowidx, vcolidx));
+
+                                                let str = "";
+                                                str = textCols[(vcolidx - vcellbnds.minColIdx) % textCols.length];
+
+                                                if (!_isCellReadonly(cell)) {
+                                                    if (_getCellType(cell, _getCellData(cell)) === "boolean") {
+                                                        singleSetCellData(state, cell, str === "true", true);
+                                                    }
+                                                    else {
+                                                        singleSetCellData(state, cell, str, true);
+                                                    }
+                                                }
+
                                             }
                                         }
-                                        viewCellIt = rngViewCells.next();
                                     }
                                 } catch (err) {
                                     console.error(err);
@@ -2248,13 +2357,15 @@ export function WSCanvas(props: WSCanvasProps) {
                         break;
                 }
 
-                if (shift_key &&
-                    (stateNfo.focusedCell.row !== state.focusedCell.row ||
-                        stateNfo.focusedCell.col !== state.focusedCell.col)) {
-                    setSelectionByEndingCell(state, realCellToView(viewMap, state.focusedCell), shift_key, !ctrl_key);
+                if (!clipboardCopied) {
+                    if (shift_key &&
+                        (stateNfo.focusedCell.row !== state.focusedCell.row ||
+                            stateNfo.focusedCell.col !== state.focusedCell.col)) {
+                        setSelectionByEndingCell(state, realCellToView(viewMap, state.focusedCell), shift_key, !ctrl_key);
+                    }
+                    else
+                        setSelectionByEndingCell(state, realCellToView(viewMap, state.focusedCell), false, true);
                 }
-                else
-                    setSelectionByEndingCell(state, realCellToView(viewMap, state.focusedCell), false, true);
 
                 let applyState = true;
 
@@ -3194,6 +3305,13 @@ export function WSCanvas(props: WSCanvasProps) {
             api.viewSelectionToReal = (selection) => viewSelectionToReal(api.states.vm, selection);
 
             api.realSelectionToView = (selection) => realSelectionToView(api.states.vm, selection);
+
+            api.copySelectionToClipboard = (selection) =>
+                navigator.clipboard.writeText(getSelectionAsClipboardText(api.states.state, selection));
+
+            api.copyWorksheetToClipboard = () => navigator.clipboard.writeText(getWorksheetAsTextClipboard(api.states.state));
+
+            api.selectionIsFullWorksheet = () => selectionIsFullWorksheet(api.states.state, api.states.state.viewSelection);
 
             api.openCustomEdit = (cell) => {
                 api.states.state.customEditCell = cell;
