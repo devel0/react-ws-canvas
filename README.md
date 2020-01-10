@@ -8,6 +8,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ---
 
+- [recent changes](#recent-changes)
 - [features](#features)
 - [todo](#todo)
 - [**quickstart**](#quickstart)
@@ -18,6 +19,11 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 - [development notes](#development-notes)
 
 ---
+
+## recent changes
+
+- v0.13.0
+  - added onCustomEdit handler
 
 ## features
 
