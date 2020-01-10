@@ -133,6 +133,7 @@ export function WSCanvas(props: WSCanvasProps) {
         onApi,
         onStateChanged,
         onMouseOverCell,
+        onCustomEdit,
         onPreviewKeyDown,
         onKeyDown,
         onPreviewMouseDown,
@@ -1992,6 +1993,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             ceditStyle, cellWidth, cellHeight);
                         if (qCust) {
                             defaultEdit = false;
+                            if (onCustomEdit) onCustomEdit(mkstates(state, vm, overridenRowHeight), state.customEditCell);
                             setChildren([<div
                                 key={"edit:" + state.customEditCell.toString()}
                                 style={ceditStyle}>
@@ -1999,7 +2001,8 @@ export function WSCanvas(props: WSCanvasProps) {
                             </div>]);
                         }
 
-                        if (defaultEdit)
+                        if (defaultEdit) {
+                            if (onCustomEdit) onCustomEdit(mkstates(state, vm, overridenRowHeight), state.customEditCell);
                             setChildren([
                                 <input
                                     autoFocus
@@ -2051,6 +2054,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                         if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                                     }} />
                             ]);
+                        }
                     }
                 }
                 //#endregion
@@ -2487,7 +2491,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const DOUBLE_CLICK_THRESHOLD = 300;
 
-    const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {        
         let cellCoord: WSCanvasCellCoord | null = null;
         const ccr = mouseCoordToCanvasCoord(e);
         if (ccr !== null) {

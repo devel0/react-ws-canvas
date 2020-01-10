@@ -197,6 +197,9 @@ export interface WSCanvasProps {
 
     onMouseOverCell?: (states: WSCanvasStates, nfo: WSCanvasXYCellCoord | null) => void;
 
+    /** fired when custom edit opens */
+    onCustomEdit?: (states: WSCanvasStates, cell: WSCanvasCellCoord) => void;
+
     onPreviewKeyDown?: (states: WSCanvasStates, e: React.KeyboardEvent) => void;
     onKeyDown?: (states: WSCanvasStates, e: React.KeyboardEvent) => void;
 
