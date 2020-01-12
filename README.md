@@ -4,7 +4,7 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.13.0](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/b3d04870e53255bbec3d7a2acb5b3bebed414712/example) )
+**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.14.0](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/ba1c4483045065f12fa3c59f1c910ad34fdeb213/example) )
 
 ---
 
@@ -22,6 +22,9 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.14.0
+  - added material-select multi example
+  - (**brk change**) added row data info to renderTransform and getCellCustomEdit
 - v0.13.0
   - added onCustomEdit handler
 
@@ -91,6 +94,10 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/custom-combobox.gif)
 
+- custom multi select with material-ui ( [example][35] )
+
+![](doc/material-select-multi.gif)
+
 - cell [background][19], [font and color][119] customization and [text align][25] also with [helper][125]
 
 ![](doc/cell-style-customization.png)
@@ -145,6 +152,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [32]: https://github.com/devel0/react-ws-canvas/blob/1606876a64be83e6c1c9e78cfdeeea5f243f52f5/example/src/lib/WSCanvasProps.tsx#L79-L80
 [33]: https://github.com/devel0/react-ws-canvas/blob/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example/src/Sample3.tsx#L211
 [34]: https://github.com/devel0/react-ws-canvas/blob/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example/src/lib/WSCanvasApi.tsx#L108-L115
+[35]: https://github.com/devel0/react-ws-canvas/blob/ba1c4483045065f12fa3c59f1c910ad34fdeb213/example/src/Sample5.tsx#L63-L116
 
 ## todo
 
