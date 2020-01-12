@@ -2153,7 +2153,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const ifBoolToggle = () => {
                 const cell = state.focusedCell;
                 const data = _getCellData(cell);
-                if (_getCellType(cell, data) === "boolean") {
+                if (_getCellType(cell, data) === "boolean" && !_isCellReadonly(cell)) {
                     keyHandled = true;
                     const boolVal = data as boolean;
                     singleSetCellData(state, cell, !boolVal);
@@ -2802,7 +2802,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (cell) {
             if (cell.row >= 0 && cell.col >= 0) {
                 const data = _getCellData(cell);
-                if (_getCellType(cell, data) === "boolean") {
+                if (_getCellType(cell, data) === "boolean" && !_isCellReadonly(cell)) {
                     const boolVal = data as boolean;
                     singleSetCellData(state, cell, !boolVal);
                     paint(state, viewMap, overridenRowHeight);
