@@ -10,7 +10,7 @@ import { WSCanvasCellCoord } from "./WSCanvasCellCoord";
 import { WSCanvasSelectionRange } from "./WSCanvasSelectionRange";
 import { WSCanvasRect, WSCanvasRectMode } from "./WSCanvasRect";
 import { WSCanvasCoord } from "./WSCanvasCoord";
-import { WSCanvasColumnClickBehavior, WSCanvasColumnType } from "./WSCanvasColumn";
+import { WSCanvasColumnClickBehavior, WSCanvasColumnType, WSCanvasColumn, WSCanvasColumnWithIdx } from "./WSCanvasColumn";
 import { WSCanvasSortDirection, WSCanvasColumnSortInfo, WSCanvasColumnToSortInfo } from "./WSCanvasSortDirection";
 
 import moment from "moment";
@@ -572,29 +572,52 @@ export function WSCanvas(props: WSCanvasProps) {
 
         const filteredToReal: number[] = [];
         if (rowsCount > 0) {
-            if (stateNfo.filters) {
+            let colFiltering: WSCanvasColumnWithIdx[] = [];
+            if (columns) {
+                colFiltering = columns.filter(x => x.dsFilter).map((c, idx) => {
+                    return {
+                        colNfo: c,
+                        colIdx: idx
+                    } as WSCanvasColumnWithIdx;
+                });
+            }
+
+            if (stateNfo.filters || colFiltering.length > 0) {
                 for (let ri = 0; ri < rowsCount; ++ri) {
                     if (appendingRows && ri >= state.rowsCountBackup) break;
 
                     let matching = true;
-                    for (let fi = 0; fi < stateNfo.filters.length; ++fi) {
-                        const { colIdx, filter } = stateNfo.filters[fi];
-                        let data: any = undefined;
-                        const cell = new WSCanvasCellCoord(ri, colIdx);
-                        const cellData = _getCellData(cell);
-                        if (_renderTransform(rows[ri], cell, cellData) && (filterUseDatasource === undefined || !filterUseDatasource(cell)))
-                            data = _renderTransform(rows[ri], cell, cellData);
-                        else
-                            data = cellData;
 
-                        const F = filterIgnoreCase ? String(filter).toLowerCase() : String(filter);
-                        const S = filterIgnoreCase ? String(data).toLowerCase() : String(data);
+                    if (stateNfo.filters) {
+                        for (let fi = 0; fi < stateNfo.filters.length; ++fi) {
+                            const { colIdx, filter } = stateNfo.filters[fi];
+                            let data: any = undefined;
+                            const cell = new WSCanvasCellCoord(ri, colIdx);
+                            const cellData = _getCellData(cell);
+                            if (_renderTransform(rows[ri], cell, cellData) && (filterUseDatasource === undefined || !filterUseDatasource(cell)))
+                                data = _renderTransform(rows[ri], cell, cellData);
+                            else
+                                data = cellData;
 
-                        if (S.indexOf(F) === -1) {
-                            matching = false;
-                            break;
+                            const F = filterIgnoreCase ? String(filter).toLowerCase() : String(filter);
+                            const S = filterIgnoreCase ? String(data).toLowerCase() : String(data);
+
+                            if (S.indexOf(F) === -1) {
+                                matching = false;
+                                break;
+                            }
                         }
                     }
+
+                    if (matching && colFiltering.length > 0) {
+                        colFiltering.forEach(colFilter => {
+                            const cell = new WSCanvasCellCoord(ri, colFilter.colIdx);
+                            const cellData = _getCellData(cell);
+                            if (!colFilter.colNfo.dsFilter!(rows[ri], cell, cellData))
+                                matching = false;
+                        });
+                    }
+
                     if (matching) {
                         filteredToReal.push(ri);
                     }

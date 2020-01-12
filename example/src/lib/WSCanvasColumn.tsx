@@ -17,6 +17,11 @@ export interface WSCanvasSortingRowInfo {
     cellData: any;
 }
 
+export interface WSCanvasColumnWithIdx {
+    colNfo: WSCanvasColumn;
+    colIdx: number;
+}
+
 /** helper to store column info ; see hints for WSCanvas prop transferring */
 export interface WSCanvasColumn {
     /** hint: getCellType={(cell, data) => columns[cell.col].type} */
@@ -54,6 +59,9 @@ export interface WSCanvasColumn {
 
     /** if true datasource will be used instead of renderTransform if present */
     filterUseDataSource?: boolean;
+
+    /** custom dataset filter (doesn't consider renderTransform even if filterUseDataSource is set) */
+    dsFilter?: (row: any, cell: WSCanvasCellCoord, value: any) => boolean;
 
     readonly?: boolean | undefined;
 
