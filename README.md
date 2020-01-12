@@ -22,11 +22,11 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.15.0
+  - dsFilter
 - v0.14.0
   - added material-select multi example
   - (**brk change**) added row data info to renderTransform and getCellCustomEdit
-- v0.13.0
-  - added onCustomEdit handler
 
 ## features
 
