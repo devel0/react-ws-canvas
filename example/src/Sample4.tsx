@@ -43,7 +43,7 @@ export function Sample4() {
                 field: "ridx",
                 width: 100,
                 textAlign: () => "center",
-                renderTransform: (cell, value) => cell.row
+                renderTransform: (row, cell, value) => cell.row
             },
             {
                 type: "number",
@@ -68,8 +68,8 @@ export function Sample4() {
                 field: "timestamp",
                 width: 250,
                 readonly: true,
-                renderTransform: (cell, value) => {
-                    const row = ds.current[cell.row];
+                renderTransform: (_row, cell, value) => {
+                    const row = _row as MyData;
                     if (row) {
                         if (api && row.timestamp) {
                             return api.formatCellDataAsDateTime(row.timestamp) + " (custom user) " + row.timestamp.getTime();

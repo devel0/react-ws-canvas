@@ -58,7 +58,7 @@ export function Sample3() {
       textAlign: () => "center",
       sortDirection: WSCanvasSortDirection.Ascending,
       sortOrder: 1,
-      renderTransform: (cell, data) => "( " + data + " )",
+      renderTransform: (row, cell, data) => "( " + data + " )",
       readonly: true,
     },
     {
@@ -89,11 +89,11 @@ export function Sample3() {
       type: "text",
       header: "cbox",
       field: "cboxcol",
-      renderTransform: (cell, data) => {
+      renderTransform: (row, cell, data) => {
         const q = mapEnum(MyEnum).find((x) => x.value === data);
         if (q) return q.name;
       },
-      customEdit: (states, cell, containerStyle?, cellWidth?, cellHeight?) => {
+      customEdit: (states, row, cell, containerStyle?, cellWidth?, cellHeight?) => {
         if (containerStyle) containerStyle.background = "lightyellow";
 
         return <div>

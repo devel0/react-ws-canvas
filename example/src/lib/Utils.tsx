@@ -206,3 +206,22 @@ export function setFieldData(obj: any, path: string, newValue: any) {
     const fields = path.split('.');    
     return setFieldDataRecurse(obj, fields, newValue);
 }
+
+/** create path from type. usage pathBuilder<type>()("xxx", "yyy", ...) */
+export function pathBuilder<T>() {
+    return <
+        K1 extends keyof T,
+        K2 extends keyof NonNullable<T[K1]>,
+        K3 extends keyof NonNullable<NonNullable<T[K1]>[K2]>,
+        K4 extends keyof NonNullable<NonNullable<NonNullable<T[K1]>[K2]>[K3]>,
+        K5 extends keyof NonNullable<NonNullable<NonNullable<NonNullable<T[K1]>[K2]>[K3]>[K4]>,
+        >
+        (p1: K1, p2?: K2, p3?: K3, p4?: K4, p5?: K5) => {
+        let res = String(p1);
+        if (p2) { res += "." + p2; }
+        if (p3) { res += "." + p3; }
+        if (p4) { res += "." + p4; }
+        if (p5) { res += "." + p5; }
+        return res;
+    };
+}

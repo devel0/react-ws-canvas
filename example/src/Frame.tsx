@@ -4,6 +4,7 @@ import { Sample1 } from './Sample1';
 import { Sample2 } from './Sample2';
 import { Sample3 } from './Sample3';
 import { Sample4 } from './Sample4';
+import { Sample5 } from './Sample5';
 
 const DEFAULT_EXAMPLE = 3;
 
@@ -18,6 +19,7 @@ export default function Frame() {
       case 2: setCtl(<Sample2 />); break;
       case 3: setCtl(<Sample3 />); break;
       case 4: setCtl(<Sample4 />); break;
+      case 5: setCtl(<Sample5 />); break;
       default: setCtl(<div>invalid example selection</div>); break;
     }
   }, [example]);
@@ -31,6 +33,7 @@ export default function Frame() {
       <button onClick={() => { setExample(2); }}>EX2</button>
       <button onClick={() => { setExample(3); }}>EX3</button>
       <button onClick={() => { setExample(4); }}>EX4</button>
+      <button onClick={() => { setExample(5); }}>EX5</button>
       <br />
     </div>
 

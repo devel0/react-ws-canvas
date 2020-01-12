@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.8.3",
     "@types/jest": "24.0.21",
     "@types/lodash": "^4.14.146",
     "@types/moment": "^2.13.0",

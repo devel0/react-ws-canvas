@@ -50,14 +50,14 @@ export interface WSCanvasColumn {
     /** hint: getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }} */
     wrapText?: boolean;
 
-    renderTransform?: (cell: WSCanvasCellCoord, value: any) => any;
+    renderTransform?: (row: any, cell: WSCanvasCellCoord, value: any) => any;
 
     /** if true datasource will be used instead of renderTransform if present */
     filterUseDataSource?: boolean;
 
     readonly?: boolean | undefined;
 
-    customEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord,
+    customEdit?: ((states: WSCanvasStates, row: any, cell: WSCanvasCellCoord,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined,
 
     hidden?: boolean | undefined;

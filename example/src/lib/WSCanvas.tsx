@@ -427,13 +427,13 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const _colsCount = colsCount ? colsCount : (columns ? columns.length : 0);
 
-    const _renderTransform = (cell: WSCanvasCellCoord, value: any) => {
+    const _renderTransform = (row: any, cell: WSCanvasCellCoord, value: any) => {
         let res: any = undefined;
 
-        if (renderTransform) res = renderTransform(cell, _getCellData(cell));
+        if (renderTransform) res = renderTransform(row, cell, _getCellData(cell));
         if (!res && columns) {
             const qTr = columns[cell.col].renderTransform;
-            if (qTr) res = qTr(cell, value);
+            if (qTr) res = qTr(row, cell, value);
         }
 
         return res;
@@ -449,16 +449,16 @@ export function WSCanvas(props: WSCanvasProps) {
         return res || false;
     }
 
-    const _getCellCustomEdit = (states: WSCanvasStates, cell: WSCanvasCellCoord,
+    const _getCellCustomEdit = (states: WSCanvasStates, row: any, cell: WSCanvasCellCoord,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => {
 
         let res: JSX.Element | undefined;
 
-        if (getCellCustomEdit) res = getCellCustomEdit(states, cell, containerStyle, cellWidth, cellHeight);
+        if (getCellCustomEdit) res = getCellCustomEdit(states, row, cell, containerStyle, cellWidth, cellHeight);
 
         if (!res && columns) {
             const qce = columns[cell.col].customEdit;
-            if (qce) res = qce(states, cell, containerStyle, cellWidth, cellHeight);
+            if (qce) res = qce(states, rows[cell.row], cell, containerStyle, cellWidth, cellHeight);
         }
 
         return res;
@@ -582,8 +582,8 @@ export function WSCanvas(props: WSCanvasProps) {
                         let data: any = undefined;
                         const cell = new WSCanvasCellCoord(ri, colIdx);
                         const cellData = _getCellData(cell);
-                        if (_renderTransform(cell, cellData) && (filterUseDatasource === undefined || !filterUseDatasource(cell)))
-                            data = _renderTransform(cell, cellData);
+                        if (_renderTransform(rows[ri], cell, cellData) && (filterUseDatasource === undefined || !filterUseDatasource(cell)))
+                            data = _renderTransform(rows[ri], cell, cellData);
                         else
                             data = cellData;
 
@@ -701,7 +701,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     const qWrap = _getCellTextWrap(cell, props);
                                     if (qWrap === true) {
                                         let celldata = _getCellData(cell);
-                                        let str = _renderTransform(cell, celldata);
+                                        let str = _renderTransform(rows[cell.row], cell, celldata);
                                         if (str === undefined) str = String(celldata);
                                         let cellFont = font;
                                         if (getCellFont !== undefined) {
@@ -1000,7 +1000,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         let str = "";
         const cellType = _getCellType(cell, cellData);
-        const qRender = _renderTransform(cell, cellData);
+        const qRender = _renderTransform(rows[cell.row], cell, cellData);
 
         if (qRender)
             str = String(qRender);
@@ -1038,7 +1038,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         str = Number(cellData).toLocaleString(navigator.language);
                     break;
                 case "text":
-                    str = _renderTransform(cell, cellData);
+                    str = _renderTransform(rows[cell.row], cell, cellData);
                     if (str === undefined) str = String(cellData);
                     break;
             }
@@ -1502,7 +1502,7 @@ export function WSCanvas(props: WSCanvasProps) {
             case "time": str = formatCellDataAsTime(data); break;
             case "datetime": str = formatCellDataAsDateTime(data); break;
             default:
-                str = _renderTransform(cell, data);
+                str = _renderTransform(rows[cell.row], cell, data);
                 if (str === undefined) str = String(data);
                 break;
         }
@@ -1989,7 +1989,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             height: defaultEdit ? cellHeight : undefined
                         } as CSSProperties;
 
-                        const qCust = _getCellCustomEdit(mkstates(state, vm, overridenRowHeight), state.customEditCell,
+                        const qCust = _getCellCustomEdit(mkstates(state, vm, overridenRowHeight), rows[state.customEditCell.row], state.customEditCell,
                             ceditStyle, cellWidth, cellHeight);
                         if (qCust) {
                             defaultEdit = false;
@@ -2414,10 +2414,10 @@ export function WSCanvas(props: WSCanvasProps) {
                             // fist character [direct editing]
                             //
                             if (!keyHandled && !_isCellReadonly(cell) &&
-                                (_getCellCustomEdit(mkstates(state, viewMap, overridenRowHeight), cell) === undefined)) {
+                                (_getCellCustomEdit(mkstates(state, viewMap, overridenRowHeight), rows[cell.row], cell) === undefined)) {
 
                                 let celldata = _getCellData(cell);
-                                const prevData = _renderTransform(cell, celldata);
+                                const prevData = _renderTransform(rows[cell.row], cell, celldata);
                                 if (prevData === undefined) celldata = String(celldata);
                                 const type = _getCellType(cell, prevData);
                                 state.editMode = WSCanvasEditMode.direct;
@@ -2438,7 +2438,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             switch (e.key) {
                                 case "Backspace":
                                     const celldata = String(_getCellData(cell));
-                                    let str = _renderTransform(cell, celldata);
+                                    let str = _renderTransform(rows[cell.row], cell, celldata);
                                     if (str === undefined) str = String(celldata);
                                     if (str.length > 0) singleSetCellData(state, cell, str.substring(0, str.length - 1));
                                     keyHandled = true;
@@ -2451,7 +2451,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             if (!keyHandled && !_isCellReadonly(cell)) {
                                 keyHandled = true;
                                 const celldata = _getCellData(cell);
-                                let prevData = _renderTransform(cell, celldata);
+                                let prevData = _renderTransform(rows[cell.row], cell, celldata);
                                 if (prevData === undefined) prevData = String(celldata);
                                 const type = _getCellType(cell, prevData);
                                 switch (type) {
@@ -2491,7 +2491,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const DOUBLE_CLICK_THRESHOLD = 300;
 
-    const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {        
+    const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         let cellCoord: WSCanvasCellCoord | null = null;
         const ccr = mouseCoordToCanvasCoord(e);
         if (ccr !== null) {

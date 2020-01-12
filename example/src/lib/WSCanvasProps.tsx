@@ -69,21 +69,21 @@ export interface WSCanvasProps {
     preventWheelOnBounds: boolean;
     /** if set new rows goes inserted at given view index [default: undefined] */
     newRowsInsertAtViewIndex?: number;
-    
+
     /** retrieve data from a row */
     rowGetCellData?: (row: any, colIdx: number) => any;
     /** allow to transform data before being displayed (useful for enum types); if defined must return input data as is or transformed ( or use columns ) [default: undefined] */
-    renderTransform?: (cell: WSCanvasCellCoord, data: any) => any;
+    renderTransform?: (row: any, cell: WSCanvasCellCoord, data: any) => any;
     /** retrieve rows dataset copy [default: []] */
     prepareCellDataset: () => any;
     /** retrieve rows from dataset [default: (ds) => ds as any[]] */
-    cellDatasetGetRows: (ds:any) => any[];
+    cellDatasetGetRows: (ds: any) => any[];
     /** set row cell data [default: {}] */
-    rowSetCellData: (row: any, colIdx: number, value: any) => void;    
+    rowSetCellData: (row: any, colIdx: number, value: any) => void;
     /** set cell dataset state [default: {}] */
     commitCellDataset: (dataset: any) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor [default: undefined] */
-    getCellCustomEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord,
+    getCellCustomEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord, row: any,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined;
     /** header of given col ( or use columns ) [default: undefined] */
     getColumnHeader?: (col: number) => string | undefined;
@@ -154,7 +154,7 @@ export interface WSCanvasProps {
     /** filter match ignore case [default: true] */
     filterIgnoreCase: boolean;
     /** filter cell background color [default: "yellow"] */
-    filterBackground: string;    
+    filterBackground: string;
     /** if autoselect all text when click on filter */
     filterAutoSelectAll: boolean;
 
