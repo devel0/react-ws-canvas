@@ -713,7 +713,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             if (ctx && rowsCount > 0) {
                 const rowHeightComputed = (ri: number) => {
-                    let rh = rowHeight(null, -1);
+                    let rh = rowHeight(rows[ri], -1);
 
                     if (ctx) {
                         for (let ci = 0; ci < _colsCount; ++ci) {
@@ -1168,8 +1168,8 @@ export function WSCanvas(props: WSCanvasProps) {
         }
     }
 
-    const singleSetCellData = (state: WSCanvasState, cell: WSCanvasCellCoord, value: any, pasteMode: boolean = false) => {
-        const ds = prepareCellDataset();
+    const singleSetCellData = (state: WSCanvasState, cell: WSCanvasCellCoord, value: any, pasteMode: boolean = false, pasteDsPrepared: any = null) => {
+        const ds = pasteMode ? pasteDsPrepared : prepareCellDataset();
         const dsRows = cellDatasetGetRows(ds);
         const row = dsRows[cell.row];
         const cellType = _getCellType(row, cell, value);
@@ -1191,7 +1191,7 @@ export function WSCanvas(props: WSCanvasProps) {
         }
         rowSetCellData(row, cell.col, cellval);
         //cellDatasetSetRows(ds, dsRows);
-        commitCellDataset(ds);
+        if (!pasteMode) commitCellDataset(ds);
     }
 
     const openCellCustomEdit = (state: WSCanvasState, cell: WSCanvasCellCoord, orh: number[] | null) => {
@@ -2339,19 +2339,15 @@ export function WSCanvas(props: WSCanvasProps) {
                             keyHandled = true;
                             e.persist();
                             if (navigator.clipboard) {
-                                try {
-                                    // const q = await (navigator.clipboard as any).read();
-                                    // console.log(q);
-                                    // const q2 = await q[0].getType("text/plain");
-                                    // const text = await (new Response(q2)).text();
-                                    // console.log("text:" + text);
-
+                                try {                                    
                                     const text = await navigator.clipboard.readText();
 
                                     const textRows = text.split("\n");
 
                                     const rngView = state.viewSelection;
                                     let vcellbnds = rngView.bounds;
+
+                                    var ds = prepareCellDataset();
 
                                     if (vcellbnds && textRows.length > 0) {
 
@@ -2369,16 +2365,18 @@ export function WSCanvas(props: WSCanvasProps) {
 
                                                 if (!_isCellReadonly(row, cell)) {
                                                     if (_getCellType(row, cell, _getCellData(cell)) === "boolean") {
-                                                        singleSetCellData(state, cell, str === "true", true);
+                                                        singleSetCellData(state, cell, str === "true", true, ds);
                                                     }
                                                     else {
-                                                        singleSetCellData(state, cell, str, true);
+                                                        singleSetCellData(state, cell, str, true, ds);
                                                     }
                                                 }
 
                                             }
                                         }
                                     }
+
+                                    commitCellDataset(ds);
                                 } catch (err) {
                                     console.error(err);
                                 }
