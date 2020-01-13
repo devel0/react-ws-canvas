@@ -22,13 +22,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.16.1
+  - (**brk change**) added row, ridx info to rowHoverColor
 - v0.16.0
   - (**brk change**) added row info to (rowHeight, getCellCustomEdit, getCellType, getCellType, isCellReadonly, getCellTextAlign, getCellBackgroundColor, getCellTextWrap, getCellFont, getCellTextColor) methods
 - v0.15.0
   - dsFilter
-- v0.14.0
-  - added material-select multi example
-  - (**brk change**) added row data info to renderTransform and getCellCustomEdit
 
 ## features
 
