@@ -9,12 +9,12 @@ export const DEFAULT_ROW_HEIGHT = 30;
 export const DEFAULT_COL_WIDTH = 120;
 
 export const WSCanvasPropsDefault = () => {
-    return {        
+    return {
         onApi: undefined,
         handlers: undefined,
 
         fullwidth: false,
-        width: window.innerWidth,        
+        width: window.innerWidth,
         height: window.innerHeight,
         rows: [],
         rowsCount: 0,
@@ -22,11 +22,11 @@ export const WSCanvasPropsDefault = () => {
         columns: undefined,
         colWidth: undefined,
         colWidthExpand: true,
-        rowHeight: () => DEFAULT_ROW_HEIGHT,
+        rowHeight: (row, ridx) => DEFAULT_ROW_HEIGHT,
         frozenRowsCount: 0,
         frozenColsCount: 0,
         selectionModeMulti: true,
-        selectionMode: WSCanvasSelectMode.Cell,        
+        selectionMode: WSCanvasSelectMode.Cell,
         showFocusedCellOutline: false,
         showRowNumber: false,
         highlightRowNumber: true,
@@ -39,14 +39,14 @@ export const WSCanvasPropsDefault = () => {
         showPartialColumns: true,
         showPartialRows: true,
         preventWheelOnBounds: true,
-        newRowsInsertAtViewIndex: undefined,        
-        
+        newRowsInsertAtViewIndex: undefined,
+
         rowGetCellData: undefined,
         renderTransform: undefined,
         prepareCellDataset: () => [],
         cellDatasetGetRows: (ds) => ds as any[],
-        rowSetCellData: (row:any, colIdx:number, value: any) => {},
-        commitCellDataset: (dataset: any) => {},        
+        rowSetCellData: (row: any, colIdx: number, value: any) => { },
+        commitCellDataset: (dataset: any) => { },
         getCellCustomEdit: undefined,
         getColumnHeader: undefined,
         getColumnHidden: undefined,
@@ -84,8 +84,8 @@ export const WSCanvasPropsDefault = () => {
         filterDebounceMs: 500,
         filterTextMargin: 3,
         filterIgnoreCase: true,
-        filterBackground: "yellow",       
-        filterAutoSelectAll: false, 
+        filterBackground: "yellow",
+        filterAutoSelectAll: false,
 
         recomputeRowHeightDebounceFilterMs: 0,
         rowNumberColWidth: 80,

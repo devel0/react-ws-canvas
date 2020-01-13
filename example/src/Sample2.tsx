@@ -95,14 +95,14 @@ export function Sample2() {
     
     fullwidth height={winSize.height * .8}
     containerStyle={{ margin: "2em" }}
-    getCellBackgroundColor={(cell) => {
+    getCellBackgroundColor={(row, cell) => {
       if (cell.row === 2) return "navy";
       if (cell.col === 1) return "lightyellow";
     }}
-    getCellFont={(cell, props) => {
+    getCellFont={(row, cell, props) => {
       if (cell.col === 1) return "bold " + props.font;
     }}
-    getCellTextColor={(cell) => {
+    getCellTextColor={(row, cell) => {
       if (cell.row === 2) return "white";
     }}
     rowHeight={() => 30}

@@ -33,8 +33,9 @@ export interface WSCanvasProps {
     colWidth?: (cidx: number) => number;
     /** expand column width to fit control width ( if column width sum not already exceed control width ) [default: true] */
     colWidthExpand: boolean;
-    /** height of rows in the grid [default: DEFAULT_ROW_HEIGHT=30] */
-    rowHeight: (ridx: number) => number;
+    /** height of rows in the grid [default: DEFAULT_ROW_HEIGHT=30] 
+     * if overriden, when row===null or ridx===-1 should return default height */
+    rowHeight: (row: any, ridx: number) => number;
     /** nr of frozen rows [default: 0] */
     frozenRowsCount: number;
     /** nr of frozen cols [default: 0] */
@@ -83,7 +84,7 @@ export interface WSCanvasProps {
     /** set cell dataset state [default: {}] */
     commitCellDataset: (dataset: any) => void;
     /** allow to define a custom editor or return undefined to use builtin cell editor [default: undefined] */
-    getCellCustomEdit?: ((states: WSCanvasStates, cell: WSCanvasCellCoord, row: any,
+    getCellCustomEdit?: ((states: WSCanvasStates, row: any, cell: WSCanvasCellCoord,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined;
     /** header of given col ( or use columns ) [default: undefined] */
     getColumnHeader?: (col: number) => string | undefined;
@@ -92,16 +93,16 @@ export interface WSCanvasProps {
     /** column sort method  ( or use columns ) [default: undefined] */
     getColumnLessThanOp?: (col: number) => ((a: any, b: any) => boolean) | undefined;
     /** specify type of a cell ( or use columns)  [default: undefined] */
-    getCellType?: (coord: WSCanvasCellCoord, value: any) => WSCanvasColumnType | undefined;
+    getCellType?: (row: any, coord: WSCanvasCellCoord, value: any) => WSCanvasColumnType | undefined;
     /** specify cell editor inhibit ( or use columns ) [default: undefined] */
-    isCellReadonly?: (coord: WSCanvasCellCoord) => boolean | undefined;
+    isCellReadonly?: (row: any, coord: WSCanvasCellCoord) => boolean | undefined;
     /** specify predefined column sort ( WSCanvasColumn array helper or use columns ) [default: undefined] */
     columnInitialSort?: WSCanvasColumnSortInfo[] | undefined;
     /** specify text align of a cell ( or use columns ) [default: undefined] */
-    getCellTextAlign?: (coord: WSCanvasCellCoord, value: any) => CanvasTextAlign | undefined;
+    getCellTextAlign?: (row: any, coord: WSCanvasCellCoord, value: any) => CanvasTextAlign | undefined;
 
     /** individual cell background customization [default: undefined] */
-    getCellBackgroundColor?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
+    getCellBackgroundColor?: (row: any, coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
     /** cell background [default: "white"] */
     sheetBackgroundColor: string;
     /** grid lines color [default: "#c0c0c0"] */
@@ -129,13 +130,13 @@ export interface WSCanvasProps {
     /** margin of text inside cells [default: 2] */
     textMargin: number;
     /** individual cell text wrap ( or use columns ) [default: undefined] */
-    getCellTextWrap?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => boolean | undefined;
+    getCellTextWrap?: (row: any, coord: WSCanvasCellCoord, props: WSCanvasProps) => boolean | undefined;
     /** individual cell font customization [default: undefined] */
-    getCellFont?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
+    getCellFont?: (row: any, coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
     /** font of cells text [default: "12px Liberation Sans"] */
     font: string;
     /** individual cell text color customization [default: undefined] */
-    getCellTextColor?: (coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
+    getCellTextColor?: (row: any, coord: WSCanvasCellCoord, props: WSCanvasProps) => string | undefined;
     /** color of cell text [default: "black"] */
     cellTextColor: string;
     /** font of row/col nunbers [default: "16px Liberation Sans"] */
