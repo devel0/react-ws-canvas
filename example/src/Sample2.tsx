@@ -92,9 +92,12 @@ export function Sample2() {
     prepareCellDataset={() => rows.slice()}
     commitCellDataset={(q) => setRows(q)}
     rowSetCellData={(row, colIdx, value) => setFieldData(row, columns[colIdx].field, value)}
-    
+
     fullwidth height={winSize.height * .8}
     containerStyle={{ margin: "2em" }}
+    rowHoverColor={(row, ridx) => {
+      if (ridx !== 2) return "rgba(248,248,248,1)";
+    }}
     getCellBackgroundColor={(row, cell) => {
       if (cell.row === 2) return "navy";
       if (cell.col === 1) return "lightyellow";
