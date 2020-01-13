@@ -955,8 +955,9 @@ export function WSCanvas(props: WSCanvasProps) {
         const y_ = y + 0.5;
 
         let cellBackground = sheetBackgroundColor;
-        if (state.hoveredViewRow === viewCell.row && rowHoverColor) {
-            cellBackground = rowHoverColor;
+        const qHoverColor = rowHoverColor(row, cell.row);
+        if (state.hoveredViewRow === viewCell.row && qHoverColor) {
+            cellBackground = qHoverColor;
         } else if (getCellBackgroundColor !== undefined) {
             const q = getCellBackgroundColor(row, cell, props);
             if (q) cellBackground = q;
