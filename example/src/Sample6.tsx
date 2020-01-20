@@ -2,33 +2,42 @@ import React, { useState, useEffect } from 'react';
 import { WSCanvas, useWindowSize, WSCanvasColumnClickBehavior, WSCanvasColumnSortInfo, WSCanvasSortDirection, WSCanvasApi } from './lib';
 
 export const Sample6 = () => {
-    const [rows, setRows] = useState<any[][]>([]);
-    const winSize = useWindowSize();
-    const [api, setapi] = useState<WSCanvasApi | null>(null);
-
     const ROWS = 10;
     const COLS = 10;
 
-    const setRndDatasource = () => {
+    const rndSrc = () => {
         const _rows = [];
         for (let ri = 0; ri < ROWS; ++ri) {
             const row = [];
-            for (let ci = 0; ci < COLS; ++ci) {                
+            for (let ci = 0; ci < COLS; ++ci) {
                 row.push(Math.trunc(Math.random() * ROWS));
             }
             _rows.push(row);
         }
+        return _rows;
+    };
+    const [rows, setRows] = useState<any[][]>(rndSrc());
+    const winSize = useWindowSize();
+    const [api, setapi] = useState<WSCanvasApi | null>(null);
+    const [useReset, setUseReset] = useState(true);
 
-        setRows(_rows);
+    const setRndDatasource = () => {
+        setRows(rndSrc());
         // reset the view to inform the grid that an initial sort required
         // elsewhere grid tought it was an editing effect and doesn't apply sorting
-        if (api) api.resetView(); // UNCOMMENT THIS TO SEE UNSORT data after "set datasource" 2th button click
+        if (api && useReset) api.resetView(); // UNCOMMENT THIS TO SEE UNSORT data after "set datasource" 2th button click
     };
 
     return <div>
         <button onClick={() => {
             setRndDatasource();
         }}>set datasource</button>
+
+        <span>
+            <input type="checkbox" id="chk" checked={useReset} onChange={(e) => { setUseReset(e.target.checked) }} />
+            <label htmlFor="chk">useResetView</label>
+        </span>
+
         <WSCanvas
             width={winSize.width} height={winSize.height}
             rowsCount={rows.length} colsCount={COLS}
