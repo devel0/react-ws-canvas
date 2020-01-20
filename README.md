@@ -22,12 +22,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.17.4
+  - tip about initial sort (example6)
 - v0.17.3
   - fix paste mode when using cellDatasetGetRows
 - v0.17.2
   - (**brk change**) added row, ridx info to rowHoverColor
-- v0.16.0
-  - (**brk change**) added row info to (rowHeight, getCellCustomEdit, getCellType, getCellType, isCellReadonly, getCellTextAlign, getCellBackgroundColor, getCellTextWrap, getCellFont, getCellTextColor) methods
 
 ## features
 
@@ -79,7 +79,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - column width [autoexpand][16]
 
-- column custom [initial sort][18] ( *note*: prepareCellDataset, rowSetCellData, commitCellDataset must defined to make sort working )
+- column custom [initial sort][18] ( *note*: prepareCellDataset, rowSetCellData, commitCellDataset must defined to make sort working ); also see [example6][36] for tip about ensure initial sort on subsequent datasource applications
 
 ![](doc/initial-sort.png)
 
@@ -154,6 +154,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [33]: https://github.com/devel0/react-ws-canvas/blob/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example/src/Sample3.tsx#L211
 [34]: https://github.com/devel0/react-ws-canvas/blob/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example/src/lib/WSCanvasApi.tsx#L108-L115
 [35]: https://github.com/devel0/react-ws-canvas/blob/ba1c4483045065f12fa3c59f1c910ad34fdeb213/example/src/Sample5.tsx#L63-L116
+[36]: https://github.com/devel0/react-ws-canvas/blob/1415a129c7e82c9c8d6ac5d88909cc2398426d85/example/src/Sample6.tsx#L23-L25
 
 ## todo
 
