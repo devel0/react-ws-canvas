@@ -154,7 +154,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [33]: https://github.com/devel0/react-ws-canvas/blob/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example/src/Sample3.tsx#L211
 [34]: https://github.com/devel0/react-ws-canvas/blob/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example/src/lib/WSCanvasApi.tsx#L108-L115
 [35]: https://github.com/devel0/react-ws-canvas/blob/ba1c4483045065f12fa3c59f1c910ad34fdeb213/example/src/Sample5.tsx#L63-L116
-[36]: https://github.com/devel0/react-ws-canvas/blob/1415a129c7e82c9c8d6ac5d88909cc2398426d85/example/src/Sample6.tsx#L23-L25
+[36]: https://github.com/devel0/react-ws-canvas/blob/d115874c761a250f280ced9f3798ad531ac59075/example/src/Sample6.tsx#L26-L28
 
 ## todo
 
