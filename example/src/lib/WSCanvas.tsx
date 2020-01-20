@@ -526,9 +526,14 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const sortData = (state: WSCanvasState) => {
-        if (debug) console.log("*** SORT DATA " + _.orderBy(state.columnsSort, x => x.sortOrder).map(x => "cidx:" + x.columnIndex + " dir:" + x.sortDirection + " ord:" + x.sortOrder).join(" - "));
 
         const ds = prepareCellDataset();
+
+        const dsRows = cellDatasetGetRows(ds);
+
+        if (dsRows.length === 0) return;
+
+        if (debug) console.log("*** SORT DATA rowscnt:" + dsRows.length + " " + _.orderBy(state.columnsSort, x => x.sortOrder).map(x => "cidx:" + x.columnIndex + " dir:" + x.sortDirection + " ord:" + x.sortOrder).join(" - "));
 
         const orderedColumnSort = _.orderBy(state.columnsSort, (x) => x.sortOrder, "desc");
 
@@ -538,8 +543,6 @@ export function WSCanvas(props: WSCanvasProps) {
             const lto = _lessThanOp(columnSort.columnIndex);
 
             if (debug) console.log(" sorting by col:" + colIdx + " dir:" + columnSort.sortOrder);
-
-            const dsRows = cellDatasetGetRows(ds);
 
             dsRows.sort((a: any, b: any) => {
                 const valA = _rowGetCellData(a, colIdx);
@@ -636,24 +639,35 @@ export function WSCanvas(props: WSCanvasProps) {
         state.filteredSortedRowsCount = (vm === null) ? rowsCount : vm.viewToReal.length;
     }
 
-    if (!stateNfo.initialized) {
-        if (rowsCount > 0) {
-            const state = stateNfo.dup();
-            const qInitialSort = _columnInitialSort();
-            if (qInitialSort)
-                state.columnsSort = qInitialSort.filter(w => w.sortDirection !== undefined && w.sortDirection !== WSCanvasSortDirection.None);
+    const [initialSortDone, setInitialSortDone] = useState(false);
 
-            state.initialized = true;
-
-            sortData(state);
-
-            const vm = {} as ViewMap;
-            filterData(state, vm);
-            _setViewMap(vm);
-            _setStateNfo(state);
-            if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
+    useEffect(() => {
+        if (!initialSortDone && rows.length > 0) {
+            setInitialSortDone(true);
+            resetState();
         }
-    }
+    }, [rows, initialSortDone]);
+
+    //useEffect(() => {
+        if (!stateNfo.initialized) {
+            if (rowsCount > 0) {
+                const state = stateNfo.dup();
+                const qInitialSort = _columnInitialSort();
+                if (qInitialSort)
+                    state.columnsSort = qInitialSort.filter(w => w.sortDirection !== undefined && w.sortDirection !== WSCanvasSortDirection.None);
+
+                state.initialized = true;
+
+                sortData(state);
+
+                const vm = {} as ViewMap;
+                filterData(state, vm);
+                _setViewMap(vm);
+                _setStateNfo(state);
+                if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
+            }
+        }
+    //}, [rows]);
 
     //#endregion    
 
@@ -2339,7 +2353,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             keyHandled = true;
                             e.persist();
                             if (navigator.clipboard) {
-                                try {                                    
+                                try {
                                     const text = await navigator.clipboard.readText();
 
                                     const textRows = text.split("\n");
