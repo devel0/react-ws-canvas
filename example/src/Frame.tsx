@@ -7,7 +7,7 @@ import { Sample4 } from './Sample4';
 import { Sample5 } from './Sample5';
 import { Sample6 } from './Sample6';
 
-const DEFAULT_EXAMPLE = 6;
+const DEFAULT_EXAMPLE = 4;
 
 export default function Frame() {
   const [example, setExample] = useState(DEFAULT_EXAMPLE);

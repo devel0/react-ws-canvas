@@ -43,7 +43,8 @@ export function Sample4() {
                 field: "ridx",
                 width: 100,
                 textAlign: () => "center",
-                renderTransform: (row, cell, value) => cell.row
+                renderTransform: (row, cell, value) => cell.row,
+                //hidden: true,
             },
             {
                 type: "number",
