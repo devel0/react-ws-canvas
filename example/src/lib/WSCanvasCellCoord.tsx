@@ -20,8 +20,16 @@ export class WSCanvasCellCoord {
 
     nextRow = () => new WSCanvasCellCoord(this._rowIdx + 1, this._colIdx);
     prevRow = () => new WSCanvasCellCoord(this._rowIdx - 1, this._colIdx);
-    nextCol = () => new WSCanvasCellCoord(this._rowIdx, this._colIdx + 1);
-    prevCol = () => new WSCanvasCellCoord(this._rowIdx, this._colIdx - 1);
+    nextCol = (colsCnt: number, qColHidden: (c: number) => boolean) => {
+        let _c = this._colIdx + 1;
+        while (_c < colsCnt && qColHidden(_c))++_c;
+        return new WSCanvasCellCoord(this._rowIdx, _c);
+    }
+    prevCol = (qColHidden: (c: number) => boolean) => {
+        let _c = this._colIdx - 1;
+        while (_c > 0 && qColHidden(_c))--_c;
+        return new WSCanvasCellCoord(this._rowIdx, _c);
+    }
 
     lessThan(other: WSCanvasCellCoord) {
         return this.row < other.row || (this.row === other.row && this.col < other.col);

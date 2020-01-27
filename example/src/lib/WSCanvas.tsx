@@ -649,24 +649,24 @@ export function WSCanvas(props: WSCanvasProps) {
     }, [rows, initialSortDone]);
 
     //useEffect(() => {
-        if (!stateNfo.initialized) {
-            if (rowsCount > 0) {
-                const state = stateNfo.dup();
-                const qInitialSort = _columnInitialSort();
-                if (qInitialSort)
-                    state.columnsSort = qInitialSort.filter(w => w.sortDirection !== undefined && w.sortDirection !== WSCanvasSortDirection.None);
+    if (!stateNfo.initialized) {
+        if (rowsCount > 0) {
+            const state = stateNfo.dup();
+            const qInitialSort = _columnInitialSort();
+            if (qInitialSort)
+                state.columnsSort = qInitialSort.filter(w => w.sortDirection !== undefined && w.sortDirection !== WSCanvasSortDirection.None);
 
-                state.initialized = true;
+            state.initialized = true;
 
-                sortData(state);
+            sortData(state);
 
-                const vm = {} as ViewMap;
-                filterData(state, vm);
-                _setViewMap(vm);
-                _setStateNfo(state);
-                if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
-            }
+            const vm = {} as ViewMap;
+            filterData(state, vm);
+            _setViewMap(vm);
+            _setStateNfo(state);
+            if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
         }
+    }
     //}, [rows]);
 
     //#endregion    
@@ -953,6 +953,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const redrawCellInternal = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, viewCell: WSCanvasCellCoord, ctx: CanvasRenderingContext2D, cWidth: number, x: number, y: number) => {
 
         const cell = viewCellToReal(vm, viewCell)!;
+        if (_colHidden(cell.col)) return;
         const row = rows[cell.row];
         const viewSelContainsCell = state.viewSelection.containsCell(viewCell, selectionMode);
 
@@ -2177,7 +2178,7 @@ export function WSCanvas(props: WSCanvasProps) {
             realColToViewCol(vm, state.focusedCell.col),
             state.focusedCell.filterRow);
         if (focusedViewCell.col < _colsCount - 1)
-            state.focusedCell = viewCellToReal(vm, focusedViewCell.nextCol());
+            state.focusedCell = viewCellToReal(vm, focusedViewCell.nextCol(_colsCount, _colHidden));
         else if (focusedViewCell.row < rowsCount - 1)
             state.focusedCell = viewCellToReal(vm, focusedViewCell.nextRow().setCol(0));
         //        focusCell(state, vm, state.focusedCell, true, false, true);
@@ -2246,21 +2247,22 @@ export function WSCanvas(props: WSCanvasProps) {
                         if (ctrl_key)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setCol(_colsCount - 1));
                         else if (focusedViewCell.col < _colsCount - 1)
-                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol());
+                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol(_colsCount, _colHidden));
                         break;
 
                     case "ArrowLeft":
                         keyHandled = true;
                         if (ctrl_key)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.setCol(0));
-                        else if (focusedViewCell.col > 0)
-                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.prevCol());
+                        else if (focusedViewCell.col > 0) {
+                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.prevCol(_colHidden));
+                        }
                         break;
 
                     case "Tab":
                         keyHandled = true;
                         if (focusedViewCell.col < _colsCount - 1)
-                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol());
+                            state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextCol(_colsCount, _colHidden));
                         else if (focusedViewCell.row < rowsCount - 1)
                             state.focusedCell = viewCellToReal(viewMap, focusedViewCell.nextRow().setCol(0));
                         break;
