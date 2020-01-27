@@ -22,12 +22,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.17.5
+  - walk through col skipping those hidden
 - v0.17.4
   - tip about initial sort (example6)
 - v0.17.3
   - fix paste mode when using cellDatasetGetRows
-- v0.17.2
-  - (**brk change**) added row, ridx info to rowHoverColor
 
 ## features
 
