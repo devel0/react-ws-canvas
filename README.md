@@ -4,15 +4,15 @@
 
 Spreadsheet like react canvas datagrid optimized for performance built entirely typescript and react functional components with react hooks.
 
-**LIVE DEMO** ( current [development](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example) or latest **stable version** [v0.17.4](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/9007961589f2f14634f4d3084a39d803deeb7273/example) )
+[**LIVE DEMO**](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/master/example)
 
 ---
 
 - [recent changes](#recent-changes)
 - [features](#features)
 - [todo](#todo)
-- [**quickstart**](#quickstart)
-- [**examples** list](#examples-list)
+- [quickstart](#quickstart)
+- [examples list](#examples-list)
 - [how to contribute ( quickstart )](#how-to-contribute--quickstart-)
 - [local deploy](#local-deploy)
 - [how this project was built](#how-this-project-was-built)
@@ -22,12 +22,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.18.0
+  - api commit with forceSort option [example](https://github.com/devel0/react-ws-canvas/blob/c4b79e30d85bb5f072200fdb65c1423a67be8428/example/src/Sample4.tsx#L152)
 - v0.17.5
   - walk through col skipping those hidden
 - v0.17.4
   - tip about initial sort (example6)
-- v0.17.3
-  - fix paste mode when using cellDatasetGetRows
 
 ## features
 
