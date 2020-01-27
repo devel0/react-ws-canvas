@@ -177,6 +177,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const debouncedColumnWidth = useDebounce(stateNfo.columnWidthOverrideTrack, recomputeRowHeightDebounceFilterMs);
     const [touchStartTime, setTouchStartTime] = useState<Date>(new Date());
     const [systemReset, setSystemReset] = useState(0);
+    const [postApiForceSort, setPostApiForceSort] = useState(false);
 
     const colNumberRowHeightFull = () => colNumberRowHeight + (showFilter ? rowHeight(null, -1) : 0);
 
@@ -525,6 +526,8 @@ export function WSCanvas(props: WSCanvasProps) {
         state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(focusedViewCell)]);
     }
 
+    let resetFocusedCell: WSCanvasCellCoord | undefined = undefined;
+
     const sortData = (state: WSCanvasState) => {
 
         const ds = prepareCellDataset();
@@ -568,6 +571,12 @@ export function WSCanvas(props: WSCanvasProps) {
         }
 
         commitCellDataset(ds);
+
+        if (resetFocusedCell) {
+            const q = resetFocusedCell;
+            resetFocusedCell = undefined;
+            focusCell(state, viewMap, q, true, false, true);
+        }
     }
 
     const filterData = (state: WSCanvasState, vm: ViewMap | null) => {
@@ -646,7 +655,11 @@ export function WSCanvas(props: WSCanvasProps) {
             setInitialSortDone(true);
             resetState();
         }
-    }, [rows, initialSortDone]);
+        if (postApiForceSort) {
+            setPostApiForceSort(false);
+            sortData(stateNfo);
+        }
+    }, [postApiForceSort, rows, initialSortDone]);
 
     //useEffect(() => {
     if (!stateNfo.initialized) {
@@ -1524,6 +1537,7 @@ export function WSCanvas(props: WSCanvasProps) {
     }
 
     const resetState = () => {
+        resetFocusedCell = new WSCanvasCellCoord(0, 0);
         setSystemReset(1);
     };
 
@@ -3331,7 +3345,9 @@ export function WSCanvas(props: WSCanvasProps) {
                     _.cloneDeep(api.states.overrideRowHeight) as number[]);
             }
 
-            api.commit = () => {
+            api.commit = (forceSort?: boolean) => {
+                if (forceSort === true) setPostApiForceSort(true);
+
                 setOverridenRowHeight(api.states.overrideRowHeight);
                 _setViewMap(api.states.vm);
                 _setStateNfo(api.states.state);
@@ -3342,7 +3358,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             api.setCellData = (cell, value) => rowSetCellData(api.ds[cell.row], cell.col, value);
 
-            api.commitCellDataset = () => commitCellDataset(api.ds);
+            api.commitCellDataset = () => commitCellDataset(api.ds)
 
             api.getCellData = (cell) => _getCellData(cell);
 

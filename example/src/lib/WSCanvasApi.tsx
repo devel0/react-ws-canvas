@@ -16,7 +16,7 @@ export class WSCanvasApi {
     begin: () => void;
 
     /** finalize API blocm ( stores api.states )*/
-    commit: () => void;
+    commit: (forceSort?: boolean) => void;
 
     /** clones dataset into api.ds */
     prepareCellDataset: () => void;

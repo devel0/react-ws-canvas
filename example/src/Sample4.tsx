@@ -121,6 +121,38 @@ export function Sample4() {
         }
     }
 
+    const insRow = () => {
+        if (api) {
+            api.begin();
+
+            api.prepareCellDataset();
+
+            const focusedCell = api.states.state.focusedCell;
+
+            // see prepareDataset type
+            const dset = api.ds as MyData[];
+
+            const row_idx_new = dset[focusedCell.row].idx;
+            const focusedViewCell = api.realCellToView(focusedCell);
+            let vri = focusedViewCell.row;
+            while (vri < api.states.state.filteredSortedRowsCount) {
+                const rowi = dset[api.viewRowToRealRow(vri)];
+                rowi.idx++;
+                ++vri;
+            }
+            const newRowData = {
+                idx: row_idx_new,
+                description: "INSERTED test" + dset.length,
+                timestamp: new Date()
+            } as MyData;
+            dset.push(newRowData);
+
+            api.commitCellDataset();                        
+
+            api.commit(true);
+        }
+    }
+
     const delRow = () => {
         if (api) {
             api.begin();
@@ -207,6 +239,8 @@ export function Sample4() {
 
         <button onClick={() => addRow()}>ADD</button>
 
+        <button onClick={() => insRow()}>INS</button>
+
         <button disabled={gridStates === null || gridStates.state.viewSelection.empty} onClick={() => delRow()}>DEL</button>
 
         <button disabled={!dirty} onClick={() => setDs(new IUpdateEntityNfo<MyData[]>(ds.current.slice()))}>SAVE</button>
@@ -232,10 +266,10 @@ export function Sample4() {
             rows={ds.current}
             rowGetCellData={(row, colIdx) => {
                 if (row) return getFieldData(row, columns[colIdx].field);
-                return "";                
+                return "";
             }}
             prepareCellDataset={() => ds.current.slice()}
-            rowSetCellData={(row,colIdx,value) => {                
+            rowSetCellData={(row, colIdx, value) => {
                 if (row) setFieldData(row, columns[colIdx].field, value);
             }}
             commitCellDataset={(q) => { setDs(new IUpdateEntityNfo<MyData[]>(q, ds.original)); }}
