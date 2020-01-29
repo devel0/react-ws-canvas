@@ -470,7 +470,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
         if (filterUseDatasource) res = filterUseDatasource(cell);
 
-        if (columns && columns[cell.col].filterUseDataSource)
+        if (columns && columns[cell.col].filterUseDataSource !== undefined)
             res = columns[cell.col].filterUseDataSource;
 
         return res;
