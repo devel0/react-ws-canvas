@@ -27,6 +27,9 @@ export class WSCanvasApi {
     /** retrieve data of given real cell */
     getCellData: (cell: WSCanvasCellCoord) => any;
 
+    /** check whatever given key isn't a movement key */
+    isDirectEditingKey: (e: React.KeyboardEvent) => boolean;
+
     /** force filter */
     filter: () => void;
 
@@ -151,6 +154,7 @@ export class WSCanvasApi {
         this.getCellData = () => null;
 
         this.clearSelection = () => { };
+        this.isDirectEditingKey = () => false;
         this.filter = () => { };
         this.sort = () => { };
         this.selectFocusedCell = () => { };
@@ -162,7 +166,7 @@ export class WSCanvasApi {
         this.viewSelectionToReal = () => new WSCanvasSelection([]);
         this.copySelectionToClipboard = () => { };
         this.copyWorksheetToClipboard = () => { };
-        this.selectionIsFullWorksheet = () => false;        
+        this.selectionIsFullWorksheet = () => false;
 
         this.clientXYToCanvasCoord = () => null;
         this.cellToCanvasCoord = () => null;

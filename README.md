@@ -23,6 +23,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.19.0
+  - api.isDirectEditingKey(e)
 - v0.18.5
   - fix _filterUseDataSource
 - v0.18.4
@@ -249,7 +251,7 @@ customize onPreviewKeyDown event handler on datagrid and preventDefault for matc
 
 ```ts
 onPreviewKeyDown={(states, e) => {
-  if (states.props.columns && e.key !== "F2") {
+  if (states.props.columns && api && api.isDirectEditingKey(e)) {
     const fieldname = states.props.columns[states.state.focusedCell.col].field;
     if (fieldname === "colname") {
       //const row = states.props.rows[states.state.focusedCell.row];

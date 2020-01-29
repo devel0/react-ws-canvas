@@ -2256,6 +2256,37 @@ export function WSCanvas(props: WSCanvasProps) {
         if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
     }
 
+    const isDirectEditingKey = (e: React.KeyboardEvent) => {
+        const ctrl_key = e.getModifierState("Control");
+
+        switch (e.key) {
+            case "ArrowDown":
+            case "ArrowUp":
+            case "ArrowRight":
+            case "ArrowLeft":
+            case "Tab":
+            case "PageDown":
+            case "PageUp":
+            case "Home":
+            case "End":
+            case "Enter":
+            case "Escape":
+            case "F2":
+                return false;
+        }
+
+        if (ctrl_key) {
+            switch (e.key) {
+                case "a":
+                case "c":
+                case "C":
+                    return false;
+            }
+        }
+
+        return true;
+    }
+
     const handleKeyDown = async (e: React.KeyboardEvent) => {
         if (onPreviewKeyDown) onPreviewKeyDown(mkstates(stateNfo, viewMap, overridenRowHeight), e);
 
@@ -3413,6 +3444,8 @@ export function WSCanvas(props: WSCanvasProps) {
             api.commitCellDataset = () => commitCellDataset(api.ds)
 
             api.getCellData = (cell) => _getCellData(cell);
+
+            api.isDirectEditingKey = (e: React.KeyboardEvent) => isDirectEditingKey(e);
 
             api.filter = () => filterData(api.states.state, api.states.vm);
 
