@@ -465,6 +465,17 @@ export function WSCanvas(props: WSCanvasProps) {
         return res;
     }
 
+    const _filterUseDatasource = (cell: WSCanvasCellCoord) => {
+        let res: boolean | undefined;
+
+        if (filterUseDatasource) res = filterUseDatasource(cell);
+
+        if (columns && columns[cell.col].filterUseDataSource)
+            res = columns[cell.col].filterUseDataSource;
+
+        return res;
+    }
+
     /** (NO side effects on state) */
     const overridenColWidth = (state: WSCanvasState, cidx: number) => {
         const q = state.columnWidthOverride.get(cidx);
@@ -606,10 +617,12 @@ export function WSCanvas(props: WSCanvasProps) {
                             let data: any = undefined;
                             const cell = new WSCanvasCellCoord(ri, colIdx);
                             const cellData = _getCellData(cell);
-                            if (_renderTransform(rows[ri], cell, cellData) && (filterUseDatasource === undefined || !filterUseDatasource(cell)))
+                            if (_renderTransform(rows[ri], cell, cellData) && (_filterUseDatasource(cell) === undefined || !_filterUseDatasource(cell))) {
                                 data = _renderTransform(rows[ri], cell, cellData);
-                            else
+                            }
+                            else {
                                 data = cellData;
+                            }
 
                             const F = filterIgnoreCase ? String(filter).toLowerCase() : String(filter);
                             const S = filterIgnoreCase ? String(data).toLowerCase() : String(data);
@@ -2480,11 +2493,14 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 let applyState = true;
 
+                if (ctrl_key && e.key.length > 0 && e.key !== "F2" && e.key[0] === 'f') {
+                    return;
+                }
+
                 if (e.key === "Shift" || e.key === "Control" || e.key === "Alt" ||
                     e.key === "CapsLock" || e.key === "NumLock" || e.key === "Pause" || e.key === "ScrollLock" ||
                     e.key === "Insert" ||
-                    e.key === "Meta" || e.key === "ContextMenu" ||
-                    (e.key !== "F2" && e.key.length > 0 && e.key[0] === "F")) {
+                    e.key === "Meta" || e.key === "ContextMenu") {
                     keyHandled = true;
                     applyState = false;
                 }

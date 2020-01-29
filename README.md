@@ -23,6 +23,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.18.4
+  - fix F key on direct editing ; fix column filterUseDataSource
 - v0.18.3
   - better date format when undefined
   - example frame with descriptions
