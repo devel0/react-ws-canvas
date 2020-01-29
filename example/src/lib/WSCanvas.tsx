@@ -916,9 +916,38 @@ export function WSCanvas(props: WSCanvasProps) {
 
     // }
 
-    const formatCellDataAsDate = (cellData: any) => moment(cellData as Date).format(dateCellMomentFormat);
-    const formatCellDataAsTime = (cellData: any) => moment(cellData as Date).format(timeCellMomentFormat);
-    const formatCellDataAsDateTime = (cellData: any) => moment(cellData as Date).format(dateTimeCellMomentFormat);
+    const formatCellDataAsDate = (cellData: any) => {
+        let res = "";
+        if (cellData) {
+            const q = moment(new Date(cellData));
+            if (q.isValid()) {
+                res = q.format(dateCellMomentFormat);
+            }
+        }
+        return res;
+    }
+
+    const formatCellDataAsTime = (cellData: any) => {
+        let res = "";
+        if (cellData) {
+            const q = moment(new Date(cellData));
+            if (q.isValid()) {
+                res = q.format(timeCellMomentFormat);
+            }
+        }
+        return res;
+    }
+
+    const formatCellDataAsDateTime = (cellData: any) => {
+        let res = "";
+        if (cellData) {
+            const q = moment(new Date(cellData));
+            if (q.isValid()) {
+                res = q.format(dateTimeCellMomentFormat);
+            }
+        }
+        return res;
+    }
 
     // TODO: optimize
     const viewSelectionToReal = (vm: ViewMap | null, viewSelection: WSCanvasSelection) => {
@@ -1060,42 +1089,47 @@ export function WSCanvas(props: WSCanvasProps) {
         if (qRender)
             str = String(qRender);
         else {
-            switch (cellType) {
-                case "boolean":
-                    const val = cellData as boolean;
-                    if (val === true)
-                        str = "\u25FC"; // https://www.rapidtables.com/code/text/unicode-characters.html                                        
-                    else
-                        str = "\u25A2";
-                    break;
-                case "date":
-                    if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
-                        str = cellData;
-                    else
-                        str = cellData ? formatCellDataAsDate(cellData) : "";
-                    break;
-                case "time":
-                    if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
-                        str = cellData;
-                    else
-                        str = cellData ? formatCellDataAsTime(cellData) : "";
-                    break;
-                case "datetime":
-                    if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
-                        str = cellData;
-                    else
-                        str = cellData ? formatCellDataAsDateTime(cellData) : "";
-                    break;
-                case "number":
-                    if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
-                        str = cellData;
-                    else
-                        str = Number(cellData).toLocaleString(navigator.language);
-                    break;
-                case "text":
-                    str = _renderTransform(row, cell, cellData);
-                    if (str === undefined) str = String(cellData);
-                    break;
+            const customRender = _renderTransform(row, cell, cellData);
+            if (customRender !== undefined) {
+                str = customRender;
+            } else {
+                switch (cellType) {
+                    case "boolean":
+                        const val = cellData as boolean;
+                        if (val === true)
+                            str = "\u25FC"; // https://www.rapidtables.com/code/text/unicode-characters.html                                        
+                        else
+                            str = "\u25A2";
+                        break;
+                    case "date":
+                        if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
+                            str = cellData;
+                        else
+                            str = formatCellDataAsDate(cellData);
+                        break;
+                    case "time":
+                        if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
+                            str = cellData;
+                        else
+                            str = formatCellDataAsTime(cellData);
+                        break;
+                    case "datetime":
+                        if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
+                            str = cellData;
+                        else
+                            str = formatCellDataAsDateTime(cellData);
+                        break;
+                    case "number":
+                        if (state.editMode !== WSCanvasEditMode.none && state.focusedCell.equals(cell))
+                            str = cellData;
+                        else
+                            str = Number(cellData).toLocaleString(navigator.language);
+                        break;
+                    case "text":
+                        //str = _renderTransform(row, cell, cellData);
+                        str = String(cellData);
+                        break;
+                }
             }
         }
 
