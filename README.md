@@ -242,7 +242,7 @@ customize onPreviewKeyDown event handler on datagrid and preventDefault for matc
 
 ```ts
 onPreviewKeyDown={(states, e) => {
-  if (states.props.columns) {
+  if (states.props.columns && e.key !== "F2") {
     const fieldname = states.props.columns[states.state.focusedCell.col].field;
     if (fieldname === "colname") {
       //const row = states.props.rows[states.state.focusedCell.row];
