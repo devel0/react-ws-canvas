@@ -22,12 +22,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.18.1
+  - do not show std cells context when custom edit present for that cell
 - v0.18.0
   - api commit with forceSort option [example](https://github.com/devel0/react-ws-canvas/blob/c4b79e30d85bb5f072200fdb65c1423a67be8428/example/src/Sample4.tsx#L152)
 - v0.17.5
   - walk through col skipping those hidden
-- v0.17.4
-  - tip about initial sort (example6)
 
 ## features
 

@@ -1154,37 +1154,39 @@ export function WSCanvas(props: WSCanvasProps) {
             return false;
         }
 
-        const textWrap = _getCellTextWrap(row, cell, props);
-        if (textWrap === true && RH > RSINGLE) {
-            if (!drawBool()) {
-                ctx.textBaseline = "bottom";
+        if (!state.customEditCell || !state.customEditCell.equals(cell)) {
+            const textWrap = _getCellTextWrap(row, cell, props);
+            if (textWrap === true && RH > RSINGLE) {
+                if (!drawBool()) {
+                    ctx.textBaseline = "bottom";
 
-                //posY = y + getRowHeight(viewCell.row) / 2 - textMargin / 2 + 2;   
-                posY = y + textMargin + 2 + RSINGLE / 2;
+                    //posY = y + getRowHeight(viewCell.row) / 2 - textMargin / 2 + 2;   
+                    posY = y + textMargin + 2 + RSINGLE / 2;
 
-                var words = str.split(' ');
-                let wc = words.length;
-                const maxLineW = cWidth - 2 * textMargin;
+                    var words = str.split(' ');
+                    let wc = words.length;
+                    const maxLineW = cWidth - 2 * textMargin;
 
-                let line = "";
-                for (let i = 0; i < wc; ++i) {
-                    const appendline = (i > 0 ? (" " + words[i]) : words[i]);
-                    const w = ctx.measureText(line + appendline).width;
-                    if (w > maxLineW) {
+                    let line = "";
+                    for (let i = 0; i < wc; ++i) {
+                        const appendline = (i > 0 ? (" " + words[i]) : words[i]);
+                        const w = ctx.measureText(line + appendline).width;
+                        if (w > maxLineW) {
+                            ctx.fillText(line, posX, posY);
+                            posY += getRowHeight(orh, null, -1);
+                            line = words[i];
+                        } else {
+                            line += appendline;
+                        }
+                    }
+                    if (line.length > 0) {
                         ctx.fillText(line, posX, posY);
-                        posY += getRowHeight(orh, null, -1);
-                        line = words[i];
-                    } else {
-                        line += appendline;
                     }
                 }
-                if (line.length > 0) {
-                    ctx.fillText(line, posX, posY);
-                }
+            } else {
+                if (!drawBool())
+                    ctx.fillText(str, posX, posY);
             }
-        } else {
-            if (!drawBool())
-                ctx.fillText(str, posX, posY);
         }
 
         if (showFocusedCellOutline && state.focusedCell.row === cell.row && state.focusedCell.col === cell.col) {
