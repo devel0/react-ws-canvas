@@ -2489,7 +2489,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             // fist character [direct editing]
                             //
                             if (!keyHandled && !_isCellReadonly(row, cell) &&
-                                (_getCellCustomEdit(mkstates(state, viewMap, overridenRowHeight), row, cell) === undefined)) {
+                                (!state.customEditCell)) {// _getCellCustomEdit(mkstates(state, viewMap, overridenRowHeight), row, cell) === undefined)) {
 
                                 let celldata = _getCellData(cell);
                                 const prevData = _renderTransform(rows[cell.row], cell, celldata);

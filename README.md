@@ -13,6 +13,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 - [todo](#todo)
 - [quickstart](#quickstart)
 - [examples list](#examples-list)
+- [tips](#tips)
 - [how to contribute ( quickstart )](#how-to-contribute--quickstart-)
 - [local deploy](#local-deploy)
 - [how this project was built](#how-this-project-was-built)
@@ -22,6 +23,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.18.2
+  - allow direct editing on customized editor cells
 - v0.18.1
   - do not show std cells context when custom edit present for that cell
 - v0.18.0
@@ -230,6 +233,24 @@ yarn start
 | [Sample4](example/src/Sample4.tsx) | add/insert/del/move rows using api |
 | [Sample5](example/src/Sample5.tsx) | custom multi select with material-ui |
 | [Sample6](example/src/Sample6.tsx) | resetView behavior to force sync ds |
+
+## tips
+
+**prevent direct editing on editor customized cells**
+
+customize onPreviewKeyDown event handler on datagrid and preventDefault for matching cell
+
+```ts
+onPreviewKeyDown={(states, e) => {
+  if (states.props.columns) {
+    const fieldname = states.props.columns[states.state.focusedCell.col].field;
+    if (fieldname === "colname") {
+      //const row = states.props.rows[states.state.focusedCell.row];
+      e.preventDefault();
+    }
+  }
+}}
+```
 
 ## how to contribute ( quickstart )
 
