@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { FormControl, InputLabel, Select, MenuItem, Input } from '@material-ui/core';
+import { FormControl, InputLabel, Select, MenuItem, Input, InputLabelProps } from '@material-ui/core';
 import {
     WSCanvas, WSCanvasColumn, WSCanvasApi, useWindowSize,
     WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord, setFieldData, getFieldData, pathBuilder
 } from "./lib";
+import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from '@date-io/date-fns';
 import * as _ from 'lodash';
 
 interface MyDataUser {
@@ -14,6 +16,7 @@ interface MyDataUser {
 interface MyData {
     descr: string;
     users: MyDataUser[];
+    dt: Date;
 }
 
 const ITEM_HEIGHT = 48;
@@ -33,11 +36,12 @@ const SP_MyData = pathBuilder<MyData>();
 export function Sample5() {
     const [ds, setDs] = useState<MyData[]>([]);
     const [api, setApi] = useState<WSCanvasApi | null>(null);
-    const [gridStates, setGridState] = useState<WSCanvasStates | null>(null);    
+    const [gridStates, setGridState] = useState<WSCanvasStates | null>(null);
     const winSize = useWindowSize();
     const [colVisible] = useState(true);
     const [columns, setColumns] = useState<WSCanvasColumn[]>([]);
     const [usersSelectOpened, setUsersSelectOpened] = useState(false);
+    const [dtDlgOpened, setDtDlgOpened] = useState(false);
 
     const USERS_BASE: MyDataUser[] = [];
     for (let i = 1; i <= 10; ++i) USERS_BASE.push(
@@ -114,6 +118,45 @@ export function Sample5() {
                         </FormControl>
                     </div >
                 }
+            },
+            {
+                // https://material-ui-pickers.dev/getting-started/installation
+                type: "date",
+                header: "date",
+                field: SP_MyData("dt"),
+                width: 100,
+
+                customEdit: (states, row) => {
+                    const r = row as MyData;
+
+                    setDtDlgOpened(true);
+
+                    return <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <DatePicker
+                            label={null}
+                            value={r.dt || new Date()}
+                            open={dtDlgOpened}
+                            onAccept={() => {
+                                if (api) api.closeCustomEdit(true);
+                                setDtDlgOpened(false);
+                            }}
+                            onAbort={() => {
+                                if (api) api.closeCustomEdit(false);
+                                setDtDlgOpened(false);
+                            }}
+                            onClose={() => {
+                                if (api) api.closeCustomEdit(false);
+                                setDtDlgOpened(false);
+                            }}
+                            onChange={date => {
+                                if (api) {
+                                    api.setCustomEditValue(date);
+                                }
+                            }}
+                            animateYearScrolling
+                        />
+                    </MuiPickersUtilsProvider>
+                }
             }
         ] as WSCanvasColumn[];
 
@@ -124,6 +167,7 @@ export function Sample5() {
         const newset = ds.slice();
         newset.push({
             descr: "test" + ds.length,
+            dt: new Date(),
             users: []
         });
         setDs(newset);
@@ -156,6 +200,7 @@ export function Sample5() {
             rowSetCellData={(row, colIdx, value) => {
                 if (row) setFieldData(row, columns[colIdx].field, value);
             }}
+            // rowHeight={() => 50}
             commitCellDataset={() => { setDs(ds); }}
             showFilter={true}
 

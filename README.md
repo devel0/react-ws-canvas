@@ -23,14 +23,14 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.18.3
+  - better date format when undefined
+  - example frame with descriptions
+  - custom date picker example5
 - v0.18.2
   - allow direct editing on customized editor cells
 - v0.18.1
   - do not show std cells context when custom edit present for that cell
-- v0.18.0
-  - api commit with forceSort option [example](https://github.com/devel0/react-ws-canvas/blob/c4b79e30d85bb5f072200fdb65c1423a67be8428/example/src/Sample4.tsx#L152)
-- v0.17.5
-  - walk through col skipping those hidden
 
 ## features
 
@@ -100,6 +100,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - custom multi select with material-ui ( [example][35] )
 
+- custom date picker with material pickers ( [example][37] )
+
 ![](doc/material-select-multi.gif)
 
 - cell [background][19], [font and color][119] customization and [text align][25] also with [helper][125]
@@ -158,6 +160,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [34]: https://github.com/devel0/react-ws-canvas/blob/a6d7e61ebc2371f4817e4ba632ff653738d26c55/example/src/lib/WSCanvasApi.tsx#L108-L115
 [35]: https://github.com/devel0/react-ws-canvas/blob/ba1c4483045065f12fa3c59f1c910ad34fdeb213/example/src/Sample5.tsx#L63-L116
 [36]: https://github.com/devel0/react-ws-canvas/blob/d115874c761a250f280ced9f3798ad531ac59075/example/src/Sample6.tsx#L26-L28
+[37]: 
 
 ## todo
 
