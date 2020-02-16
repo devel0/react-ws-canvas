@@ -96,7 +96,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - optional dataset on external object with [ds rows getter mapper][32] useful in some circumstance when need to preserve rows array object ref
 
-- [api][10] and [handlers][27] available for control interactions ( [example][11] ) ; props can be accessed [inversely][31] through api
+- [api][10] and [handlers][27] available for control interactions ( [example][11] ) ; props can be accessed [inversely][31] through api; retrieve list of selected row idxs [example][38]
 
 ![](doc/api.gif)
 
@@ -167,6 +167,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [35]: https://github.com/devel0/react-ws-canvas/blob/ba1c4483045065f12fa3c59f1c910ad34fdeb213/example/src/Sample5.tsx#L63-L116
 [36]: https://github.com/devel0/react-ws-canvas/blob/d115874c761a250f280ced9f3798ad531ac59075/example/src/Sample6.tsx#L26-L28
 [37]: https://github.com/devel0/react-ws-canvas/blob/58f253259b6dc563dadbcdd598a9f0b81d3baa26/example/src/Sample5.tsx#L122-L160
+[38]: https://github.com/devel0/react-ws-canvas/blob/315d2d22075c042897652253469272d8e4ee9171/example/src/Sample4.tsx#L289
 
 ## todo
 
