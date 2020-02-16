@@ -34,6 +34,7 @@ export function Sample4() {
     const winSize = useWindowSize();
     const [colVisible, setColVisible] = useState(true);
     const [columns, setColumns] = useState<WSCanvasColumn[]>([]);
+    const [selectedRealRowIdxs, setSelectedRealRowIdx] = useState<number[]>([]);
 
     useEffect(() => {
         const cols = [
@@ -147,7 +148,7 @@ export function Sample4() {
             } as MyData;
             dset.push(newRowData);
 
-            api.commitCellDataset();                        
+            api.commitCellDataset();
 
             api.commit(true);
         }
@@ -236,6 +237,7 @@ export function Sample4() {
         apiOverCell:{api ? String(api.states.state.cursorOverCell) : ""}<br />
         realToView:{(api && api.states.vm) ? api.states.vm.realToView.join('-') : ""}<br />
         viewToReal:{(api && api.states.vm) ? api.states.vm.viewToReal.join('-') : ""}<br />
+        selectedRealRowIdxs:{selectedRealRowIdxs.join(", ")}<br />
 
         <button onClick={() => addRow()}>ADD</button>
 
@@ -283,7 +285,10 @@ export function Sample4() {
 
             debug={false}
             onApi={(api) => setApi(api)}
-            onStateChanged={(states) => setGridState(states)}
+            onStateChanged={(states) => {
+                if (api) setSelectedRealRowIdx(Array.from(api.getRealSelection().rowIdxs()));
+                setGridState(states);
+            }}
         />
     </div>
 }

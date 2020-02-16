@@ -12,7 +12,7 @@ const EXAMPLE_NOTES = [
   "50000 x 200 grid with frozen row/col, filter, custom column width",
   "5000 x 6 grid db-record-like column mapping, initial sort, custom sort, api onMouseDown",
   "5000 x 7 grid db-record-like, data interact del/change row, custom cell editor, rowHover",
-  "add/insert/del/move rows using api",
+  "add/insert/del/move/currentRealRowSel rows using api",
   "custom multi select with material-ui",
   "resetView behavior to force sync ds"
 ];
