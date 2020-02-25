@@ -23,20 +23,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.19.1
+  - better row hover color ; fix bool color cell
 - v0.19.0
   - api.isDirectEditingKey(e)
 - v0.18.5
   - fix _filterUseDataSource
-- v0.18.4
-  - fix F key on direct editing ; fix column filterUseDataSource
-- v0.18.3
-  - better date format when undefined
-  - example frame with descriptions
-  - custom date picker example5
-- v0.18.2
-  - allow direct editing on customized editor cells
-- v0.18.1
-  - do not show std cells context when custom edit present for that cell
 
 ## features
 
