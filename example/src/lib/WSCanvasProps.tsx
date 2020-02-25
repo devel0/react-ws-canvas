@@ -145,7 +145,7 @@ export interface WSCanvasProps {
     cellCursor: string;
     /** default non cell cursor [default: "default"] */
     outsideCellCursor: string;
-    /** row hover (ex. "rgba(250,250,250,0.5)") [default: undefined] */
+    /** row hover (ex. "rgba(127,127,127, 0.1)") [default: undefined] */
     rowHoverColor: (row: any, ridx: number) => string | undefined;
 
     /** filter apply debounce (ms) [default: 500] */
