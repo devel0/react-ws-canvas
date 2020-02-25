@@ -17,7 +17,7 @@ const EXAMPLE_NOTES = [
   "resetView behavior to force sync ds"
 ];
 
-const DEFAULT_EXAMPLE = 5;
+const DEFAULT_EXAMPLE = 2;
 
 export default function Frame() {
   const [example, setExample] = useState(DEFAULT_EXAMPLE);

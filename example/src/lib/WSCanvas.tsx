@@ -1026,15 +1026,18 @@ export function WSCanvas(props: WSCanvasProps) {
 
         let cellBackground = sheetBackgroundColor;
         const qHoverColor = rowHoverColor(row, cell.row);
-        if (state.hoveredViewRow === viewCell.row && qHoverColor) {
-            cellBackground = qHoverColor;
-        } else if (getCellBackgroundColor !== undefined) {
+        if (getCellBackgroundColor !== undefined) {
             const q = getCellBackgroundColor(row, cell, props);
             if (q) cellBackground = q;
         }
-        ctx.fillStyle = isSelected ? selectionBackgroundColor : cellBackground;
 
-        ctx.fillRect(x, y, cWidth, getRowHeight(orh, row, cell.row));
+        if (isSelected ) {
+            ctx.fillStyle = selectionBackgroundColor;
+            ctx.fillRect(x, y, cWidth, getRowHeight(orh, row, cell.row));
+        } else {
+            ctx.fillStyle = cellBackground;
+            ctx.fillRect(x, y, cWidth, getRowHeight(orh, row, cell.row));
+        }
 
         if (isSelected) {
             const leftBorder = viewCell.col === 0 || !state.viewSelection.containsCell(new WSCanvasCellCoord(viewCell.row, viewCell.col - 1), selectionMode);
@@ -1186,12 +1189,12 @@ export function WSCanvas(props: WSCanvasProps) {
                 const by = y + RH / 2;
                 const bw = 10;
                 const bh = 10;
-                ctx.fillStyle = "black";
+                ctx.fillStyle = cellColor;// "black";
                 if (cellData as boolean)
                     ctx.fillRect(bx - bw / 2, by - bh / 2, bw, bh);
                 else {
                     ctx.beginPath();
-                    ctx.strokeStyle = "black";
+                    ctx.strokeStyle = cellColor;// "black";
                     ctx.lineWidth = 1;
                     ctx.strokeRect(bx - bw / 2, by - bh / 2, bw, bh);
                     ctx.stroke();
@@ -1234,6 +1237,16 @@ export function WSCanvas(props: WSCanvasProps) {
                 if (!drawBool())
                     ctx.fillText(str, posX, posY);
             }
+        }
+
+        // selection
+
+
+        // hover
+        if (state.hoveredViewRow === viewCell.row && qHoverColor) {
+            //cellBackground = qHoverColor;
+            ctx.fillStyle = qHoverColor;// isSelected ? selectionBackgroundColor : cellBackground;
+            ctx.fillRect(x, y, cWidth, getRowHeight(orh, row, cell.row));
         }
 
         if (showFocusedCellOutline && state.focusedCell.row === cell.row && state.focusedCell.col === cell.col) {

@@ -1,4 +1,4 @@
-import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, useWindowSize, setFieldData } from "./lib";
+import { WSCanvas, WSCanvasColumn, WSCanvasSortDirection, useWindowSize, setFieldData, WSCanvasSelectMode } from "./lib";
 
 import React, { useState, useEffect } from "react";
 import * as _ from 'lodash';
@@ -95,20 +95,22 @@ export function Sample2() {
 
     fullwidth height={winSize.height * .8}
     containerStyle={{ margin: "2em" }}
-    rowHoverColor={(row, ridx) => {
-      if (ridx !== 2) return "rgba(248,248,248,1)";
-    }}
+    rowHoverColor={(row,ridx) => "rgba(127,127,127, 0.1)"}
+    // rowHoverColor={(row, ridx) => {
+    //   if (ridx !== 2) return "rgba(248,248,248,1)";
+    // }}
     getCellBackgroundColor={(row, cell) => {
-      if (cell.row === 2) return "navy";
+      if (cell.row === 2) return "cyan";
       if (cell.col === 1) return "lightyellow";
     }}
     getCellFont={(row, cell, props) => {
       if (cell.col === 1) return "bold " + props.font;
     }}
-    getCellTextColor={(row, cell) => {
-      if (cell.row === 2) return "white";
+    getCellTextColor={(row, cell) => {      
+      if (cell.col === 2) return "green";
     }}
     rowHeight={() => 30}
+    selectionMode={WSCanvasSelectMode.Row}
     showFilter={true}
     showColNumber={true} showRowNumber={true}
     colWidthExpand={false}
