@@ -38,6 +38,7 @@ export function Sample3() {
   const [tooltipTest, setTooltipTest] = useState(false);
   const winSize = useWindowSize();
   const dbgDiv = useRef<HTMLDivElement>(null);
+  const [readonly, setReadonly] = useState(false);
 
   const ROWS = 5000;
 
@@ -211,6 +212,9 @@ export function Sample3() {
         api.copyWorksheetToClipboard();
     }}>COPY ENTIRE TO CLIP</button>
 
+    <input type="checkbox" id="chk" checked={readonly} onChange={(e) => { setReadonly(e.target.checked) }} />
+    <label htmlFor="chk">readonly</label>
+
     <span style={{ marginLeft: "1em" }}>
       gridStateNfo:{(gridStateNfo && gridStateNfo.state && gridStateNfo.state.focusedCell) ? gridStateNfo.state.focusedCell.toString() : ""}
       <div ref={dbgDiv}></div>
@@ -255,6 +259,13 @@ export function Sample3() {
       selectionMode={WSCanvasSelectMode.Cell}
 
       onStateChanged={(states) => setGridStateNfo(states)}
+      getCellTextColor={(row, coord, props) => {
+        if (props.isCellReadonly && props.isCellReadonly(row, coord)) return "gray";
+        return undefined;
+      }}
+      isCellReadonly={(row, coord) => {        
+        return readonly;
+      }}
       onApi={(api) => setApi(api)}
       onMouseDown={(states, e, cell) => {
         if (cell) {
