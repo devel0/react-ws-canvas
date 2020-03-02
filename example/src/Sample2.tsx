@@ -110,7 +110,7 @@ export function Sample2() {
       if (cell.col === 2) return "green";
     }}
     rowHeight={() => 30}
-    selectionMode={WSCanvasSelectMode.Row}
+    selectionMode={WSCanvasSelectMode.Cell}
     showFilter={true}
     showColNumber={true} showRowNumber={true}
     colWidthExpand={false}
