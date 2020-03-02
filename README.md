@@ -23,6 +23,9 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.19.6
+  - fix ex3 row hover color
+  - added example of usage readonly
 - v0.19.5
   - fix deps for sandbox LIVE
 - v0.19.1
@@ -102,7 +105,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/material-select-multi.gif)
 
-- cell [background][19], [font and color][119] customization and [text align][25] also with [helper][125]
+- cell [background][19], [font and color][119], [readonly mode][126] customization and [text align][25] also with [helper][125]
 
 ![](doc/cell-style-customization.png)
 
@@ -160,6 +163,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [36]: https://github.com/devel0/react-ws-canvas/blob/d115874c761a250f280ced9f3798ad531ac59075/example/src/Sample6.tsx#L26-L28
 [37]: https://github.com/devel0/react-ws-canvas/blob/58f253259b6dc563dadbcdd598a9f0b81d3baa26/example/src/Sample5.tsx#L122-L160
 [38]: https://github.com/devel0/react-ws-canvas/blob/315d2d22075c042897652253469272d8e4ee9171/example/src/Sample4.tsx#L289
+[126]: https://github.com/devel0/react-ws-canvas/blob/4c6ca74106654cec114887b542f64fb41a8cdd0f/example/src/Sample3.tsx#L262-L268
 
 ## todo
 
