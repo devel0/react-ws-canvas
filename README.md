@@ -23,10 +23,9 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
-- v0.19.6
+- v0.19.5
   - fix ex3 row hover color
   - added example of usage readonly
-- v0.19.5
   - fix deps for sandbox LIVE
 - v0.19.1
   - better row hover color ; fix bool color cell
