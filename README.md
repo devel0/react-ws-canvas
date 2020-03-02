@@ -23,12 +23,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.19.5
+  - fix deps for sandbox LIVE
 - v0.19.1
   - better row hover color ; fix bool color cell
 - v0.19.0
   - api.isDirectEditingKey(e)
-- v0.18.5
-  - fix _filterUseDataSource
 
 ## features
 
