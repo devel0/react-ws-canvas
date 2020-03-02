@@ -250,7 +250,7 @@ export function Sample3() {
       showFilter={true}
       showPartialColumns={true} showPartialRows={true}
       showColNumber={true} showRowNumber={true}
-      rowHoverColor={(row, ridx) => "rgba(248,248,248,1)"}
+      rowHoverColor={(row, ridx) => "rgba(127,127,127, 0.1)"}
       rowHeight={() => 35} textMargin={5}
       selectionMode={WSCanvasSelectMode.Cell}
 
