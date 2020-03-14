@@ -14,7 +14,7 @@ const EXAMPLE_NOTES = [
   "5000 x 7 grid db-record-like, data interact del/change row, custom cell editor, rowHover",
   "add/insert/del/move/currentRealRowSel rows using api",
   "custom multi select with material-ui",
-  "resetView behavior to force sync ds"
+  "resetView behavior to force sync ds ; resetView resetSorting argument usage"
 ];
 
 const DEFAULT_EXAMPLE = 2;
