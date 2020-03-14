@@ -23,14 +23,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.21.0
+  - fix columnSortOnReset ; added resetFilters option to resetView
 - v0.20.1
   - fix columnSortOnReset
 - v0.20.0
   - changed behavior of resetView to maintain current Column sort and allow to specify resetSorting if want to reset column sorting to initial state
-- v0.19.5
-  - fix ex3 row hover color
-  - added example of usage readonly
-  - fix deps for sandbox LIVE
 
 ## features
 
@@ -237,7 +235,7 @@ yarn start
 | [Sample3](example/src/Sample3.tsx) | 5000 x 7 grid db-record-like, data interact del/change row, custom cell editor, rowHover |
 | [Sample4](example/src/Sample4.tsx) | add/insert/del/move/currentRealRowSel rows using api |
 | [Sample5](example/src/Sample5.tsx) | custom multi select with material-ui |
-| [Sample6](example/src/Sample6.tsx) | resetView behavior to force sync ds ; resetView resetSorting argument usage |
+| [Sample6](example/src/Sample6.tsx) | resetView behavior to force sync ds ; resetSorting and resetFilters resetView arguments |
 
 ## tips
 

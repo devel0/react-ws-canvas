@@ -21,12 +21,13 @@ export const Sample6 = () => {
     const [api, setapi] = useState<WSCanvasApi | null>(null);
     const [useReset, setUseReset] = useState(true);
     const [resetColumnSorting, setResetColumnSorting] = useState(false);
+    const [resetColumnFilters, setResetColumnFilters] = useState(false);
 
     const setRndDatasource = () => {
         setRows(rndSrc());
         // reset the view to inform the grid that an initial sort required
         // elsewhere grid tought it was an editing effect and doesn't apply sorting
-        if (api && useReset) api.resetView(resetColumnSorting); // UNCOMMENT THIS TO SEE UNSORT data after "set datasource" 2th button click
+        if (api && useReset) api.resetView(resetColumnSorting, resetColumnFilters); // UNCOMMENT THIS TO SEE UNSORT data after "set datasource" 2th button click
     };
 
     return <div>
@@ -41,7 +42,12 @@ export const Sample6 = () => {
 
         <span>
             <input type="checkbox" id="chk1" checked={resetColumnSorting} onChange={(e) => { setResetColumnSorting(e.target.checked) }} />
-            <label htmlFor="chk1">reset Column Sort to initial</label>
+            <label htmlFor="chk1">reset Sort</label>
+        </span>
+
+        <span>
+            <input type="checkbox" id="chk2" checked={resetColumnFilters} onChange={(e) => { setResetColumnFilters(e.target.checked) }} />
+            <label htmlFor="chk2">reset Filters</label>
         </span>
 
         <WSCanvas
@@ -50,6 +56,7 @@ export const Sample6 = () => {
             showColNumber={true} showRowNumber={true}
             columnClickBehavior={WSCanvasColumnClickBehavior.ToggleSort}
             rows={rows}
+            showFilter={true}
             rowGetCellData={(row, colIdx) => row[colIdx]}
             prepareCellDataset={() => rows.slice()}
             commitCellDataset={(q) => setRows(q)}

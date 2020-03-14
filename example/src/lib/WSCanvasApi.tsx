@@ -130,7 +130,7 @@ export class WSCanvasApi {
     paint: () => void;
 
     /** force view reset */
-    resetView: (resetSorting?: boolean) => void;
+    resetView: (resetSorting?: boolean, resetFilters?: boolean) => void;
 
     /** testing */
     onSync: (fn: WSCanvasSyncFn) => void;
