@@ -178,6 +178,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const [touchStartTime, setTouchStartTime] = useState<Date>(new Date());
     const [systemReset, setSystemReset] = useState(0);
     const [postApiForceSort, setPostApiForceSort] = useState(false);
+    const [columnSortOnReset, setColumnSortOnReset] = useState<WSCanvasColumnSortInfo[] | undefined>(undefined);
 
     const colNumberRowHeightFull = () => colNumberRowHeight + (showFilter ? rowHeight(null, -1) : 0);
 
@@ -410,7 +411,9 @@ export function WSCanvas(props: WSCanvasProps) {
     const _columnInitialSort = () => {
         let res: WSCanvasColumnSortInfo[] | undefined;
 
-        if (columnInitialSort) res = columnInitialSort;
+        if (columnSortOnReset !== undefined)
+            res = columnSortOnReset;
+        else if (columnInitialSort) res = columnInitialSort;
 
         if (!res && columns) res = WSCanvasColumnToSortInfo(columns);
 
@@ -1031,7 +1034,7 @@ export function WSCanvas(props: WSCanvasProps) {
             if (q) cellBackground = q;
         }
 
-        if (isSelected ) {
+        if (isSelected) {
             ctx.fillStyle = selectionBackgroundColor;
             ctx.fillRect(x, y, cWidth, getRowHeight(orh, row, cell.row));
         } else {
@@ -1598,7 +1601,12 @@ export function WSCanvas(props: WSCanvasProps) {
             y >= state.tableCellsBBox.leftTop.y && y <= state.tableCellsBBox.rightBottom.y;
     }
 
-    const resetState = () => {
+    const resetState = (resetSorting?: boolean) => {
+        if (resetSorting === true) {
+            setColumnSortOnReset(undefined);
+        } else {
+            setColumnSortOnReset(_.cloneDeep(stateNfo.columnsSort));            
+        }
         resetFocusedCell = new WSCanvasCellCoord(0, 0);
         setSystemReset(1);
     };
@@ -3392,6 +3400,9 @@ export function WSCanvas(props: WSCanvasProps) {
                 _setViewMap(vm);
 
                 const state = new WSCanvasState();
+                if (columnSortOnReset !== undefined) {
+                    state.columnsSort = columnSortOnReset;
+                }
                 _setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
 
@@ -3557,7 +3568,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             api.paint = () => paint(api.states.state, api.states.vm, api.states.overrideRowHeight);
 
-            api.resetView = () => resetState();
+            api.resetView = (resetSorting) => resetState(resetSorting);
 
             api.onSync = (action) => {
                 //setWaitingSync(true);
