@@ -1605,7 +1605,7 @@ export function WSCanvas(props: WSCanvasProps) {
         if (resetSorting === true) {
             setColumnSortOnReset(undefined);
         } else {
-            setColumnSortOnReset(_.cloneDeep(stateNfo.columnsSort));            
+            setColumnSortOnReset(_.cloneDeep(stateNfo.columnsSort));
         }
         resetFocusedCell = new WSCanvasCellCoord(0, 0);
         setSystemReset(1);
@@ -3399,10 +3399,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const vm: ViewMap | null = null;
                 _setViewMap(vm);
 
-                const state = new WSCanvasState();
-                if (columnSortOnReset !== undefined) {
-                    state.columnsSort = columnSortOnReset;
-                }
+                const state = new WSCanvasState();                
                 _setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
 
