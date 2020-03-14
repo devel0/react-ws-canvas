@@ -23,7 +23,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
-- v0.21.1
+- v0.21.0
   - fix columnSortOnReset ; added resetFilters option to resetView
 - v0.20.1
   - fix columnSortOnReset
