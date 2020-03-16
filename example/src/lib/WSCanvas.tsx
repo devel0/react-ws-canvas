@@ -191,7 +191,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const canvGeomCalc = () => {
         /** canvas width */
-        let CW = fullwidth ? (winSize.width - canvas_container_mp[0] - toplevel_container_mp[0]) : (width - toplevel_container_mp[0]);
+        let CW = fullwidth ? (width - canvas_container_mp[0] - toplevel_container_mp[0]) : (width - toplevel_container_mp[0]);
 
         /** canvas height */
         let CH = height - (debug ? debugSize.height : 0) - canvas_container_mp[1];

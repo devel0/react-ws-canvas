@@ -23,6 +23,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.21.1
+  - fix custom width ( if unspecified default props already use window.innerWidth )
 - v0.21.0
   - fix columnSortOnReset ; added resetFilters option to resetView
 - v0.20.1
