@@ -98,7 +98,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/api.gif)
 
-- each individual cell [custom edit][13] ( F2 ) control can be customized also in [column helper][113] ( [example][24] : through keyboard F2, arrows then enter ) ; cell [changing/changed][128] also in [column helper][129]
+- each individual cell [custom edit][13] ( F2 ) control can be customized also in [column helper][113] ( [example][24] : through keyboard F2, arrows then enter ) ; cell [editing/edited][128] also in [column helper][127]
 
 ![](doc/custom-combobox.gif)
 
