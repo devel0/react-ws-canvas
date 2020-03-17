@@ -64,6 +64,7 @@ export function WSCanvas(props: WSCanvasProps) {
         showPartialRows,
         preventWheelOnBounds,
         newRowsInsertAtViewIndex,
+        globalFilter,
 
         rowGetCellData,
         renderTransform,
@@ -146,7 +147,9 @@ export function WSCanvas(props: WSCanvasProps) {
         onMouseDoubleClick,
         onPreviewMouseWheel,
         onMouseWheel,
-        onContextMenu
+        onContextMenu,
+        onCellEditing,
+        onCellEdited,
     } = props;
 
     useEffect(() => {
@@ -647,12 +650,25 @@ export function WSCanvas(props: WSCanvasProps) {
                         });
                     }
 
+                    if (globalFilter) {
+                        const q = globalFilter(rows[ri], ri);
+                        if (q === false) matching = false;
+                    }
+
                     if (matching) {
                         filteredToReal.push(ri);
                     }
                 }
             } else {
-                for (let ri = 0; ri < rowsCount; ++ri) filteredToReal.push(ri);
+                if (globalFilter) {
+                    for (let ri = 0; ri < rowsCount; ++ri) {
+                        const q = globalFilter(rows[ri], ri);
+                        if (q === undefined || q) filteredToReal.push(ri);
+                    }
+                }
+                else {
+                    for (let ri = 0; ri < rowsCount; ++ri) filteredToReal.push(ri);
+                }
             }
         }
         else return;
@@ -1286,9 +1302,34 @@ export function WSCanvas(props: WSCanvasProps) {
                     break;
             }
         }
-        rowSetCellData(row, cell.col, cellval);
-        //cellDatasetSetRows(ds, dsRows);
-        if (!pasteMode) commitCellDataset(ds);
+
+        const valBefore = _getCellData(cell);
+
+        if (onCellEditing === undefined ||
+            (onCellEditing && onCellEditing(mkstates(stateNfo, viewMap, overridenRowHeight), row, cell, valBefore, value))) {
+
+            let skip = false;
+
+            if (columns && columns[cell.col].onChanging) {
+                const fn = columns[cell.col].onChanging;
+                if (fn && !fn(mkstates(stateNfo, viewMap, overridenRowHeight), row, cell, valBefore, value)) {
+                    skip = true;
+                }
+            }
+
+            if (!skip) {
+                rowSetCellData(row, cell.col, cellval);
+                //cellDatasetSetRows(ds, dsRows);
+                if (!pasteMode) commitCellDataset(ds);
+
+                if (onCellEdited) onCellEdited(mkstates(stateNfo, viewMap, overridenRowHeight), row, cell, valBefore, value);
+
+                if (columns && columns[cell.col].onChanged) {
+                    const fn = columns[cell.col].onChanged;
+                    if (fn) fn(mkstates(stateNfo, viewMap, overridenRowHeight), row, cell, valBefore, value);
+                }
+            }
+        }
     }
 
     const openCellCustomEdit = (state: WSCanvasState, cell: WSCanvasCellCoord, orh: number[] | null) => {
@@ -2585,8 +2626,35 @@ export function WSCanvas(props: WSCanvasProps) {
                                             const viewCell = viewCellIt.value;
                                             const cell = viewCellToReal(viewMap, viewCell);
                                             const row = rows[cell.row];
+
                                             if (!_isCellReadonly(row, cell)) {
-                                                rowSetCellData(cellDatasetGetRows(ds)[cell.row], cell.col, "");
+                                                const valBefore = _getCellData(cell);
+                                                const value = "";
+
+                                                if (onCellEditing === undefined ||
+                                                    (onCellEditing && onCellEditing(mkstates(stateNfo, viewMap, overridenRowHeight), row, cell, valBefore, value))) {
+
+                                                    let skip = false;
+
+                                                    if (columns && columns[cell.col].onChanging) {
+                                                        const fn = columns[cell.col].onChanging;
+                                                        if (fn && !fn(mkstates(stateNfo, viewMap, overridenRowHeight), row, cell, valBefore, value)) {
+                                                            skip = true;
+                                                        }
+                                                    }
+
+                                                    if (!skip) {
+                                                        rowSetCellData(cellDatasetGetRows(ds)[cell.row], cell.col, value);
+
+                                                        if (onCellEdited) onCellEdited(mkstates(stateNfo, viewMap, overridenRowHeight), row, cell, valBefore, value);
+
+                                                        if (columns && columns[cell.col].onChanged) {
+                                                            const fn = columns[cell.col].onChanged;
+                                                            if (fn) fn(mkstates(stateNfo, viewMap, overridenRowHeight), row, cell, valBefore, value);
+                                                        }
+                                                    }
+                                                }
+
                                             }
                                             viewCellIt = viewCellRng.next();
                                         }

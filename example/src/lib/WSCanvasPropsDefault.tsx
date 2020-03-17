@@ -40,6 +40,7 @@ export const WSCanvasPropsDefault = () => {
         showPartialRows: true,
         preventWheelOnBounds: true,
         newRowsInsertAtViewIndex: undefined,
+        globalFilter: undefined,
 
         rowGetCellData: undefined,
         renderTransform: undefined,

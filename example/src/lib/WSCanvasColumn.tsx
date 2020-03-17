@@ -69,4 +69,10 @@ export interface WSCanvasColumn {
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined,
 
     hidden?: boolean | undefined;
+
+    /** fired before cell editing done ; can prevent editing done by return false */
+    onChanging?: (states: WSCanvasStates, row: any, cell: WSCanvasCellCoord, oldValue: any, newValue: any) => boolean;
+
+    /** fired after cell edited */
+    onChanged?: (states: WSCanvasStates, row: any, cell: WSCanvasCellCoord, oldValue: any, newValue: any) => void;
 }

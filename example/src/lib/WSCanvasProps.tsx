@@ -70,6 +70,8 @@ export interface WSCanvasProps {
     preventWheelOnBounds: boolean;
     /** if set new rows goes inserted at given view index [default: undefined] */
     newRowsInsertAtViewIndex?: number;
+    /** allow to force a global filter ; rows that not satisfy the filter aren't shown */
+    globalFilter?: (row: any, ridx:number) => boolean | undefined;
 
     /** retrieve data from a row */
     rowGetCellData?: (row: any, colIdx: number) => any;
@@ -221,4 +223,10 @@ export interface WSCanvasProps {
     onMouseWheel?: (states: WSCanvasStates, e: WheelEvent) => void;
 
     onContextMenu?: (states: WSCanvasStates, e: React.MouseEvent<HTMLCanvasElement, MouseEvent>, cell: WSCanvasCellCoord | null) => void;
+
+    /** fired before cell editing done ; can prevent editing done by return false */
+    onCellEditing?: (states: WSCanvasStates, row: any, cell: WSCanvasCellCoord, oldValue: any, newValue:any) => boolean;
+
+    /** fired after cell edited */
+    onCellEdited?: (states: WSCanvasStates, row: any, cell: WSCanvasCellCoord, oldValue: any, newValue:any) => void;
 }
