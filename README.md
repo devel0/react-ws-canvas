@@ -23,6 +23,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.22.0
+  - globalFilter ; onCellEditing/onCellEdited ; onChanging/onChanged column helper
 - v0.21.1
   - fix custom width ( if unspecified default props already use window.innerWidth )
 - v0.21.0
@@ -88,13 +90,15 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - data getter/setter can follow a [worksheet][7] or a [db record type][8] ( [example of nested field][28] using [getFieldData][29] and [setFieldData][30] methods)
 
+- data [filter global][129]
+
 - optional dataset on external object with [ds rows getter mapper][32] useful in some circumstance when need to preserve rows array object ref
 
 - [api][10] and [handlers][27] available for control interactions ( [example][11] ) ; props can be accessed [inversely][31] through api; retrieve list of selected row idxs [example][38]
 
 ![](doc/api.gif)
 
-- each individual cell [custom edit][13] ( F2 ) control can be customized also in [column helper][113] ( [example][24] : through keyboard F2, arrows then enter )
+- each individual cell [custom edit][13] ( F2 ) control can be customized also in [column helper][113] ( [example][24] : through keyboard F2, arrows then enter ) ; cell [changing/changed][128] also in [column helper][129]
 
 ![](doc/custom-combobox.gif)
 
@@ -163,6 +167,9 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [37]: https://github.com/devel0/react-ws-canvas/blob/58f253259b6dc563dadbcdd598a9f0b81d3baa26/example/src/Sample5.tsx#L122-L160
 [38]: https://github.com/devel0/react-ws-canvas/blob/315d2d22075c042897652253469272d8e4ee9171/example/src/Sample4.tsx#L289
 [126]: https://github.com/devel0/react-ws-canvas/blob/4c6ca74106654cec114887b542f64fb41a8cdd0f/example/src/Sample3.tsx#L262-L268
+[127]: https://github.com/devel0/react-ws-canvas/blob/b123792518147670b918a392a8894a98e5442ca5/example/src/Sample2.tsx#L52-L59
+[128]: https://github.com/devel0/react-ws-canvas/blob/b123792518147670b918a392a8894a98e5442ca5/example/src/Sample2.tsx#L151-L157
+[129]: https://github.com/devel0/react-ws-canvas/blob/b123792518147670b918a392a8894a98e5442ca5/example/src/Sample2.tsx#L126-L132
 
 ## todo
 
@@ -233,7 +240,7 @@ yarn start
 |---|---|
 | [quickstart](example/src/App.quickstart.tsx) | 500000 x 20 grid with minimal props |
 | [Sample1](example/src/Sample1.tsx) | 50000 x 200 grid with frozen row/col, filter, custom column width |
-| [Sample2](example/src/Sample2.tsx) | 5000 x 6 grid db-record-like column mapping, initial sort, custom sort, api onMouseDown |
+| [Sample2](example/src/Sample2.tsx) | 5000 x 6 grid db-record-like column mapping, initial sort, custom sort, api onMouseDown, global filter, cell changing/changed |
 | [Sample3](example/src/Sample3.tsx) | 5000 x 7 grid db-record-like, data interact del/change row, custom cell editor, rowHover |
 | [Sample4](example/src/Sample4.tsx) | add/insert/del/move/currentRealRowSel rows using api |
 | [Sample5](example/src/Sample5.tsx) | custom multi select with material-ui |
