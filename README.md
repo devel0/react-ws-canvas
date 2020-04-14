@@ -23,16 +23,13 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.23.0
+  - selectedRowsCount, selectedRow helpers
+  - custom render ; example of color picker ; fix custom edit width,height
 - v0.22.0
   - globalFilter ; onCellEditing/onCellEdited ; onChanging/onChanged column helper
 - v0.21.1
   - fix custom width ( if unspecified default props already use window.innerWidth )
-- v0.21.0
-  - fix columnSortOnReset ; added resetFilters option to resetView
-- v0.20.1
-  - fix columnSortOnReset
-- v0.20.0
-  - changed behavior of resetView to maintain current Column sort and allow to specify resetSorting if want to reset column sorting to initial state
 
 ## features
 
@@ -108,6 +105,10 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/material-select-multi.gif)
 
+- custom color picker with custom render ( [example][130] )
+
+![](doc/custom-color-picker.gif)
+
 - cell [background][19], [font and color][119], [readonly mode][126] customization and [text align][25] also with [helper][125]
 
 ![](doc/cell-style-customization.png)
@@ -170,6 +171,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 [127]: https://github.com/devel0/react-ws-canvas/blob/b123792518147670b918a392a8894a98e5442ca5/example/src/Sample2.tsx#L52-L59
 [128]: https://github.com/devel0/react-ws-canvas/blob/b123792518147670b918a392a8894a98e5442ca5/example/src/Sample2.tsx#L151-L157
 [129]: https://github.com/devel0/react-ws-canvas/blob/b123792518147670b918a392a8894a98e5442ca5/example/src/Sample2.tsx#L126-L132
+[130]: https://github.com/devel0/react-ws-canvas/blob/2d8ec23eb40a059825d6ac4dc2520ad696468595/example/src/Sample5.tsx#L129-L132
 
 ## todo
 
