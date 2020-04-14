@@ -243,7 +243,7 @@ yarn start
 | [Sample2](example/src/Sample2.tsx) | 5000 x 6 grid db-record-like column mapping, initial sort, custom sort, api onMouseDown, global filter, cell changing/changed |
 | [Sample3](example/src/Sample3.tsx) | 5000 x 7 grid db-record-like, data interact del/change row, custom cell editor, rowHover |
 | [Sample4](example/src/Sample4.tsx) | add/insert/del/move/currentRealRowSel rows using api |
-| [Sample5](example/src/Sample5.tsx) | custom multi select with material-ui |
+| [Sample5](example/src/Sample5.tsx) | custom multi select with material-ui ; custom render chip with color picker |
 | [Sample6](example/src/Sample6.tsx) | resetView behavior to force sync ds ; resetSorting and resetFilters resetView arguments |
 
 ## tips

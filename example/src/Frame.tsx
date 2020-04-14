@@ -13,11 +13,11 @@ const EXAMPLE_NOTES = [
   "5000 x 6 grid db-record-like column mapping, initial sort, custom sort, api onMouseDown, global filter, cell changing/changed",
   "5000 x 7 grid db-record-like, data interact del/change row, custom cell editor, rowHover",
   "add/insert/del/move/currentRealRowSel rows using api",
-  "custom multi select with material-ui",
+  "custom multi select with material-ui ; custom render chip with color picker",
   "resetView behavior to force sync ds ; resetSorting and resetFilters resetView arguments"
 ];
 
-const DEFAULT_EXAMPLE = 2;
+const DEFAULT_EXAMPLE = 5;
 
 export default function Frame() {
   const [example, setExample] = useState(DEFAULT_EXAMPLE);

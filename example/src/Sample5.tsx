@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FormControl, InputLabel, Select, MenuItem, Input, InputLabelProps } from '@material-ui/core';
+import { FormControl, InputLabel, Select, MenuItem, Input, InputLabelProps, Chip } from '@material-ui/core';
 import {
     WSCanvas, WSCanvasColumn, WSCanvasApi, useWindowSize,
     WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord, setFieldData, getFieldData, pathBuilder
@@ -7,6 +7,7 @@ import {
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
 import * as _ from 'lodash';
+import { SketchPicker, SwatchesPicker } from "react-color";
 
 interface MyDataUser {
     id: number;
@@ -16,6 +17,7 @@ interface MyDataUser {
 interface MyData {
     descr: string;
     users: MyDataUser[];
+    color: string;
     dt: Date;
 }
 
@@ -120,6 +122,35 @@ export function Sample5() {
                 }
             },
             {
+                type: "text",
+                header: "color",
+                field: SP_MyData("color"),
+                width: 100,
+                customRender: (states, _row) => {
+                    const row = _row as MyData;
+                    return <Chip size="small" style={{ fontWeight: "bold", background: row.color, color: "white" }} label={row.color} />
+                },
+                customEdit: (states, _row) => {
+                    const row = _row as MyData;
+
+                    return <div>
+                        <SwatchesPicker
+                            color={states.state.customEditValue}
+                            onChangeComplete={(x) => {
+                                
+                            }}
+                            onChange={(x) => {
+                                if (api) {
+                                    api.begin();
+                                    api.setCustomEditValue(x.hex);
+                                    api.commit();
+                                    api.closeCustomEdit(true);
+                                }
+                            }} />
+                    </div >
+                }
+            },
+            {
                 // https://material-ui-pickers.dev/getting-started/installation
                 type: "date",
                 header: "date",
@@ -168,6 +199,7 @@ export function Sample5() {
         newset.push({
             descr: "test" + ds.length,
             dt: new Date(),
+            color: "#ff0000",
             users: []
         });
         setDs(newset);

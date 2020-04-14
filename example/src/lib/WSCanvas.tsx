@@ -173,6 +173,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const [waitingSync, setWaitingSync] = useState(false);
 
     const [children, setChildren] = useState<JSX.Element[]>([]);
+    const [customRenderChildren, setCustomRenderChildren] = useState<JSX.Element[]>([]);
     const [filterChildren, setFilterChildren] = useState<JSX.Element[]>([]);
     const [viewMap, setViewMap] = useState<ViewMap | null>(null);
     const [overridenRowHeight, setOverridenRowHeight] = useState<number[] | null>(null);
@@ -447,6 +448,8 @@ export function WSCanvas(props: WSCanvasProps) {
         return res;
     }
 
+
+
     const _isCellReadonly = (row: any, cell: WSCanvasCellCoord) => {
         let res: boolean | undefined;
 
@@ -469,6 +472,19 @@ export function WSCanvas(props: WSCanvasProps) {
             if (qce) res = qce(states, rows[cell.row], cell, containerStyle, cellWidth, cellHeight);
         }
 
+        return res;
+    }
+
+    const _customRender = (states: WSCanvasStates, row: any, cell: WSCanvasCellCoord,
+        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => {
+        let res: any = undefined;
+
+        if (columns) {
+            var col = columns[cell.col];
+            if (col && col.customRender) {
+                res = col.customRender(states, rows[cell.row], cell, containerStyle, cellWidth, cellHeight);
+            }
+        }
         return res;
     }
 
@@ -1028,7 +1044,8 @@ export function WSCanvas(props: WSCanvasProps) {
      * PAINT CELL
      * 
      */
-    const redrawCellInternal = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, viewCell: WSCanvasCellCoord, ctx: CanvasRenderingContext2D, cWidth: number, x: number, y: number) => {
+    const redrawCellInternal = (state: WSCanvasState, vm: ViewMap | null, orh: number[] | null, viewCell: WSCanvasCellCoord,
+        ctx: CanvasRenderingContext2D, cWidth: number, x: number, y: number, tmpCustomRenderChildren: any[]) => {
 
         const cell = viewCellToReal(vm, viewCell)!;
         if (_colHidden(cell.col)) return;
@@ -1125,7 +1142,37 @@ export function WSCanvas(props: WSCanvasProps) {
         const cellType = _getCellType(row, cell, cellData);
         const qRender = _renderTransform(row, cell, cellData);
 
-        if (qRender)
+        const qCustRender = _customRender(mkstates(state, vm, overridenRowHeight), rows[row], cell);
+        if (canvasRef.current && qCustRender) {
+            const viewCell = realCellToView(vm, cell);
+            const ccoord = viewCellToCanvasCoord(state, vm, orh, viewCell);
+
+            if (ccoord) {
+                const cellWidth = overridenColWidth(state, cell.col) - textMargin - 2;
+                const cellHeight = getRowHeight(orh, row, cell.row) - textMargin;
+
+                const ceditStyle = {
+                    font: font,
+                    //background: "yellow",
+                    margin: 0, padding: 0, outline: 0, border: 0,
+                    position: "absolute",
+                    overflow: "hidden",
+                    left: canvasRef.current.offsetLeft + ccoord.x + textMargin + 1,
+                    top: canvasRef.current.offsetTop + ccoord.y + textMargin,
+                    width: cellWidth,
+                    height: cellHeight
+                } as CSSProperties;
+
+                //if (onCustomEdit) onCustomEdit(mkstates(state, vm, overridenRowHeight), state.customEditCell);                
+                tmpCustomRenderChildren.push(<div
+                    key={"crender:" + cell.toString()}
+                    onDoubleClick={handleDoubleClick}
+                    onMouseDown={(e) => { handleMouseDown(e); }}
+                    style={ceditStyle}>
+                    {qCustRender}
+                </div>);
+            }
+        } else if (qRender)
             str = String(qRender);
         else {
             const customRender = _renderTransform(row, cell, cellData);
@@ -1831,6 +1878,10 @@ export function WSCanvas(props: WSCanvasProps) {
                 let y = 1;
                 if (showColNumber) y = colNumberRowHeightFull() + 2;
 
+                setCustomRenderChildren([]);
+
+                const tmpCustomRenderChildren: any[] = [];
+
                 //#region CELLS
                 {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1849,7 +1900,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                 for (let ci = ciFrom; ci <= ciTo; ++ci) {
                                     const cWidth = overridenColWidth(state, ci);
 
-                                    redrawCellInternal(state, vm, orh, new WSCanvasCellCoord(vri, ci), ctx, cWidth, x, y);
+                                    redrawCellInternal(state, vm, orh, new WSCanvasCellCoord(vri, ci), ctx, cWidth, x, y, tmpCustomRenderChildren);
 
                                     x += cWidth + 1;
 
@@ -1906,6 +1957,8 @@ export function WSCanvas(props: WSCanvasProps) {
                     // }
                 }
                 //#endregion
+
+                setCustomRenderChildren(tmpCustomRenderChildren);
 
                 //#region COLUMN NUMBERS ( optional )
                 if (showColNumber) {
@@ -2179,6 +2232,8 @@ export function WSCanvas(props: WSCanvasProps) {
                             ceditStyle, cellWidth, cellHeight);
                         if (qCust) {
                             defaultEdit = false;
+                            ceditStyle.width = undefined;
+                            ceditStyle.height = undefined;
                             if (onCustomEdit) onCustomEdit(mkstates(state, vm, overridenRowHeight), state.customEditCell);
                             setChildren([<div
                                 key={"edit:" + state.customEditCell.toString()}
@@ -2745,7 +2800,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const DOUBLE_CLICK_THRESHOLD = 300;
 
-    const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    const handleMouseDown = (e: React.MouseEvent<any, MouseEvent>) => {
         let cellCoord: WSCanvasCellCoord | null = null;
         const ccr = mouseCoordToCanvasCoord(e);
         if (ccr !== null) {
@@ -3073,7 +3128,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     }
 
-    const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    const handleDoubleClick = (e: React.MouseEvent<any, MouseEvent>) => {
         const ccr = mouseCoordToCanvasCoord(e);
 
         if (ccr !== null) {
@@ -3705,6 +3760,8 @@ export function WSCanvas(props: WSCanvasProps) {
             border: debug ? "1px solid blue" : "",
             overflow: "hidden"
         }}>
+
+        {customRenderChildren}
 
         <div ref={canvasContainerDivRef}
             style={containerStyle === undefined ? baseDivContainerStyle : Object.assign(baseDivContainerStyle, containerStyle)}>

@@ -65,6 +65,9 @@ export interface WSCanvasColumn {
 
     readonly?: boolean | undefined;
 
+    customRender?: ((states: WSCanvasStates, row: any, cell: WSCanvasCellCoord,
+        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined,
+
     customEdit?: ((states: WSCanvasStates, row: any, cell: WSCanvasCellCoord,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined,
 
