@@ -18,6 +18,9 @@ export class WSCanvasState {
         this.viewRowsCount = 0;
         this.viewColsCount = 0;
 
+        this.selectedRow = undefined;
+        this.selectedRowsCount = 0;
+
         this.viewScrollOffset = new WSCanvasCellCoord();
         this.scrollOffsetStart = new WSCanvasCellCoord();
         this.tableCellsBBox = new WSCanvasRect();
@@ -72,6 +75,10 @@ export class WSCanvasState {
 
     viewRowsCount: number;
     viewColsCount: number;
+
+    /** selected row ( if multiple rows, this is the first ) */
+    selectedRow: any;
+    selectedRowsCount: number;
 
     viewScrollOffset: WSCanvasCellCoord;
     scrollOffsetStart: WSCanvasCellCoord;

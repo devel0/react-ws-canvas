@@ -137,7 +137,7 @@ export function Sample5() {
                         <SwatchesPicker
                             color={states.state.customEditValue}
                             onChangeComplete={(x) => {
-                                
+
                             }}
                             onChange={(x) => {
                                 if (api) {
@@ -217,6 +217,9 @@ export function Sample5() {
     }, []);
 
     return <div style={{ margin: "1em" }}>
+        <span><b>selected rows count:</b> {(api ? api.states.state.selectedRowsCount : 0)}</span>
+        <span><b> description:</b> {((api && api.states.state.selectedRow) ? (api.states.state.selectedRow as MyData).descr : "")}</span>
+        <br /><br />
 
         <button onClick={() => addRow()}>ADD</button>
 

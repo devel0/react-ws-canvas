@@ -294,6 +294,8 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const _setStateNfo = (newState: WSCanvasState) => {
         if (debug) debugEvalStateChange(stateNfo, newState);
+        newState.selectedRowsCount = newState.viewSelection.rowIdxs().size;
+        newState.selectedRow = rows[newState.focusedCell.row];
         setStateNfo(newState);
     }
 
@@ -558,6 +560,8 @@ export function WSCanvas(props: WSCanvasProps) {
     const selectFocusedCell = (state: WSCanvasState, vm: ViewMap | null) => {
         const focusedViewCell = realCellToView(vm, state.focusedCell);
         state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(focusedViewCell)]);
+        state.selectedRowsCount = 1;
+        state.selectedRow = rows[state.focusedCell.row];
     }
 
     let resetFocusedCell: WSCanvasCellCoord | undefined = undefined;
