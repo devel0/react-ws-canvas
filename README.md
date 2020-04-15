@@ -23,6 +23,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.23.1
+  - handle wheel on custom render
 - v0.23.0
   - selectedRowsCount, selectedRow helpers
   - custom render ; example of color picker ; fix custom edit width,height

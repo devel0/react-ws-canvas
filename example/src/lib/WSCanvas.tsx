@@ -1170,8 +1170,15 @@ export function WSCanvas(props: WSCanvasProps) {
                 //if (onCustomEdit) onCustomEdit(mkstates(state, vm, overridenRowHeight), state.customEditCell);                
                 tmpCustomRenderChildren.push(<div
                     key={"crender:" + cell.toString()}
+                    // onLoad={(e) => {
+                    //     e.currentTarget.addEventListener("wheel", handleWheel);
+                    // }}
                     onDoubleClick={handleDoubleClick}
                     onMouseDown={(e) => { handleMouseDown(e); }}
+                    onWheel={(e) => {
+                        e.preventDefault();
+                        handleWheel(e.nativeEvent);
+                    }}
                     style={ceditStyle}>
                     {qCustRender}
                 </div>);
