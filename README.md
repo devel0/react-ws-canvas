@@ -23,17 +23,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.23.3
+  - fix recompute row height for custom render els
 - v0.23.2
   - changed customRender, customEdit signature to allow return undefined ; added autoresize height for customRender elements ( when wrapText enabled )  
 - v0.23.1
   - handle wheel on custom render
-- v0.23.0
-  - selectedRowsCount, selectedRow helpers
-  - custom render ; example of color picker ; fix custom edit width,height
-- v0.22.0
-  - globalFilter ; onCellEditing/onCellEdited ; onChanging/onChanged column helper
-- v0.21.1
-  - fix custom width ( if unspecified default props already use window.innerWidth )
 
 ## features
 
