@@ -812,11 +812,14 @@ export function WSCanvas(props: WSCanvasProps) {
                                         let celldata = _getCellData(cell);
 
                                         const qcrender = _customRender(cstates, rows[cell.row], cell);
-                                        if (qcrender) {                                            
+                                        if (qcrender) {
                                             const qcel = document.getElementById("crender_" + cell.toString());
-                                            if (qcel) {                                                
-                                                rh = qcel.children[0].clientHeight;
-                                            }                                            
+                                            if (qcel) {
+                                                if (qcel && qcel.children.length > 0) {
+                                                    const qh = qcel.children[0].getBoundingClientRect().height;                                                    
+                                                    if (qh > rh) rh = qh;
+                                                }
+                                            }
                                         } else {
 
                                             let str = _renderTransform(rows[cell.row], cell, celldata);
@@ -1179,13 +1182,11 @@ export function WSCanvas(props: WSCanvasProps) {
                     height: cellHeight
                 } as CSSProperties;
 
-                //if (onCustomEdit) onCustomEdit(mkstates(state, vm, overridenRowHeight), state.customEditCell);                
+                //if (onCustomEdit) onCustomEdit(mkstates(state, vm, overridenRowHeight), state.customEditCell);                                                
+
                 tmpCustomRenderChildren.push(<div
                     id={"crender_" + cell.toString()}
                     key={"crender:" + cell.toString()}
-                    // onLoad={(e) => {
-                    //     e.currentTarget.addEventListener("wheel", handleWheel);
-                    // }}
                     onDoubleClick={handleDoubleClick}
                     onMouseDown={(e) => { handleMouseDown(e); }}
                     onWheel={(e) => {
@@ -1193,7 +1194,9 @@ export function WSCanvas(props: WSCanvasProps) {
                         handleWheel(e.nativeEvent);
                     }}
                     style={ceditStyle}>
-                    {qCustRender}
+                    <div>
+                        {qCustRender}
+                    </div>
                 </div>);
             }
         } else if (qRender)
@@ -3772,6 +3775,7 @@ export function WSCanvas(props: WSCanvasProps) {
     useEffect(() => {
         //if (waitingSync) return;
         if (debug) console.log("************VIEW SYNCED");
+        recomputeOverridenRowHeight(stateNfo);
         if (onSync !== undefined) {
             onSync.fn(mkstates(stateNfo, viewMap, overridenRowHeight));
             setOnSync(undefined);
