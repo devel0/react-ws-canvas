@@ -479,7 +479,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
     const _customRender = (states: WSCanvasStates, row: any, cell: WSCanvasCellCoord,
         containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => {
-        let res: any = undefined;
+        let res: JSX.Element | undefined = undefined;
 
         if (columns) {
             var col = columns[cell.col];
@@ -795,6 +795,8 @@ export function WSCanvas(props: WSCanvasProps) {
             const ctx = canvas.getContext("2d");
 
             if (ctx && rowsCount > 0) {
+                const cstates = mkstates(state, viewMap, overridenRowHeight);
+
                 const rowHeightComputed = (ri: number) => {
                     let rh = rowHeight(rows[ri], -1);
 
@@ -808,18 +810,28 @@ export function WSCanvas(props: WSCanvasProps) {
                                     const qWrap = _getCellTextWrap(row, cell, props);
                                     if (qWrap === true) {
                                         let celldata = _getCellData(cell);
-                                        let str = _renderTransform(rows[cell.row], cell, celldata);
-                                        if (str === undefined) str = String(celldata);
-                                        let cellFont = font;
-                                        if (getCellFont !== undefined) {
-                                            const q = getCellFont(row, cell, props);
-                                            if (q) cellFont = q;
+
+                                        const qcrender = _customRender(cstates, rows[cell.row], cell);
+                                        if (qcrender) {                                            
+                                            const qcel = document.getElementById("crender_" + cell.toString());
+                                            if (qcel) {                                                
+                                                rh = qcel.children[0].clientHeight;
+                                            }                                            
+                                        } else {
+
+                                            let str = _renderTransform(rows[cell.row], cell, celldata);
+                                            if (str === undefined) str = String(celldata);
+                                            let cellFont = font;
+                                            if (getCellFont !== undefined) {
+                                                const q = getCellFont(row, cell, props);
+                                                if (q) cellFont = q;
+                                            }
+                                            ctx.font = cellFont;
+                                            const txtWidth = ctx.measureText(str).width;
+                                            const f = Math.ceil(txtWidth / colW);
+                                            const q = rh * f;
+                                            if (q > rh) rh = q;
                                         }
-                                        ctx.font = cellFont;
-                                        const txtWidth = ctx.measureText(str).width;
-                                        const f = Math.ceil(txtWidth / colW);
-                                        const q = rh * f;
-                                        if (q > rh) rh = q;
                                     }
                                 }
                             }
@@ -1169,6 +1181,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 //if (onCustomEdit) onCustomEdit(mkstates(state, vm, overridenRowHeight), state.customEditCell);                
                 tmpCustomRenderChildren.push(<div
+                    id={"crender_" + cell.toString()}
                     key={"crender:" + cell.toString()}
                     // onLoad={(e) => {
                     //     e.currentTarget.addEventListener("wheel", handleWheel);

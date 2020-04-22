@@ -52,7 +52,8 @@ export interface WSCanvasColumn {
     /** hint: columnInitialSort={WSCanvasColumnToSortInfo(columns)} */
     sortOrder?: number;
 
-    /** hint: getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }} */
+    /** hint: getCellTextWrap={(cell, props) => { if (columns[cell.col].wrapText) return columns[cell.col].wrapText; }}
+     * if customRender active then real element height will retrieved     */
     wrapText?: boolean;
 
     renderTransform?: (row: any, cell: WSCanvasCellCoord, value: any) => any;
@@ -66,10 +67,10 @@ export interface WSCanvasColumn {
     readonly?: boolean | undefined;
 
     customRender?: ((states: WSCanvasStates, row: any, cell: WSCanvasCellCoord,
-        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined,
+        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element | undefined) | undefined,
 
     customEdit?: ((states: WSCanvasStates, row: any, cell: WSCanvasCellCoord,
-        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element) | undefined,
+        containerStyle?: CSSProperties, cellWidth?: number, cellHeight?: number) => JSX.Element | undefined) | undefined,
 
     hidden?: boolean | undefined;
 
