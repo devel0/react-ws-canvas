@@ -23,6 +23,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.23.2
+  - changed customRender, customEdit signature to allow return undefined ; added autoresize height for customRender elements ( when wrapText enabled )  
 - v0.23.1
   - handle wheel on custom render
 - v0.23.0
@@ -107,7 +109,7 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ![](doc/material-select-multi.gif)
 
-- custom color picker with custom render ( [example][130] )
+- custom color picker with **custom render** ( [example][130] ) ; note: wrapText will use custom component height to *autoresize row height* ; *filter* can work as text mode defining renderTransform
 
 ![](doc/custom-color-picker.gif)
 
