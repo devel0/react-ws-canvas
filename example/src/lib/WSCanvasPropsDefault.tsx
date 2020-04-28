@@ -10,6 +10,7 @@ export const DEFAULT_COL_WIDTH = 120;
 
 export const WSCanvasPropsDefault = () => {
     return {
+        id: undefined,
         onApi: undefined,
         handlers: undefined,
 

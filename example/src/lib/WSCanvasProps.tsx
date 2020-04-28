@@ -15,6 +15,8 @@ export interface WSCanvasCellDataNfo {
 
 /** see WSCanvasPropsDefault for default values */
 export interface WSCanvasProps {
+    /** custom identifier */
+    id?: string;
     /** width 100% [default: false] */
     fullwidth: boolean;
     /** width of canvas [default: window.innerWidth] */
