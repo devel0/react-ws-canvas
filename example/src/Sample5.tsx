@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FormControl, InputLabel, Select, MenuItem, Input, InputLabelProps, Chip } from '@material-ui/core';
 import {
     WSCanvas, WSCanvasColumn, WSCanvasApi, useWindowSize,
-    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord, setFieldData, getFieldData, pathBuilder
+    WSCanvasStates, WSCanvasColumnClickBehavior, WSCanvasCellCoord, setFieldData, getFieldData, pathBuilder, WSCanvasScrollbarMode
 } from "./lib";
 import { DatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
@@ -125,10 +125,14 @@ export function Sample5() {
                 type: "text",
                 header: "color",
                 field: SP_MyData("color"),
+                wrapText: true,
                 width: 100,
                 customRender: (states, _row) => {
                     const row = _row as MyData;
-                    return <Chip size="small" style={{ fontWeight: "bold", background: row.color, color: "white" }} label={row.color} />
+                    return <div>
+                        <Chip size="small" style={{ fontWeight: "bold", background: row.color, color: "white" }} label={row.color} />
+                        <Chip size="small" style={{ fontWeight: "bold", background: row.color, color: "white" }} label={row.color} />
+                    </div>
                 },
                 customEdit: (states, _row) => {
                     const row = _row as MyData;
@@ -227,6 +231,7 @@ export function Sample5() {
             columns={columns}
             rowsCount={ds.length}
             rows={ds}
+            debug={true}
             rowGetCellData={(row, colIdx) => {
                 if (row) return getFieldData(row, columns[colIdx].field);
                 return "";
@@ -239,13 +244,15 @@ export function Sample5() {
             commitCellDataset={() => { setDs(ds); }}
             showFilter={true}
 
+            verticalScrollbarMode={WSCanvasScrollbarMode.on}
             containerStyle={{ marginTop: "1em" }}
-            fullwidth
-            height={Math.max(300, winSize.height * .4)}
+            // fullwidth
+            width={300}
+
+            height={Math.max(300, winSize.height * .85)}
             showColNumber={true}
             columnClickBehavior={WSCanvasColumnClickBehavior.None}
 
-            debug={false}
             onApi={(api) => setApi(api)}
             onCustomEdit={() => { setUsersSelectOpened(true); }}
             onStateChanged={(states) => setGridState(states)}
