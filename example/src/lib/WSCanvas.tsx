@@ -817,7 +817,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                             const qcel = document.getElementById("crender_" + cell.toString());
                                             if (qcel) {
                                                 if (qcel && qcel.children.length > 0) {
-                                                    const qh = qcel.children[0].getBoundingClientRect().height;                                                    
+                                                    const qh = qcel.children[0].getBoundingClientRect().height + 2 * props.textMargin;
                                                     if (qh > rh) rh = qh;
                                                 }
                                             }
