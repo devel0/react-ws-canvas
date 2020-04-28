@@ -192,6 +192,7 @@ export function WSCanvas(props: WSCanvasProps) {
     const canvas_container_mp = useDivMarginPadding(canvasContainerDivRef, true);
 
     const [cs, setCanvSize] = useState<GraphicsSize>({ width: 0, height: 0 });
+    const [session, setSession] = useState("");
 
     const canvGeomCalc = () => {
         /** canvas width */
@@ -206,6 +207,11 @@ export function WSCanvas(props: WSCanvasProps) {
     useEffect(() => {
         canvGeomCalc();
     }, [fullwidth, winSize, width, height, toplevel_container_mp, canvas_container_mp, debugSize.height, toplevel_container_size]);
+
+    const notifySession = (type: string) => {
+        if (debug) console.log(type);
+        setSession(type);
+    }
 
     /** no side effect on vm */
     const viewRowToRealRow = (vm: ViewMap | null, viewRow: number) => {
@@ -732,7 +738,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
             filterData(state, vm);
             _setViewMap(vm);
-            if (debug) console.log("SS1");
+            if (debug) notifySession("SS1");
             _setStateNfo(state);
             if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
         }
@@ -799,6 +805,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 const cstates = mkstates(state, viewMap, overridenRowHeight);
 
                 const rowHeightComputed = (ri: number) => {
+                    let skipRowHeightComputation = false;
                     let rh = rowHeight(rows[ri], -1);
 
                     if (ctx) {
@@ -820,6 +827,8 @@ export function WSCanvas(props: WSCanvasProps) {
                                                     const qh = qcel.children[0].getBoundingClientRect().height + 2 * props.textMargin;
                                                     if (qh > rh) rh = qh;
                                                 }
+                                            } else {
+                                                skipRowHeightComputation = true;
                                             }
                                         } else {
 
@@ -841,19 +850,23 @@ export function WSCanvas(props: WSCanvasProps) {
                             }
                         }
                     }
-                    return rh;
+                    return { rh:rh, skip:skipRowHeightComputation };
                 }
 
                 if (onlyRowIdx && overridenRowHeight) {
                     const hs = overridenRowHeight.slice();
-                    hs[onlyRowIdx] = rowHeightComputed(onlyRowIdx);
+                    const q = rowHeightComputed(onlyRowIdx);
+                    if (!q.skip) hs[onlyRowIdx] = q.rh;
                     setOverridenRowHeight(hs);
                 } else {
                     const hs: number[] = [];
+                    let skip = false;
                     for (let ri = 0; ri < rowsCount; ++ri) {
-                        hs.push(rowHeightComputed(ri));
+                        const q = rowHeightComputed(ri);
+                        if (q.skip) { skip = true; break; }
+                        hs.push(q.rh);
                     }
-                    setOverridenRowHeight(hs);
+                    if (!skip) setOverridenRowHeight(hs);
                 }
             }
         }
@@ -866,7 +879,7 @@ export function WSCanvas(props: WSCanvasProps) {
         const state = stateNfo.dup();
         state.viewRowsCount = qViewRowsCount;
         state.viewColsCount = qViewColsCount;
-        if (debug) console.log("SS2");
+        notifySession("SS2");
         _setStateNfo(state);
         if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
     }
@@ -1855,7 +1868,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 state.columnWidthOverrideTrack = JSON.stringify([...state.columnWidthOverride]);
                 recomputeOverridenRowHeight(state);
                 stateChanged = true;
-                if (debug) console.log("SS3");
+                notifySession("SS3");
                 _setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                 paint(state, vm, orh);
@@ -2122,7 +2135,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                         q.filter = e.target.value;
                                     }
                                     state.filtersTrack = JSON.stringify(state.filters);
-                                    if (debug) console.log("SS4");
+                                    notifySession("SS4");
                                     _setStateNfo(state);
                                     if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                                 }}
@@ -2130,7 +2143,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     if (stateNfo.focusedCell.row !== -1 || stateNfo.focusedCell.col !== -1) {
                                         const state = stateNfo.dup();
                                         state.focusedCell = new WSCanvasCellCoord(-1, -1);
-                                        if (debug) console.log("SS5");
+                                        notifySession("SS5");
                                         _setStateNfo(state);
                                         if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                                     }
@@ -2154,7 +2167,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                                 if (canvasRef.current) {
                                                     canvasRef.current.focus();
                                                 }
-                                                if (debug) console.log("SS6");
+                                                notifySession("SS6");
                                                 _setStateNfo(state);
                                                 if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                                             }
@@ -2294,7 +2307,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                                     closeCustomEdit(state, true);
                                                     state.focusedCell = viewCellToReal(vm, realCellToView(vm, state.focusedCell).nextRow());
                                                     rectifyScrollOffset(state, vm);
-                                                    if (debug) console.log("SS7");
+                                                    notifySession("SS7");
                                                     _setStateNfo(state);
                                                     if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                                                 }
@@ -2304,7 +2317,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                                 {
                                                     const state = stateNfo.dup();
                                                     closeCustomEdit(state, false);
-                                                    if (debug) console.log("SS8");
+                                                    notifySession("SS8");
                                                     _setStateNfo(state);
                                                     if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                                                 }
@@ -2327,7 +2340,7 @@ export function WSCanvas(props: WSCanvasProps) {
                                     onChange={(e) => {
                                         const state = stateNfo.dup();
                                         state.customEditValue = e.target.value;
-                                        if (debug) console.log("SS9");
+                                        notifySession("SS9");
                                         _setStateNfo(state);
                                         if (onStateChanged) onStateChanged(mkstates(state, vm, orh));
                                     }} />
@@ -2410,7 +2423,7 @@ export function WSCanvas(props: WSCanvasProps) {
         //        focusCell(state, vm, state.focusedCell, true, false, true);
         const newViewCell = realCellToView(vm, state.focusedCell);
         state.viewSelection = new WSCanvasSelection([new WSCanvasSelectionRange(newViewCell)]);
-        if (debug) console.log("SS10");
+        notifySession("SS10");
         _setStateNfo(state);
         paint(state, vm, orh);
         if (canvasContainerDivRef.current) {
@@ -2572,7 +2585,7 @@ export function WSCanvas(props: WSCanvasProps) {
                             keyHandled = true;
                             entireGridSel(state);
                             e.preventDefault();
-                            if (debug) console.log("SS11");
+                            notifySession("SS11");
                             _setStateNfo(state);
                             if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
                             return;
@@ -2828,7 +2841,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 if (applyState) {
                     rectifyScrollOffset(state, viewMap);
-                    if (debug) console.log("SS12");
+                    notifySession("SS12");
                     _setStateNfo(state);
                     if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
                 }
@@ -2975,7 +2988,7 @@ export function WSCanvas(props: WSCanvasProps) {
                         }
                     }
 
-                    if (debug) console.log("SS13");
+                    notifySession("SS13");
                     _setStateNfo(state);
                     if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
                 }
@@ -2992,7 +3005,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const state = stateNfo.dup();
             cleanupScrollClick(state);
             state.resizingCol = -2;
-            if (debug) console.log("SS14");
+            notifySession("SS14");
             _setStateNfo(state);
             if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
 
@@ -3140,7 +3153,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 }
 
                 if (stateUpdated) {
-                    if (debug) console.log("SS15");
+                    notifySession("SS15");
                     _setStateNfo(state!);
                     if (onStateChanged) onStateChanged(mkstates(state!, viewMap, overridenRowHeight));
                 }
@@ -3188,7 +3201,7 @@ export function WSCanvas(props: WSCanvasProps) {
                     const state = stateNfo.dup();
                     dblClick(state, cell, x, y);
                     if (onMouseDoubleClick) onMouseDoubleClick(mkstates(state, viewMap, overridenRowHeight), e, cell);
-                    if (debug) console.log("SS16");
+                    notifySession("SS16");
                     _setStateNfo(state);
                     if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
                 }
@@ -3227,7 +3240,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             evalScrollChanged(state);
 
-            if (debug) console.log("SS17");
+            notifySession("SS17");
             _setStateNfo(state);
             if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
 
@@ -3284,7 +3297,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
         }
 
-        if (debug) console.log("SS18");
+        notifySession("SS18");
         _setStateNfo(state);
         if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
     }
@@ -3379,7 +3392,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             if (matches || state.horizontalScrollClickStartCoord !== null || state.verticalScrollClickStartCoord !== null) {
                 e.preventDefault();
-                if (debug) console.log("SS19");
+                notifySession("SS19");
                 _setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
             }
@@ -3391,7 +3404,7 @@ export function WSCanvas(props: WSCanvasProps) {
             const state = stateNfo.dup();
             state.horizontalScrollClickStartCoord = null;
             state.verticalScrollClickStartCoord = null;
-            if (debug) console.log("SS20");
+            notifySession("SS20");
             _setStateNfo(state);
             if (onStateChanged) onStateChanged(mkstates(state, viewMap, overridenRowHeight));
         }
@@ -3434,7 +3447,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 if (debug) console.log("paintfrom:4");
                 paint(state, viewMap, overridenRowHeight);
                 _setViewMap(vm);
-                if (debug) console.log("SS21");
+                notifySession("SS21");
                 _setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
             }
@@ -3464,7 +3477,7 @@ export function WSCanvas(props: WSCanvasProps) {
         filterData(state, vm);
         recomputeGeometry2(state, vm);
         _setViewMap(vm);
-        if (debug) console.log("SS22");
+        notifySession("SS22");
         _setStateNfo(state);
         if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
     }, [debouncedColumnWidth]);
@@ -3483,7 +3496,7 @@ export function WSCanvas(props: WSCanvasProps) {
             state.filteredSortedRowsCount = 0;
             state.viewSelection.clearSelection();
             state.focusedCell = new WSCanvasCellCoord(-1, -1);
-            if (debug) console.log("SS23");
+            notifySession("SS23");
             _setStateNfo(state);
             if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
         }
@@ -3539,7 +3552,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
 
             _setViewMap(vm);
-            if (debug) console.log("SS24");
+            notifySession("SS24");
             _setStateNfo(state);
 
             if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
@@ -3562,7 +3575,7 @@ export function WSCanvas(props: WSCanvasProps) {
             }
 
             _setViewMap(vm);
-            if (debug) console.log("SS25");
+            notifySession("SS25");
             _setStateNfo(state);
             if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
         }
@@ -3585,7 +3598,7 @@ export function WSCanvas(props: WSCanvasProps) {
                 _setViewMap(vm);
 
                 const state = new WSCanvasState();
-                if (debug) console.log("SS26");
+                notifySession("SS26");
                 _setStateNfo(state);
                 if (onStateChanged) onStateChanged(mkstates(state, vm, overridenRowHeight));
 
@@ -3640,7 +3653,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
                 setOverridenRowHeight(api.states.overrideRowHeight);
                 _setViewMap(api.states.vm);
-                if (debug) console.log("SS27");
+                notifySession("SS27");
                 _setStateNfo(api.states.state);
                 if (onStateChanged) onStateChanged(mkstates(api.states.state, api.states.vm, api.states.overrideRowHeight));
             }
@@ -3692,7 +3705,7 @@ export function WSCanvas(props: WSCanvasProps) {
 
             api.openCustomEdit = (cell) => {
                 api.states.state.customEditCell = cell;
-                if (debug) console.log("SS28");
+                notifySession("SS28");
                 _setStateNfo(api.states.state);
                 if (onStateChanged) onStateChanged(mkstates(api.states.state, api.states.vm, api.states.overrideRowHeight));
                 openCellCustomEdit(api.states.state, cell, api.states.overrideRowHeight);

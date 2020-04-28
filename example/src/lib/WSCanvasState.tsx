@@ -9,7 +9,7 @@ import { WSCanvasFilter } from "./WSCanvasFilter";
 import { GraphicsSize } from "./Utils";
 
 export class WSCanvasState {
-    constructor() {
+    constructor() {        
         this.colsCountBackup = 0;
         this.filteredSortedRowsCount = 0;
         this.widthBackup = 0;
@@ -67,7 +67,7 @@ export class WSCanvasState {
         this.initialized = false;
         this.rowsCountBackup = 0;
     }
-
+    
     colsCountBackup: number;
     filteredSortedRowsCount: number;
     widthBackup: number;
