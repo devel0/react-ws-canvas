@@ -23,6 +23,8 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.23.4
+  - added margin when wrap custom rendere objects
 - v0.23.3
   - fix recompute row height for custom render els
 - v0.23.2
