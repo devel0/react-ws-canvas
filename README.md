@@ -23,14 +23,12 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.23.5
+  - infinite rearrangement workaround ; [repro](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/infinite_rearrange_repro/example) start sample5 and size height of the window like the grid then add items until last in the grid will start infinite rearrange
 - v0.23.4
   - added margin when wrap custom rendere objects
 - v0.23.3
   - fix recompute row height for custom render els
-- v0.23.2
-  - changed customRender, customEdit signature to allow return undefined ; added autoresize height for customRender elements ( when wrapText enabled )  
-- v0.23.1
-  - handle wheel on custom render
 
 ## features
 
