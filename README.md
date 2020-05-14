@@ -23,12 +23,18 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 ## recent changes
 
+- v0.23.6
+  - fix custom render component visibiliy when column scrolls
 - v0.23.5
   - infinite rearrangement workaround ; [repro](https://codesandbox.io/s/github/devel0/react-ws-canvas/tree/infinite_rearrange_repro/example) start sample5 and size height of the window like the grid then add items until last in the grid will start infinite rearrange
 - v0.23.4
   - added margin when wrap custom rendere objects
-- v0.23.3
-  - fix recompute row height for custom render els
+
+## issues and improvements roadmap
+
+- can't deselect cell ( a better negative selection should implement with a class that implements a contains operator that matches in order selection pattern, for example select all then deselect a cell )
+- smooth scroll ( actually scroll by row and col and not partial by pixel )
+- a complete refactoring with better state management ( collect all feature currently available and rewrite the code with better modularization and functional correspondance )
 
 ## features
 
