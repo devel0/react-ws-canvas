@@ -1179,9 +1179,9 @@ export function WSCanvas(props: WSCanvasProps) {
         const qCustRender = _customRender(mkstates(state, vm, overridenRowHeight), rows[row], cell);
         if (canvasRef.current && qCustRender) {
             const viewCell = realCellToView(vm, cell);
-            const ccoord = viewCellToCanvasCoord(state, vm, orh, viewCell);
+            const ccoord = viewCellToCanvasCoord(state, vm, orh, viewCell, true);
 
-            if (ccoord) {
+            if (ccoord && viewCell.col >= stateNfo.viewScrollOffset.col && viewCell.col <= stateNfo.viewScrollOffset.col + stateNfo.viewColsCount) {
                 const cellWidth = overridenColWidth(state, cell.col) - textMargin - 2;
                 const cellHeight = getRowHeight(orh, row, cell.row) - textMargin;
 
