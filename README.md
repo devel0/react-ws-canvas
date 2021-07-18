@@ -314,7 +314,7 @@ npm uninstall react-ws-canvas --save && yalc add react-ws-canvas && npm install
 ## how this project was built
 
 ```sh
-yarn create react-app react-ws-canvas --typescript
+yarn create react-app react-ws-canvas --template typescript
 ```
 
 Because I need a library to publish and either a working example to test/debug the library project structured this way:
