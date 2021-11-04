@@ -186,8 +186,14 @@ Spreadsheet like react canvas datagrid optimized for performance built entirely 
 
 - create react app
 
+eventually install create-react-app
+
 ```sh
-create-react-app test --typescript
+npm install -g create-react-app
+```
+
+```sh
+create-react-app test --template typescript
 cd test
 yarn add react-ws-canvas
 ```
